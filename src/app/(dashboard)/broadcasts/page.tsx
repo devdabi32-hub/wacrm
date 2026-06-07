@@ -35,7 +35,7 @@ function RateCell({
 }: {
   value: number;
   total: number;
-  /** Tailwind bg class for the fill, e.g. "bg-violet-500" */
+  /** Tailwind bg class for the fill, e.g. "bg-[#0084ff]" */
   color: string;
 }) {
   const pct = percent(value, total);
@@ -128,7 +128,7 @@ export default function BroadcastsPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-violet-500" />
+        <Loader2 className="h-6 w-6 animate-spin text-[#0084ff]" />
       </div>
     );
   }
@@ -154,7 +154,7 @@ export default function BroadcastsPage() {
           aria-label="Broadcast in progress"
           className="broadcast-indeterminate fixed inset-x-0 top-0 z-40 h-0.5 overflow-hidden bg-slate-800"
         >
-          <div className="broadcast-indeterminate-bar h-0.5 bg-violet-500" />
+          <div className="broadcast-indeterminate-bar h-0.5 bg-[#0084ff]" />
           <style jsx>{`
             .broadcast-indeterminate-bar {
               width: 33%;
@@ -183,7 +183,7 @@ export default function BroadcastsPage() {
         </div>
         <Button
           onClick={() => router.push('/broadcasts/new')}
-          className="bg-violet-600 text-white hover:bg-violet-700"
+          className="bg-[#0084ff] text-white hover:bg-[#0055cc]"
         >
           <Plus className="h-4 w-4" />
           New Broadcast
@@ -199,7 +199,7 @@ export default function BroadcastsPage() {
           </p>
           <Button
             onClick={() => router.push('/broadcasts/new')}
-            className="mt-4 bg-violet-600 text-white hover:bg-violet-700"
+            className="mt-4 bg-[#0084ff] text-white hover:bg-[#0055cc]"
           >
             <Plus className="h-4 w-4" />
             New Broadcast
@@ -243,7 +243,7 @@ export default function BroadcastsPage() {
                       <RateCell
                         value={broadcast.delivered_count}
                         total={broadcast.total_recipients}
-                        color="bg-violet-500"
+                        color="bg-[#0084ff]"
                       />
                     </TableCell>
                     <TableCell className="hidden lg:table-cell">

@@ -65,7 +65,7 @@ export function LandingNav() {
           className="flex items-center gap-2"
           aria-label="CRM Template for WhatsApp home"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0084ff]">
             <MessageSquare className="h-4 w-4 text-white" />
           </span>
           <span className="text-sm font-semibold text-white">
@@ -151,7 +151,7 @@ function NavCtas({ auth, mobile = false }: { auth: AuthState; mobile?: boolean }
   )
   const primary = cn(
     btnBase,
-    'bg-violet-500 text-white hover:bg-violet-400',
+    'bg-[#0084ff] text-white hover:bg-[#0066cc]',
     mobile && 'justify-center',
   )
 

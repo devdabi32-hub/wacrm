@@ -49,7 +49,7 @@ export function AnalyticsMock() {
               </div>
               <div
                 className={`text-[10px] tabular-nums ${
-                  s.positive ? 'text-violet-400' : 'text-red-400'
+                  s.positive ? 'text-[#0084ff]' : 'text-red-400'
                 }`}
               >
                 {s.delta}
@@ -69,7 +69,7 @@ export function AnalyticsMock() {
                 Incoming
               </span>
               <span className="inline-flex items-center gap-1 text-[9px] text-slate-500">
-                <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#0084ff]" />
                 Outgoing
               </span>
             </div>
@@ -91,7 +91,7 @@ export function AnalyticsMock() {
                 strokeDasharray="3 3"
               />
             ))}
-            <path d={path(outgoing)} fill="none" stroke="#7c3aed" strokeWidth={1.5} />
+            <path d={path(outgoing)} fill="none" stroke="#0084ff" strokeWidth={1.5} />
             <path d={path(incoming)} fill="none" stroke="#3b82f6" strokeWidth={1.5} />
           </svg>
         </div>

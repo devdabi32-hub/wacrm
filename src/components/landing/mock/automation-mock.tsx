@@ -19,8 +19,8 @@ export function AutomationMock() {
       kind: 'action',
       label: 'Send "Hi! 👋 Thanks for reaching out."',
       icon: MessageSquare,
-      accent: 'border-l-violet-500',
-      badgeClass: 'bg-violet-500/10 text-violet-400',
+      accent: 'border-l-[#0084ff]',
+      badgeClass: 'bg-[#0084ff]/10 text-[#0084ff]',
       kindLabel: 'ACTION',
     },
     {

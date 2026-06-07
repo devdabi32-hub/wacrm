@@ -32,14 +32,14 @@ const FEATURES: Feature[] = [
     description:
       'Tags, custom fields, notes, and automatic deduplication. Import existing contacts from CSV.',
     icon: Users,
-    tint: 'text-violet-400 bg-violet-500/10',
+    tint: 'text-[#0084ff] bg-[#0084ff]/10',
   },
   {
     title: 'Sales pipelines',
     description:
       'Drag deals through stages. See what is won, what is slipping, and where revenue is stuck.',
     icon: GitBranch,
-    tint: 'text-violet-400 bg-violet-500/10',
+    tint: 'text-[#0084ff] bg-[#0084ff]/10',
   },
   {
     title: 'Broadcast campaigns',

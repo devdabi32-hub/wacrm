@@ -21,7 +21,7 @@ export const TRIGGER_META: Record<AutomationTriggerType, TriggerMeta> = {
   },
   new_contact_created: {
     label: 'New Contact',
-    pillClass: 'border-violet-500/30 bg-violet-500/10 text-violet-300',
+    pillClass: 'border-[#0084ff]/30 bg-[#0084ff]/10 text-[#4da6ff]',
   },
   conversation_assigned: {
     label: 'Conversation Assigned',

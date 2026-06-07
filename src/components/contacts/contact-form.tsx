@@ -245,7 +245,7 @@ export function ContactForm({
                       onClick={() => toggleTag(tag.id)}
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors cursor-pointer ${
                         selected
-                          ? 'ring-2 ring-violet-500 ring-offset-1 ring-offset-slate-900'
+                          ? 'ring-2 ring-[#0084ff] ring-offset-1 ring-offset-slate-900'
                           : 'opacity-60 hover:opacity-100'
                       }`}
                       style={{
@@ -274,7 +274,7 @@ export function ContactForm({
             <Button
               type="submit"
               disabled={saving}
-              className="bg-violet-600 hover:bg-violet-700 text-white"
+              className="bg-[#0084ff] hover:bg-[#0055cc] text-white"
             >
               {saving && <Loader2 className="size-4 animate-spin" />}
               {isEdit ? 'Update' : 'Create'}

@@ -23,7 +23,7 @@ export function PipelineMock() {
     },
     {
       name: 'Won',
-      color: 'bg-violet-500',
+      color: 'bg-[#0084ff]',
       deals: [{ title: 'Lagoon Spa', value: '$3,200' }],
     },
   ]

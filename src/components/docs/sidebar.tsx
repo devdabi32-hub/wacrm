@@ -51,7 +51,7 @@ export function DocsSidebar({ pages, onNavigate }: DocsSidebarProps) {
                     className={cn(
                       'block rounded-md px-3 py-1.5 transition-colors',
                       active
-                        ? 'bg-violet-500/10 text-violet-300'
+                        ? 'bg-[#0084ff]/10 text-[#4da6ff]'
                         : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
                     )}
                   >

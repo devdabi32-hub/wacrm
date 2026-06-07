@@ -206,7 +206,7 @@ function StageColumn({
         ref={setNodeRef}
         className={`mt-3 flex flex-1 flex-col gap-2 rounded-lg transition-all ${
           isOver
-            ? "bg-violet-500/5 outline outline-2 outline-dashed outline-violet-400 outline-offset-2"
+            ? "bg-[#0084ff]/5 outline outline-2 outline-dashed outline-[#0084ff] outline-offset-2"
             : ""
         }`}
       >

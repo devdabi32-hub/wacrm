@@ -22,7 +22,7 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#7c3aed", // violet-600 (Hostinger-aligned purple)
+          background: "#0084ff", // [#0084ff] (Hostinger-aligned purple)
           borderRadius: 6,
         }}
       >
