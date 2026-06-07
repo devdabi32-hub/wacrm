@@ -164,9 +164,10 @@ export async function POST(request: Request) {
   }
 
   // Process asynchronously so we can ack Meta within their timeout.
-  processWebhook(body).catch((error) => {
+  const { waitUntil } = await import('@vercel/functions')
+  waitUntil(processWebhook(body).catch((error) => {
     console.error('Error processing webhook:', error)
-  })
+  }))
 
   return NextResponse.json({ status: 'received' }, { status: 200 })
 }
