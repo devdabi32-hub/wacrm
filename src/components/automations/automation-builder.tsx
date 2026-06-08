@@ -690,7 +690,6 @@ function AddButton({ onPick }: { onPick: (t: AutomationStepType) => void }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
-          modal={false}
           className="max-h-80 min-w-56 overflow-y-auto border-slate-700 bg-slate-900"
         >
           {ADDABLE_STEPS.map((t) => {
@@ -918,7 +917,8 @@ function StepEditor({
             </select>
           </FieldBlock>
           <FieldBlock label="Operand">
-            <Input
+            <input
+              type="text"
               placeholder={
                 cfg.subject === "time_of_day"
                   ? "HH:mm-HH:mm"
@@ -930,7 +930,9 @@ function StepEditor({
               }
               value={(cfg.operand as string) ?? ""}
               onChange={(e) => set({ operand: e.target.value })}
-              className="bg-slate-800 text-white"
+              onClick={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+              className="w-full rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-white outline-none focus:border-[#0084ff]"
             />
           </FieldBlock>
           {(cfg.subject === "contact_field" || cfg.subject === "message_content") && (
