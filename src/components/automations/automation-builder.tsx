@@ -690,6 +690,7 @@ function AddButton({ onPick }: { onPick: (t: AutomationStepType) => void }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
+          modal={false}
           className="max-h-80 min-w-56 overflow-y-auto border-slate-700 bg-slate-900"
         >
           {ADDABLE_STEPS.map((t) => {
