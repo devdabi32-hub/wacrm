@@ -771,12 +771,13 @@ function StepEditor({
     case "remove_tag":
       return (
         <FieldBlock label="Tag id">
-          <Input
+          <input
+            type="text"
             value={(cfg.tag_id as string) ?? ""}
             onChange={(e) => set({ tag_id: e.target.value })}
             onClick={(e) => e.stopPropagation()}
             onMouseDown={(e) => e.stopPropagation()}
-            className="bg-slate-800 text-white"
+            className="w-full rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-white outline-none focus:border-[#0084ff]"
           />
         </FieldBlock>
       )
