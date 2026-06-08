@@ -774,6 +774,8 @@ function StepEditor({
           <Input
             value={(cfg.tag_id as string) ?? ""}
             onChange={(e) => set({ tag_id: e.target.value })}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             className="bg-slate-800 text-white"
           />
         </FieldBlock>
