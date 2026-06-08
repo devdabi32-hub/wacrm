@@ -985,7 +985,7 @@ function FieldBlock({
 }) {
   return (
     <div className="mb-2 last:mb-0">
-      <label className="mb-1 block text-xs font-medium text-slate-400">{label}</label>
+      <div className="mb-1 block text-xs font-medium text-slate-400">{label}</div>
       {children}
     </div>
   )
