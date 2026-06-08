@@ -40,6 +40,59 @@ interface ContactDetailViewProps {
   onUpdated: () => void;
 }
 
+function SmartFieldInput({
+  field,
+  value,
+  onChange,
+}: {
+  field: CustomField;
+  value: string;
+  onChange: (val: string) => void;
+}) {
+  const base = 'bg-slate-800 border-slate-700 text-white h-8 text-sm placeholder:text-slate-500';
+
+  switch (field.field_type) {
+    case 'select':
+      return (
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full rounded-md border px-2 py-1.5 text-sm ${base} focus:outline-none focus:ring-1 focus:ring-[#0084ff]`}
+        >
+          <option value="">— Select —</option>
+          {((field.field_options as string[] | undefined) ?? []).map((opt) => (
+            <option key={opt} value={opt}>
+              {opt}
+            </option>
+          ))}
+        </select>
+      );
+    case 'date':
+      return (
+        <Input type="date" value={value} onChange={(e) => onChange(e.target.value)} className={base} />
+      );
+    case 'number':
+      return (
+        <Input type="number" value={value} onChange={(e) => onChange(e.target.value)} placeholder={`Enter ${field.field_name}...`} className={base} />
+      );
+    case 'url':
+      return (
+        <div className="space-y-1">
+          <Input type="url" value={value} onChange={(e) => onChange(e.target.value)} placeholder="https://..." className={base} />
+          {value && (
+            <a href={value} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-[#0084ff] hover:underline">
+              Open link ↗
+            </a>
+          )}
+        </div>
+      );
+    default:
+      return (
+        <Input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder={`Enter ${field.field_name}...`} className={base} />
+      );
+  }
+}
+
 export function ContactDetailView({
   open,
   onOpenChange,
@@ -487,11 +540,10 @@ export function ContactDetailView({
                             key={tag.id}
                             onClick={() => toggleTag(tag.id)}
                             disabled={savingTags}
-                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all cursor-pointer ${
-                              selected
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all cursor-pointer ${selected
                                 ? 'ring-2 ring-[#0084ff] ring-offset-1 ring-offset-slate-900'
                                 : 'opacity-50 hover:opacity-80'
-                            }`}
+                              }`}
                             style={{
                               backgroundColor: tag.color + '20',
                               color: tag.color,
@@ -588,20 +640,20 @@ export function ContactDetailView({
                       <div key={field.id} className="space-y-1.5">
                         <Label className="text-slate-400 text-xs capitalize">
                           {field.field_name}
+                          <span className="ml-1.5 text-slate-600 font-normal normal-case">
+                            ({field.field_type})
+                          </span>
                         </Label>
-                        <Input
+                        <SmartFieldInput
+                          field={field}
                           value={customValues[field.id] ?? ''}
-                          onChange={(e) =>
-                            setCustomValues((prev) => ({
-                              ...prev,
-                              [field.id]: e.target.value,
-                            }))
+                          onChange={(val) =>
+                            setCustomValues((prev) => ({ ...prev, [field.id]: val }))
                           }
-                          placeholder={`Enter ${field.field_name}...`}
-                          className="bg-slate-800 border-slate-700 text-white h-8 text-sm placeholder:text-slate-500"
                         />
                       </div>
                     ))}
+
                     <Button
                       onClick={saveCustomFields}
                       disabled={savingCustom}

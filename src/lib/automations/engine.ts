@@ -394,6 +394,22 @@ async function runStep(step: AutomationStep, args: ExecuteArgs): Promise<string>
     case 'update_contact_field': {
       const cfg = step.step_config as UpdateContactFieldStepConfig
       if (!args.contactId) throw new Error('update_contact_field needs a contact')
+
+      if (cfg.field.startsWith('custom::')) {
+        const customFieldId = cfg.field.replace('custom::', '')
+        await db
+          .from('contact_custom_values')
+          .upsert(
+            {
+              contact_id: args.contactId,
+              custom_field_id: customFieldId,
+              value: cfg.value,
+            },
+            { onConflict: 'contact_id,custom_field_id' },
+          )
+        return `custom field ${customFieldId} updated`
+      }
+
       const allowed = new Set(['name', 'email', 'company'])
       if (!allowed.has(cfg.field)) {
         return `field ${cfg.field} not writable from automations`

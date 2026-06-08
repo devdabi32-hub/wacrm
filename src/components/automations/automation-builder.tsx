@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -42,6 +42,7 @@ import type {
   KeywordMatchTriggerConfig,
 } from "@/types"
 import { cn } from "@/lib/utils"
+import { createClient } from '@/lib/supabase/client'
 
 // ------------------------------------------------------------
 // Types (builder-local — mirror the flattened rows we POST)
@@ -706,6 +707,19 @@ function StepEditor({
   step: BuilderStep
   onChange: (s: BuilderStep) => void
 }) {
+  const supabase = createClient()
+  const [customFields, setCustomFields] = useState<Array<{ id: string; field_name: string; field_type: string }>>([])
+
+  useEffect(() => {
+    supabase
+      .from('custom_fields')
+      .select('id, field_name, field_type')
+      .order('created_at', { ascending: true })
+      .then(({ data }) => {
+        if (data) setCustomFields(data)
+      })
+  }, [])
+
   const cfg = step.step_config
   const set = (patch: Record<string, unknown>) =>
     onChange({ ...step, step_config: { ...cfg, ...patch } })
@@ -776,7 +790,8 @@ function StepEditor({
           )}
         </>
       )
-    case "update_contact_field":
+    case "update_contact_field": {
+      const isCustom = (cfg.field as string)?.startsWith('custom::')
       return (
         <>
           <FieldBlock label="Field">
@@ -785,20 +800,33 @@ function StepEditor({
               onChange={(e) => set({ field: e.target.value })}
               className="w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-white"
             >
-              <option value="name">Name</option>
-              <option value="email">Email</option>
-              <option value="company">Company</option>
+              <optgroup label="Standard fields">
+                <option value="name">Name</option>
+                <option value="email">Email</option>
+                <option value="company">Company</option>
+              </optgroup>
+              {customFields.length > 0 && (
+                <optgroup label="Custom fields">
+                  {customFields.map((f) => (
+                    <option key={f.id} value={`custom::${f.id}`}>
+                      {f.field_name}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </FieldBlock>
           <FieldBlock label="Value">
             <Input
               value={(cfg.value as string) ?? ""}
               onChange={(e) => set({ value: e.target.value })}
+              placeholder={isCustom ? "New value for custom field" : "New value"}
               className="bg-slate-800 text-white"
             />
           </FieldBlock>
         </>
       )
+    }
     case "create_deal":
       return (
         <>
