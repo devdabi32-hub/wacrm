@@ -463,7 +463,10 @@ async function processMessage(
     | 'first_inbound_message'
     | 'new_message_received'
     | 'keyword_match'
-  )[] = ['new_message_received', 'keyword_match']
+  )[] = ['new_message_received']
+  // keyword_match is dispatched separately so it doesn't double-fire
+  // automations that match both new_message_received + keyword_match
+  if (inboundText) automationTriggers.push('keyword_match')
   // new_contact_created fires only when the webhook just auto-created the
   // contact row. first_inbound_message fires whenever this is the contact's
   // first-ever customer-sent message — a superset that also catches
@@ -473,7 +476,7 @@ async function processMessage(
   if (contactOutcome.wasCreated) automationTriggers.unshift('new_contact_created')
   if (isFirstInboundMessage) automationTriggers.unshift('first_inbound_message')
   for (const triggerType of automationTriggers) {
-    runAutomationsForTrigger({
+    await runAutomationsForTrigger({
       userId,
       triggerType,
       contactId: contactRecord.id,
