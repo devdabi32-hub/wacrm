@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -28,7 +28,6 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import {
   DropdownMenu,
@@ -736,15 +735,25 @@ function StepEditor({
   const set = (patch: Record<string, unknown>) =>
     onChange({ ...step, step_config: { ...cfg, ...patch } })
 
+  const inputCls = "w-full rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-white outline-none focus:border-[#0084ff]"
+  const textareaCls = "w-full min-h-24 rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-white outline-none focus:border-[#0084ff] resize-y"
+  const selectCls = "w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-white"
+  const stop = {
+    onClick: (e: React.MouseEvent) => e.stopPropagation(),
+    onMouseDown: (e: React.MouseEvent) => e.stopPropagation(),
+    onPointerDown: (e: React.PointerEvent) => e.stopPropagation(),
+  }
+
   switch (step.step_type) {
     case "send_message":
       return (
         <FieldBlock label="Message text">
-          <Textarea
+          <textarea
             value={(cfg.text as string) ?? ""}
             onChange={(e) => set({ text: e.target.value })}
             placeholder="Hi! Thanks for reaching out…"
-            className="min-h-24 bg-slate-800 text-white"
+            className={textareaCls}
+            {...stop}
           />
         </FieldBlock>
       )
@@ -752,18 +761,10 @@ function StepEditor({
       return (
         <>
           <FieldBlock label="Template name">
-            <Input
-              value={(cfg.template_name as string) ?? ""}
-              onChange={(e) => set({ template_name: e.target.value })}
-              className="bg-slate-800 text-white"
-            />
+            <input type="text" value={(cfg.template_name as string) ?? ""} onChange={(e) => set({ template_name: e.target.value })} className={inputCls} {...stop} />
           </FieldBlock>
           <FieldBlock label="Language">
-            <Input
-              value={(cfg.language as string) ?? ""}
-              onChange={(e) => set({ language: e.target.value })}
-              className="bg-slate-800 text-white"
-            />
+            <input type="text" value={(cfg.language as string) ?? ""} onChange={(e) => set({ language: e.target.value })} className={inputCls} {...stop} />
           </FieldBlock>
         </>
       )
@@ -771,36 +772,21 @@ function StepEditor({
     case "remove_tag":
       return (
         <FieldBlock label="Tag id">
-          <input
-            type="text"
-            value={(cfg.tag_id as string) ?? ""}
-            onChange={(e) => set({ tag_id: e.target.value })}
-            onClick={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-            className="w-full rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-white outline-none focus:border-[#0084ff]"
-          />
+          <input type="text" value={(cfg.tag_id as string) ?? ""} onChange={(e) => set({ tag_id: e.target.value })} className={inputCls} {...stop} />
         </FieldBlock>
       )
     case "assign_conversation":
       return (
         <>
           <FieldBlock label="Mode">
-            <select
-              value={(cfg.mode as string) ?? "round_robin"}
-              onChange={(e) => set({ mode: e.target.value })}
-              className="w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-white"
-            >
+            <select value={(cfg.mode as string) ?? "round_robin"} onChange={(e) => set({ mode: e.target.value })} className={selectCls} {...stop}>
               <option value="round_robin">Round-robin</option>
               <option value="specific">Specific agent</option>
             </select>
           </FieldBlock>
           {cfg.mode === "specific" && (
             <FieldBlock label="Agent id">
-              <Input
-                value={(cfg.agent_id as string) ?? ""}
-                onChange={(e) => set({ agent_id: e.target.value })}
-                className="bg-slate-800 text-white"
-              />
+              <input type="text" value={(cfg.agent_id as string) ?? ""} onChange={(e) => set({ agent_id: e.target.value })} className={inputCls} {...stop} />
             </FieldBlock>
           )}
         </>
@@ -810,11 +796,7 @@ function StepEditor({
       return (
         <>
           <FieldBlock label="Field">
-            <select
-              value={(cfg.field as string) ?? "name"}
-              onChange={(e) => set({ field: e.target.value })}
-              className="w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-white"
-            >
+            <select value={(cfg.field as string) ?? "name"} onChange={(e) => set({ field: e.target.value })} className={selectCls} {...stop}>
               <optgroup label="Standard fields">
                 <option value="name">Name</option>
                 <option value="email">Email</option>
@@ -823,21 +805,14 @@ function StepEditor({
               {customFields.length > 0 && (
                 <optgroup label="Custom fields">
                   {customFields.map((f) => (
-                    <option key={f.id} value={`custom::${f.id}`}>
-                      {f.field_name}
-                    </option>
+                    <option key={f.id} value={`custom::${f.id}`}>{f.field_name}</option>
                   ))}
                 </optgroup>
               )}
             </select>
           </FieldBlock>
           <FieldBlock label="Value">
-            <Input
-              value={(cfg.value as string) ?? ""}
-              onChange={(e) => set({ value: e.target.value })}
-              placeholder={isCustom ? "New value for custom field" : "New value"}
-              className="bg-slate-800 text-white"
-            />
+            <input type="text" value={(cfg.value as string) ?? ""} onChange={(e) => set({ value: e.target.value })} placeholder={isCustom ? "New value for custom field" : "New value"} className={inputCls} {...stop} />
           </FieldBlock>
         </>
       )
@@ -846,33 +821,16 @@ function StepEditor({
       return (
         <>
           <FieldBlock label="Pipeline id">
-            <Input
-              value={(cfg.pipeline_id as string) ?? ""}
-              onChange={(e) => set({ pipeline_id: e.target.value })}
-              className="bg-slate-800 text-white"
-            />
+            <input type="text" value={(cfg.pipeline_id as string) ?? ""} onChange={(e) => set({ pipeline_id: e.target.value })} className={inputCls} {...stop} />
           </FieldBlock>
           <FieldBlock label="Stage id">
-            <Input
-              value={(cfg.stage_id as string) ?? ""}
-              onChange={(e) => set({ stage_id: e.target.value })}
-              className="bg-slate-800 text-white"
-            />
+            <input type="text" value={(cfg.stage_id as string) ?? ""} onChange={(e) => set({ stage_id: e.target.value })} className={inputCls} {...stop} />
           </FieldBlock>
           <FieldBlock label="Title">
-            <Input
-              value={(cfg.title as string) ?? ""}
-              onChange={(e) => set({ title: e.target.value })}
-              className="bg-slate-800 text-white"
-            />
+            <input type="text" value={(cfg.title as string) ?? ""} onChange={(e) => set({ title: e.target.value })} className={inputCls} {...stop} />
           </FieldBlock>
           <FieldBlock label="Value">
-            <Input
-              type="number"
-              value={(cfg.value as number) ?? 0}
-              onChange={(e) => set({ value: Number(e.target.value) })}
-              className="bg-slate-800 text-white"
-            />
+            <input type="number" value={(cfg.value as number) ?? 0} onChange={(e) => set({ value: Number(e.target.value) })} className={inputCls} {...stop} />
           </FieldBlock>
         </>
       )
@@ -880,20 +838,10 @@ function StepEditor({
       return (
         <div className="grid grid-cols-2 gap-2">
           <FieldBlock label="Amount">
-            <Input
-              type="number"
-              min={1}
-              value={(cfg.amount as number) ?? 1}
-              onChange={(e) => set({ amount: Math.max(1, Number(e.target.value)) })}
-              className="bg-slate-800 text-white"
-            />
+            <input type="number" min={1} value={(cfg.amount as number) ?? 1} onChange={(e) => set({ amount: Math.max(1, Number(e.target.value)) })} className={inputCls} {...stop} />
           </FieldBlock>
           <FieldBlock label="Unit">
-            <select
-              value={(cfg.unit as string) ?? "hours"}
-              onChange={(e) => set({ unit: e.target.value })}
-              className="w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-white"
-            >
+            <select value={(cfg.unit as string) ?? "hours"} onChange={(e) => set({ unit: e.target.value })} className={selectCls} {...stop}>
               <option value="minutes">Minutes</option>
               <option value="hours">Hours</option>
               <option value="days">Days</option>
@@ -905,11 +853,7 @@ function StepEditor({
       return (
         <>
           <FieldBlock label="Subject">
-            <select
-              value={(cfg.subject as string) ?? "tag_presence"}
-              onChange={(e) => set({ subject: e.target.value })}
-              className="w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-white"
-            >
+            <select value={(cfg.subject as string) ?? "tag_presence"} onChange={(e) => set({ subject: e.target.value })} className={selectCls} {...stop}>
               <option value="tag_presence">Tag presence</option>
               <option value="contact_field">Contact field</option>
               <option value="message_content">Message content</option>
@@ -920,28 +864,20 @@ function StepEditor({
             <input
               type="text"
               placeholder={
-                cfg.subject === "time_of_day"
-                  ? "HH:mm-HH:mm"
-                  : cfg.subject === "contact_field"
-                    ? "name / email / company"
-                    : cfg.subject === "tag_presence"
-                      ? "tag id"
+                cfg.subject === "time_of_day" ? "HH:mm-HH:mm"
+                  : cfg.subject === "contact_field" ? "name / email / company"
+                    : cfg.subject === "tag_presence" ? "tag id"
                       : ""
               }
               value={(cfg.operand as string) ?? ""}
               onChange={(e) => set({ operand: e.target.value })}
-              onClick={(e) => e.stopPropagation()}
-              onMouseDown={(e) => e.stopPropagation()}
-              className="w-full rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-sm text-white outline-none focus:border-[#0084ff]"
+              className={inputCls}
+              {...stop}
             />
           </FieldBlock>
           {(cfg.subject === "contact_field" || cfg.subject === "message_content") && (
             <FieldBlock label="Value">
-              <Input
-                value={(cfg.value as string) ?? ""}
-                onChange={(e) => set({ value: e.target.value })}
-                className="bg-slate-800 text-white"
-              />
+              <input type="text" value={(cfg.value as string) ?? ""} onChange={(e) => set({ value: e.target.value })} className={inputCls} {...stop} />
             </FieldBlock>
           )}
         </>
@@ -950,18 +886,10 @@ function StepEditor({
       return (
         <>
           <FieldBlock label="URL">
-            <Input
-              value={(cfg.url as string) ?? ""}
-              onChange={(e) => set({ url: e.target.value })}
-              className="bg-slate-800 text-white"
-            />
+            <input type="text" value={(cfg.url as string) ?? ""} onChange={(e) => set({ url: e.target.value })} className={inputCls} {...stop} />
           </FieldBlock>
           <FieldBlock label="Body template (JSON)">
-            <Textarea
-              value={(cfg.body_template as string) ?? ""}
-              onChange={(e) => set({ body_template: e.target.value })}
-              className="min-h-20 bg-slate-800 font-mono text-xs text-white"
-            />
+            <textarea value={(cfg.body_template as string) ?? ""} onChange={(e) => set({ body_template: e.target.value })} className="w-full min-h-20 rounded-md border border-slate-700 bg-slate-800 px-2.5 py-1.5 text-xs font-mono text-white outline-none focus:border-[#0084ff] resize-y" {...stop} />
           </FieldBlock>
         </>
       )
