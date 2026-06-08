@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Settings, MessageSquare, Tag, User } from 'lucide-react';
+import { Settings, MessageSquare, Tag, User, SlidersHorizontal } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { WhatsAppConfig } from '@/components/settings/whatsapp-config';
 import { TemplateManager } from '@/components/settings/template-manager';
@@ -9,8 +9,9 @@ import { TagManager } from '@/components/settings/tag-manager';
 import { ProfileForm } from '@/components/settings/profile-form';
 import { PasswordForm } from '@/components/settings/password-form';
 import { SessionsCard } from '@/components/settings/sessions-card';
+import { CustomFieldManager } from '@/components/settings/custom-field-manager';
 
-const TAB_VALUES = ['profile', 'whatsapp', 'templates', 'tags'] as const;
+const TAB_VALUES = ['profile', 'whatsapp', 'templates', 'tags', 'fields'] as const;
 type TabValue = (typeof TAB_VALUES)[number];
 
 function isTabValue(v: string | null): v is TabValue {
@@ -21,10 +22,6 @@ export default function SettingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // The URL is the single source of truth for the active tab — no
-  // local state, no sync effect. A previous revision duplicated this
-  // into `useState` + a sync effect, which tripped React 19's
-  // set-state-in-effect rule and was also redundant.
   const queryTab = searchParams.get('tab');
   const tab: TabValue = isTabValue(queryTab) ? queryTab : 'profile';
 
@@ -39,8 +36,8 @@ export default function SettingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-white">Settings</h1>
         <p className="text-sm text-slate-400 mt-1">
-          Manage your profile, WhatsApp® integration, message templates, and
-          tags.
+          Manage your profile, WhatsApp® integration, message templates, tags,
+          and custom contact fields.
         </p>
       </div>
 
@@ -74,6 +71,13 @@ export default function SettingsPage() {
             <Tag className="size-4" />
             Tags
           </TabsTrigger>
+          <TabsTrigger
+            value="fields"
+            className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+          >
+            <SlidersHorizontal className="size-4" />
+            Custom Fields
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
@@ -92,6 +96,10 @@ export default function SettingsPage() {
 
         <TabsContent value="tags">
           <TagManager />
+        </TabsContent>
+
+        <TabsContent value="fields">
+          <CustomFieldManager />
         </TabsContent>
       </Tabs>
     </div>
