@@ -5,6 +5,7 @@ import { getMediaUrl, downloadMedia } from '@/lib/whatsapp/meta-api'
 import { normalizePhone, phonesMatch } from '@/lib/whatsapp/phone-utils'
 import { verifyMetaWebhookSignature } from '@/lib/whatsapp/webhook-signature'
 import { runAutomationsForTrigger } from '@/lib/automations/engine'
+import { runAIReply } from '@/lib/automations/ai-engine'
 
 // Lazy-initialized to avoid build-time crash when env vars are missing
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -486,7 +487,21 @@ async function processMessage(
       },
     }).catch((err) => console.error('[automations] dispatch failed:', err))
   }
+
+
+  // ── AI Engine reply (fire-and-forget, after automations) ──
+  // Runs AFTER all automation triggers so workflow steps complete first.
+  // Never throws — ai-engine.ts catches all errors internally.
+  runAIReply({
+    userId,
+    contactId: contactRecord.id,
+    conversationId: conversation.id,
+    messageText: inboundText,
+    wasNewContact: contactOutcome.wasCreated,
+  }).catch((err) => console.error('[ai-engine] dispatch failed:', err))
 }
+
+
 
 async function parseMessageContent(
   message: WhatsAppMessage,
