@@ -209,6 +209,8 @@ export function AutomationBuilder({ initial }: { initial: BuilderInitial }) {
 
   async function save() {
     setSaving(true)
+    // Snapshot is_active before save — needed for rollback if API rejects.
+    const previousIsActive = state.is_active
     try {
       const payload = {
         name: state.name || "Untitled automation",
@@ -233,9 +235,10 @@ export function AutomationBuilder({ initial }: { initial: BuilderInitial }) {
 
       const body = await res.json().catch(() => ({}))
       if (!res.ok) {
-        // If the server blocked activation with validation issues,
-        // surface the first concrete problem so the user can fix it
-        // without opening DevTools for the full array.
+        // Rollback is_active toggle in UI — DB write was blocked.
+        setState((s) => ({ ...s, is_active: previousIsActive }))
+
+        // Surface the first validation issue so user knows what to fix.
         const firstIssue: { path?: string; message?: string } | undefined =
           body?.issues?.[0]
         if (firstIssue?.message) {
@@ -247,6 +250,7 @@ export function AutomationBuilder({ initial }: { initial: BuilderInitial }) {
         }
         return
       }
+
       toast.success(isEditing ? "Automation saved" : "Automation created")
       if (!isEditing && body?.automation?.id) {
         router.replace(`/automations/${body.automation.id}/edit`)

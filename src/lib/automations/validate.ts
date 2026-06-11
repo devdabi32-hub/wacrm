@@ -154,7 +154,8 @@ export function validateTriggerForActivation(
     } else if (k.some((v) => typeof v !== 'string' || v.trim() === '')) {
       issues.push({ path: 'trigger.keywords', message: 'keywords cannot be empty strings' })
     }
-    if (cfg.match_type !== 'exact' && cfg.match_type !== 'contains') {
+    const mt = cfg.match_type ?? 'contains'
+    if (mt !== 'exact' && mt !== 'contains') {
       issues.push({
         path: 'trigger.match_type',
         message: 'match type must be "exact" or "contains"',
