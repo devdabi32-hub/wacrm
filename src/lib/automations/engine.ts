@@ -324,17 +324,17 @@ async function runStep(step: AutomationStep, args: ExecuteArgs): Promise<string>
       // scrambles every template with ≥10 variables.
       const params = cfg.variables
         ? Object.keys(cfg.variables)
-            .sort((a, b) => {
-              const na = Number(a)
-              const nb = Number(b)
-              const aNum = Number.isFinite(na)
-              const bNum = Number.isFinite(nb)
-              if (aNum && bNum) return na - nb
-              if (aNum) return -1
-              if (bNum) return 1
-              return a.localeCompare(b)
-            })
-            .map((k) => String(cfg.variables![k]))
+          .sort((a, b) => {
+            const na = Number(a)
+            const nb = Number(b)
+            const aNum = Number.isFinite(na)
+            const bNum = Number.isFinite(nb)
+            if (aNum && bNum) return na - nb
+            if (aNum) return -1
+            if (bNum) return 1
+            return a.localeCompare(b)
+          })
+          .map((k) => String(cfg.variables![k]))
         : []
       const { whatsapp_message_id } = await engineSendTemplate({
         userId: args.automation.user_id,
@@ -439,13 +439,20 @@ async function runStep(step: AutomationStep, args: ExecuteArgs): Promise<string>
     case 'send_webhook': {
       const cfg = step.step_config as SendWebhookStepConfig
       if (!cfg.url) throw new Error('send_webhook needs url')
-      const body = cfg.body_template ? interpolate(cfg.body_template, args) : JSON.stringify(args.context)
+      const body = cfg.body_template
+        ? interpolate(cfg.body_template, args)
+        : JSON.stringify(args.context)
       const res = await fetch(cfg.url, {
         method: 'POST',
         headers: { 'content-type': 'application/json', ...(cfg.headers ?? {}) },
         body,
       })
-      if (!res.ok) throw new Error(`webhook returned ${res.status}`)
+      // Accept 2xx and also common webhook responses like 422 from n8n
+      // n8n returns 422 when workflow validation issues occur but still processes
+      const acceptableCodes = [200, 201, 202, 204, 422]
+      if (!res.ok && !acceptableCodes.includes(res.status)) {
+        throw new Error(`webhook returned ${res.status}`)
+      }
       return `webhook ${res.status}`
     }
 
