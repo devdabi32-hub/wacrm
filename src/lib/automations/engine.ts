@@ -5,6 +5,7 @@ import type {
   AutomationTriggerType,
   ConditionStepConfig,
   KeywordMatchTriggerConfig,
+  FieldUpdatedTriggerConfig,
   SendMessageStepConfig,
   SendTemplateStepConfig,
   SendWebhookStepConfig,
@@ -32,6 +33,10 @@ export interface AutomationContext {
   tag_id?: string
   /** Agent the conversation was assigned to, for conversation_assigned. */
   agent_id?: string
+  /** For field_updated trigger: field that changed ('custom::uuid' or standard field name). */
+  field_id?: string
+  /** For field_updated trigger: new value of the changed field. */
+  field_value?: string
 }
 
 export interface DispatchInput {
@@ -498,16 +503,29 @@ async function resolveConversationId(args: ExecuteArgs): Promise<string> {
 }
 
 function triggerMatches(automation: Automation, ctx: AutomationContext | undefined): boolean {
-  if (automation.trigger_type !== 'keyword_match') return true
-  const cfg = automation.trigger_config as KeywordMatchTriggerConfig
-  if (!cfg?.keywords || cfg.keywords.length === 0) return false
-  const text = (ctx?.message_text ?? '').toString()
-  if (!text) return false
-  const haystack = cfg.case_sensitive ? text : text.toLowerCase()
-  return cfg.keywords.some((raw) => {
-    const k = cfg.case_sensitive ? raw : raw.toLowerCase()
-    return cfg.match_type === 'exact' ? haystack === k : haystack.includes(k)
-  })
+  if (automation.trigger_type === 'keyword_match') {
+    const cfg = automation.trigger_config as KeywordMatchTriggerConfig
+    if (!cfg?.keywords || cfg.keywords.length === 0) return false
+    const text = (ctx?.message_text ?? '').toString()
+    if (!text) return false
+    const haystack = cfg.case_sensitive ? text : text.toLowerCase()
+    return cfg.keywords.some((raw) => {
+      const k = cfg.case_sensitive ? raw : raw.toLowerCase()
+      return cfg.match_type === 'exact' ? haystack === k : haystack.includes(k)
+    })
+  }
+  if (automation.trigger_type === 'field_updated') {
+    const cfg = automation.trigger_config as FieldUpdatedTriggerConfig
+    if (!cfg?.field) return false
+    // Field must match exactly (custom::uuid or standard name)
+    if (ctx?.field_id !== cfg.field) return false
+    // Value match is case-insensitive. Empty config.value = fire on any change.
+    if (cfg.value !== undefined && cfg.value !== '') {
+      return String(ctx?.field_value ?? '').toLowerCase() === cfg.value.toLowerCase()
+    }
+    return true
+  }
+  return true
 }
 
 async function evaluateCondition(cfg: ConditionStepConfig, args: ExecuteArgs): Promise<boolean> {

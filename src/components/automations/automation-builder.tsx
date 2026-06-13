@@ -115,8 +115,8 @@ const TRIGGER_OPTIONS: { value: AutomationTriggerType; label: string; hint: stri
   { value: "new_contact_created", label: "New Contact Created", hint: "When a contact is auto-created from an incoming message" },
   { value: "conversation_assigned", label: "Conversation Assigned", hint: "When assigned to an agent" },
   { value: "tag_added", label: "Tag Added", hint: "When a tag is added to a contact" },
-  { value: "time_based", label: "Time-Based", hint: "On a recurring schedule" },
-]
+  { value: "field_updated", label: "Field Updated", hint: "When a contact field changes to a specific value (e.g. booking_status = Confirmed)" },
+  { value: "time_based", label: "Time-Based", hint: "On a recurring schedule" },]
 
 function cid(): string {
   return (
@@ -178,9 +178,11 @@ export function AutomationBuilder({ initial }: { initial: BuilderInitial }) {
         ? { keywords: [], match_type: "contains" }
         : newType === "tag_added"
           ? { tag_id: "" }
-          : newType === "time_based"
-            ? { schedule: "" }
-            : {}
+          : newType === "field_updated"
+            ? { field: "", value: "" }
+            : newType === "time_based"
+              ? { schedule: "" }
+              : {}
     setState((s) => ({ ...s, trigger_type: newType, trigger_config: defaultConfig }))
   }
 
@@ -340,6 +342,15 @@ function TriggerCard({
   onConfigChange: (c: Record<string, unknown>) => void
 }) {
   const [open, setOpen] = useState(false)
+  const supabase = createClient()
+  const [customFields, setCustomFields] = useState<Array<{ id: string; field_name: string; field_type: string }>>([])
+  useEffect(() => {
+    supabase
+      .from('custom_fields')
+      .select('id, field_name, field_type')
+      .order('created_at', { ascending: true })
+      .then(({ data }) => { if (data) setCustomFields(data) })
+  }, [])
   return (
     // Card width: full on mobile, fixed 320px on sm+. The canvas wrapper
     // (max-w-2xl + px-4) keeps this tidy on tablet/desktop.
@@ -399,6 +410,44 @@ function TriggerCard({
                 }
                 className="bg-slate-800 text-white"
               />
+            )}
+            {type === "field_updated" && (
+              <div className="space-y-2">
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-400">Field</label>
+                  <select
+                    value={(config.field as string) ?? ""}
+                    onChange={(e) => onConfigChange({ ...config, field: e.target.value })}
+                    className="w-full rounded-md border border-slate-700 bg-slate-800 px-2 py-1.5 text-sm text-white focus:border-[#0084ff] focus:outline-none"
+                  >
+                    <option value="">Select a field…</option>
+                    <optgroup label="Standard fields">
+                      <option value="name">Name</option>
+                      <option value="email">Email</option>
+                      <option value="company">Company</option>
+                    </optgroup>
+                    {customFields.length > 0 && (
+                      <optgroup label="Custom fields">
+                        {customFields.map((f) => (
+                          <option key={f.id} value={`custom::${f.id}`}>{f.field_name}</option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-medium text-slate-400">Value equals</label>
+                  <Input
+                    placeholder="e.g. Confirmed"
+                    value={(config.value as string) ?? ""}
+                    onChange={(e) => onConfigChange({ ...config, value: e.target.value })}
+                    className="bg-slate-800 text-white"
+                  />
+                  <p className="mt-1 text-[11px] text-slate-500">
+                    Case-insensitive. Leave empty to fire on any change to this field.
+                  </p>
+                </div>
+              </div>
             )}
             {type === "time_based" && (
               <Input

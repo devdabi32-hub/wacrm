@@ -219,6 +219,7 @@ export type AutomationTriggerType =
   | 'new_contact_created'
   | 'conversation_assigned'
   | 'tag_added'
+  | 'field_updated'
   | 'time_based';
 
 export type AutomationStepType =
@@ -246,6 +247,13 @@ export interface TagTriggerConfig {
   tag_id: string;
 }
 
+export interface FieldUpdatedTriggerConfig {
+  /** Standard field name ('name'/'email'/'company') or 'custom::uuid' for custom fields. */
+  field: string;
+  /** Value to match (case-insensitive). Leave empty to fire on any change to this field. */
+  value: string;
+}
+
 export interface TimeBasedTriggerConfig {
   /** Cron expression or simple HH:mm string; engine can accept either. */
   schedule: string;
@@ -256,6 +264,7 @@ export type AutomationTriggerConfig =
   | Record<string, never>
   | KeywordMatchTriggerConfig
   | TagTriggerConfig
+  | FieldUpdatedTriggerConfig
   | TimeBasedTriggerConfig
   | Record<string, unknown>;
 
