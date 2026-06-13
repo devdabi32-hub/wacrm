@@ -498,6 +498,7 @@ async function processMessage(
     conversationId: conversation.id,
     messageText: inboundText,
     wasNewContact: contactOutcome.wasCreated,
+    currentMessageId: message.id,
   }).catch((err) => console.error('[ai-engine] dispatch failed:', err))
 }
 

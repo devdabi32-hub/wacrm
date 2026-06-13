@@ -35,6 +35,7 @@ export interface AIReplyInput {
     conversationId: string
     messageText: string
     wasNewContact: boolean
+    currentMessageId?: string
 }
 
 interface ChatMessage {
@@ -83,24 +84,36 @@ function isInOOOWindow(start: string, end: string): boolean {
 
 async function getConversationHistory(
     conversationId: string,
+    currentMessageId?: string,
     limit = 5
 ): Promise<ChatMessage[]> {
     const db = supabaseAdmin()
-    const { data, error } = await db
+    let query = db
         .from('messages')
-        .select('content_text, sender_type')
+        .select('message_id, content_text, sender_type')
         .eq('conversation_id', conversationId)
         .in('sender_type', ['customer', 'bot'])
         .order('created_at', { ascending: false })
-        .limit(limit)
+        .limit(limit + 1) // fetch one extra in case we filter out current
+
+    // Exclude the current incoming message so it isn't double-counted
+    // (it's passed separately as userMessage to callAI).
+    if (currentMessageId) {
+        query = query.neq('message_id', currentMessageId)
+    }
+
+    const { data, error } = await query
 
     if (error || !data || data.length === 0) return []
 
-    // Reverse so oldest first (chronological for LLM context)
-    return data.reverse().map((msg) => ({
-        role: msg.sender_type === 'bot' ? 'assistant' : 'user',
-        content: msg.content_text || '',
-    }))
+    // Trim back to limit, reverse so oldest first (chronological for LLM)
+    return data
+        .slice(0, limit)
+        .reverse()
+        .map((msg) => ({
+            role: msg.sender_type === 'bot' ? 'assistant' : 'user',
+            content: msg.content_text || '',
+        }))
 }
 
 // ─────────────────────────────────────────────
@@ -211,7 +224,7 @@ async function callAI(
 // ─────────────────────────────────────────────
 
 export async function runAIReply(input: AIReplyInput): Promise<void> {
-    const { userId, contactId, conversationId, messageText, wasNewContact } = input
+    const { userId, contactId, conversationId, messageText, wasNewContact, currentMessageId } = input
     const db = supabaseAdmin()
 
     try {
@@ -361,8 +374,8 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
                 ? `You are a helpful WhatsApp assistant for a Tour & Travel company. This is a NEW customer reaching out for the first time. Greet them warmly and ask about their travel interests, dates, group size, and budget. Keep it conversational — ask ONE question at a time. Max 2-3 sentences.`
                 : DEFAULT_SYSTEM_PROMPT)
 
-        // Fetch conversation history for context
-        const history = await getConversationHistory(conversationId, 5)
+        // Fetch conversation history for context (excludes current message)
+        const history = await getConversationHistory(conversationId, currentMessageId, 5)
         console.log(`[ai-engine] History: ${history.length} messages, provider: ${provider}`)
 
         // Call LLM
