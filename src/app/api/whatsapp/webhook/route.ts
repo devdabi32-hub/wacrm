@@ -489,11 +489,13 @@ async function processMessage(
   }
 
 
-  // ── AI Engine reply (fire-and-forget, after automations) ──
-  // Runs AFTER all automation triggers so workflow steps complete first.
-  // Never throws — ai-engine.ts catches all errors internally.
+  // ── AI Engine reply ──
+  // MUST be awaited. processMessage runs inside waitUntil(); if runAIReply
+  // is fire-and-forget here, processMessage finishes immediately and Vercel
+  // tears down the function mid-await (the whatsapp_config query never
+  // completes). Awaiting keeps the function alive until the reply is sent.
   console.log('[webhook] About to call runAIReply for message:', message.id, 'text:', inboundText)
-  runAIReply({
+  await runAIReply({
     userId,
     contactId: contactRecord.id,
     conversationId: conversation.id,
