@@ -191,7 +191,7 @@ export async function engineSendTyping(args: SendTypingArgs): Promise<void> {
     const accessToken = decrypt(config.access_token)
 
     await fetch(
-      `https://graph.facebook.com/v19.0/${config.phone_number_id}/messages`,
+      `https://graph.facebook.com/v21.0/${config.phone_number_id}/messages`,
       {
         method: 'POST',
         headers: {

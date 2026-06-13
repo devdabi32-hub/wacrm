@@ -375,16 +375,20 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
         const DEBOUNCE_MS = 3000
         await new Promise((r) => setTimeout(r, DEBOUNCE_MS))
 
-        if (currentMessageCreatedAt) {
-            const { data: newerMsgs } = await db
+        if (currentMessageId) {
+            // Find the most recent customer message in this conversation.
+            // If it's NOT the message we're processing, a newer one arrived
+            // during the debounce window — skip, the newer call handles it.
+            const { data: latestMsg } = await db
                 .from('messages')
-                .select('id')
+                .select('message_id')
                 .eq('conversation_id', conversationId)
                 .eq('sender_type', 'customer')
-                .gt('created_at', currentMessageCreatedAt)
+                .order('created_at', { ascending: false })
                 .limit(1)
+                .maybeSingle()
 
-            if (newerMsgs && newerMsgs.length > 0) {
+            if (latestMsg && latestMsg.message_id !== currentMessageId) {
                 console.log('[ai-engine] Newer message arrived during debounce — skipping (batched)')
                 return
             }
