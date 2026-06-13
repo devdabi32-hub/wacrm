@@ -228,6 +228,8 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
     const { userId, contactId, conversationId, messageText, wasNewContact, currentMessageId, currentMessageCreatedAt } = input
     const db = supabaseAdmin()
 
+    console.log('[ai-engine] runAIReply ENTRY — message:', currentMessageId, 'user:', userId)
+
     try {
         // ── 1. Fetch AI config from whatsapp_config ──────────────────
         const { data: cfg, error: cfgErr } = await db

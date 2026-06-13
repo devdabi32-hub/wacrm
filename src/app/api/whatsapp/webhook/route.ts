@@ -492,6 +492,7 @@ async function processMessage(
   // ── AI Engine reply (fire-and-forget, after automations) ──
   // Runs AFTER all automation triggers so workflow steps complete first.
   // Never throws — ai-engine.ts catches all errors internally.
+  console.log('[webhook] About to call runAIReply for message:', message.id, 'text:', inboundText)
   runAIReply({
     userId,
     contactId: contactRecord.id,
