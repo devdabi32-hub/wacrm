@@ -36,6 +36,7 @@ export interface AIReplyInput {
     messageText: string
     wasNewContact: boolean
     currentMessageId?: string
+    currentMessageCreatedAt?: string
 }
 
 interface ChatMessage {
@@ -224,7 +225,7 @@ async function callAI(
 // ─────────────────────────────────────────────
 
 export async function runAIReply(input: AIReplyInput): Promise<void> {
-    const { userId, contactId, conversationId, messageText, wasNewContact, currentMessageId } = input
+    const { userId, contactId, conversationId, messageText, wasNewContact, currentMessageId, currentMessageCreatedAt } = input
     const db = supabaseAdmin()
 
     try {
@@ -365,6 +366,30 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
             console.error('[ai-engine] Failed to decrypt AI API key')
             return
         }
+        // ── DEBOUNCE: wait 3s, then bail out if a newer message arrived ──
+        // If the customer sends several quick messages, only the LAST
+        // message's AI call survives — the earlier ones detect a newer
+        // message during the wait and skip. The surviving call picks up
+        // all the messages via getConversationHistory, producing ONE
+        // coherent reply instead of one-per-message.
+        const DEBOUNCE_MS = 3000
+        await new Promise((r) => setTimeout(r, DEBOUNCE_MS))
+
+        if (currentMessageCreatedAt) {
+            const { data: newerMsgs } = await db
+                .from('messages')
+                .select('id')
+                .eq('conversation_id', conversationId)
+                .eq('sender_type', 'customer')
+                .gt('created_at', currentMessageCreatedAt)
+                .limit(1)
+
+            if (newerMsgs && newerMsgs.length > 0) {
+                console.log('[ai-engine] Newer message arrived during debounce — skipping (batched)')
+                return
+            }
+        }
+
 
         // Build system prompt with context awareness
         const isNewContact = wasNewContact

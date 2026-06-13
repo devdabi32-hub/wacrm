@@ -499,6 +499,7 @@ async function processMessage(
     messageText: inboundText,
     wasNewContact: contactOutcome.wasCreated,
     currentMessageId: message.id,
+    currentMessageCreatedAt: new Date(parseInt(message.timestamp) * 1000).toISOString(),
   }).catch((err) => console.error('[ai-engine] dispatch failed:', err))
 }
 
