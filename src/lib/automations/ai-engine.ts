@@ -372,10 +372,10 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
         // message during the wait and skip. The surviving call picks up
         // all the messages via getConversationHistory, producing ONE
         // coherent reply instead of one-per-message.
-        console.log('[ai-engine] Reached LLM section, starting debounce')
-        const DEBOUNCE_MS = 1200
-        await new Promise((r) => setTimeout(r, DEBOUNCE_MS))
-
+        // ── Light dedup (no setTimeout — Vercel free kills waitUntil tasks
+        //    that sleep). If a newer customer message ALREADY exists in the
+        //    DB by the time this runs, skip — the newer call will reply with
+        //    full context. No artificial wait, so it survives on free tier.
         if (currentMessageId) {
             const { data: latestMsg } = await db
                 .from('messages')
@@ -387,11 +387,11 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
                 .maybeSingle()
 
             if (latestMsg && latestMsg.message_id !== currentMessageId) {
-                console.log('[ai-engine] Newer message arrived during debounce — skipping (batched)')
+                console.log('[ai-engine] A newer message already exists — skipping (batched)')
                 return
             }
         }
-        console.log('[ai-engine] Debounce passed, proceeding to reply')
+        console.log('[ai-engine] Proceeding to reply')
 
         // ── Show "typing..." while the LLM thinks ──
         // Fires only for the surviving (last) message after debounce.
