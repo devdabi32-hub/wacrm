@@ -372,13 +372,11 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
         // message during the wait and skip. The surviving call picks up
         // all the messages via getConversationHistory, producing ONE
         // coherent reply instead of one-per-message.
-        const DEBOUNCE_MS = 3000
+        console.log('[ai-engine] Reached LLM section, starting debounce')
+        const DEBOUNCE_MS = 1200
         await new Promise((r) => setTimeout(r, DEBOUNCE_MS))
 
         if (currentMessageId) {
-            // Find the most recent customer message in this conversation.
-            // If it's NOT the message we're processing, a newer one arrived
-            // during the debounce window — skip, the newer call handles it.
             const { data: latestMsg } = await db
                 .from('messages')
                 .select('message_id')
@@ -393,6 +391,7 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
                 return
             }
         }
+        console.log('[ai-engine] Debounce passed, proceeding to reply')
 
         // ── Show "typing..." while the LLM thinks ──
         // Fires only for the surviving (last) message after debounce.
