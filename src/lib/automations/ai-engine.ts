@@ -23,7 +23,7 @@
 
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { decrypt } from '@/lib/whatsapp/encryption'
-import { engineSendText, engineSendTyping, engineSendRead } from '@/lib/automations/meta-send'
+import { engineSendText, engineSendTyping } from '@/lib/automations/meta-send'
 
 // ─────────────────────────────────────────────
 // Types
@@ -366,40 +366,19 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
             console.error('[ai-engine] Failed to decrypt AI API key')
             return
         }
-        // ── Blue tick for EVERY message (read receipt, before dedup) ──
-        // Runs for every incoming message — even ones that get batched/
-        // skipped below — so the customer always sees a read receipt.
+        // ── Blue tick + typing indicator for this message ──
+        // No dedup/batching: Vercel free's waitUntil runs background tasks
+        // with unpredictable timing, so a DB-query-based "is this the latest
+        // message" check is unreliable (it caused every message to be skipped).
+        // Real customers leave 10-30s gaps between messages, so replying to
+        // each one is the correct, predictable behaviour. The off-by-one fix
+        // in getConversationHistory already excludes the current message, so
+        // each reply is built on correct context.
         if (currentMessageId) {
-            await engineSendRead({ userId, incomingMessageId: currentMessageId })
-        }
-
-        // ── Light dedup (no setTimeout — Vercel free kills waitUntil tasks
-        //    that sleep). If a newer customer message ALREADY exists in the
-        //    DB by the time this runs, skip — the newer (last) call will
-        //    reply with full context. No artificial wait, so it survives on
-        //    free tier. Customer already saw the blue tick above.
-        if (currentMessageId) {
-            const { data: latestMsg } = await db
-                .from('messages')
-                .select('message_id')
-                .eq('conversation_id', conversationId)
-                .eq('sender_type', 'customer')
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .maybeSingle()
-
-            if (latestMsg && latestMsg.message_id !== currentMessageId) {
-                console.log('[ai-engine] A newer message already exists — skipping reply (batched, but read receipt sent)')
-                return
-            }
-        }
-        console.log('[ai-engine] Proceeding to reply')
-
-        // ── Show "typing..." while the LLM thinks ──
-        // Only for the surviving (last) message that will actually reply.
-        if (currentMessageId) {
+            // engineSendTyping marks as read (blue tick) AND shows typing.
             await engineSendTyping({ userId, incomingMessageId: currentMessageId })
         }
+        console.log('[ai-engine] Proceeding to reply')
 
         // Build system prompt with context awareness
         const isNewContact = wasNewContact
