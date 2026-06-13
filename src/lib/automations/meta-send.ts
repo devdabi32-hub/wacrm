@@ -165,4 +165,48 @@ async function sendViaMeta(input: SendInput): Promise<{ whatsapp_message_id: str
     .eq('id', input.conversationId)
 
   return { whatsapp_message_id: waMessageId }
+
+}
+// ------------------------------------------------------------
+// Typing indicator — shows "typing..." + marks message as read.
+// Meta combines read-receipt and typing into one call. Best-effort.
+// ------------------------------------------------------------
+
+interface SendTypingArgs {
+  userId: string
+  incomingMessageId: string
+}
+
+export async function engineSendTyping(args: SendTypingArgs): Promise<void> {
+  const db = supabaseAdmin()
+
+  try {
+    const { data: config, error: configErr } = await db
+      .from('whatsapp_config')
+      .select('phone_number_id, access_token')
+      .eq('user_id', args.userId)
+      .single()
+    if (configErr || !config) return
+
+    const accessToken = decrypt(config.access_token)
+
+    await fetch(
+      `https://graph.facebook.com/v19.0/${config.phone_number_id}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          status: 'read',
+          message_id: args.incomingMessageId,
+          typing_indicator: { type: 'text' },
+        }),
+      },
+    )
+  } catch (err) {
+    console.error('[meta-send] typing indicator failed:', err)
+  }
 }

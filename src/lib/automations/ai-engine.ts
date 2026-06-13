@@ -23,7 +23,7 @@
 
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { decrypt } from '@/lib/whatsapp/encryption'
-import { engineSendText } from '@/lib/automations/meta-send'
+import { engineSendText, engineSendTyping } from '@/lib/automations/meta-send'
 
 // ─────────────────────────────────────────────
 // Types
@@ -390,6 +390,12 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
             }
         }
 
+        // ── Show "typing..." while the LLM thinks ──
+        // Fires only for the surviving (last) message after debounce.
+        // Best-effort — never blocks the reply.
+        if (currentMessageId) {
+            await engineSendTyping({ userId, incomingMessageId: currentMessageId })
+        }
 
         // Build system prompt with context awareness
         const isNewContact = wasNewContact
