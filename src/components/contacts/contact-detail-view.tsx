@@ -338,27 +338,17 @@ export function ContactDetailView({
     setSavingCustom(true);
 
     try {
-      // Delete existing values and re-insert
-      await supabase
-        .from('contact_custom_values')
-        .delete()
-        .eq('contact_id', contactId);
-
-      const rows = Object.entries(customValues)
-        .filter(([, val]) => val.trim())
-        .map(([fieldId, val]) => ({
-          contact_id: contactId,
-          custom_field_id: fieldId,
-          value: val.trim(),
-        }));
-
-      if (rows.length > 0) {
-        const { error } = await supabase
-          .from('contact_custom_values')
-          .insert(rows);
-        if (error) throw error;
+      // Save via API route so the server can fire the `field_updated`
+      // automation trigger for any field whose value actually changed.
+      const res = await fetch('/api/contacts/custom-fields', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ contact_id: contactId, values: customValues }),
+      });
+      if (!res.ok) {
+        const b = await res.json().catch(() => ({}));
+        throw new Error(b?.error ?? 'save failed');
       }
-
       toast.success('Custom fields saved');
     } catch {
       toast.error('Failed to save custom fields');
@@ -541,8 +531,8 @@ export function ContactDetailView({
                             onClick={() => toggleTag(tag.id)}
                             disabled={savingTags}
                             className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-all cursor-pointer ${selected
-                                ? 'ring-2 ring-[#0084ff] ring-offset-1 ring-offset-slate-900'
-                                : 'opacity-50 hover:opacity-80'
+                              ? 'ring-2 ring-[#0084ff] ring-offset-1 ring-offset-slate-900'
+                              : 'opacity-50 hover:opacity-80'
                               }`}
                             style={{
                               backgroundColor: tag.color + '20',
