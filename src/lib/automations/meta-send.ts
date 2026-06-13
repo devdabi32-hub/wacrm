@@ -209,4 +209,42 @@ export async function engineSendTyping(args: SendTypingArgs): Promise<void> {
   } catch (err) {
     console.error('[meta-send] typing indicator failed:', err)
   }
+}// ------------------------------------------------------------
+// Read receipt only — blue tick without typing bubble.
+// Runs for EVERY incoming message (even ones that get batched/
+// skipped) so the customer always sees their message was read.
+// Best-effort.
+// ------------------------------------------------------------
+
+export async function engineSendRead(args: SendTypingArgs): Promise<void> {
+  const db = supabaseAdmin()
+
+  try {
+    const { data: config, error: configErr } = await db
+      .from('whatsapp_config')
+      .select('phone_number_id, access_token')
+      .eq('user_id', args.userId)
+      .single()
+    if (configErr || !config) return
+
+    const accessToken = decrypt(config.access_token)
+
+    await fetch(
+      `https://graph.facebook.com/v21.0/${config.phone_number_id}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          messaging_product: 'whatsapp',
+          status: 'read',
+          message_id: args.incomingMessageId,
+        }),
+      },
+    )
+  } catch (err) {
+    console.error('[meta-send] read receipt failed:', err)
+  }
 }

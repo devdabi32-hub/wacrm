@@ -23,7 +23,7 @@
 
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { decrypt } from '@/lib/whatsapp/encryption'
-import { engineSendText, engineSendTyping } from '@/lib/automations/meta-send'
+import { engineSendText, engineSendTyping, engineSendRead } from '@/lib/automations/meta-send'
 
 // ─────────────────────────────────────────────
 // Types
@@ -366,16 +366,18 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
             console.error('[ai-engine] Failed to decrypt AI API key')
             return
         }
-        // ── DEBOUNCE: wait 3s, then bail out if a newer message arrived ──
-        // If the customer sends several quick messages, only the LAST
-        // message's AI call survives — the earlier ones detect a newer
-        // message during the wait and skip. The surviving call picks up
-        // all the messages via getConversationHistory, producing ONE
-        // coherent reply instead of one-per-message.
+        // ── Blue tick for EVERY message (read receipt, before dedup) ──
+        // Runs for every incoming message — even ones that get batched/
+        // skipped below — so the customer always sees a read receipt.
+        if (currentMessageId) {
+            await engineSendRead({ userId, incomingMessageId: currentMessageId })
+        }
+
         // ── Light dedup (no setTimeout — Vercel free kills waitUntil tasks
         //    that sleep). If a newer customer message ALREADY exists in the
-        //    DB by the time this runs, skip — the newer call will reply with
-        //    full context. No artificial wait, so it survives on free tier.
+        //    DB by the time this runs, skip — the newer (last) call will
+        //    reply with full context. No artificial wait, so it survives on
+        //    free tier. Customer already saw the blue tick above.
         if (currentMessageId) {
             const { data: latestMsg } = await db
                 .from('messages')
@@ -387,15 +389,14 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
                 .maybeSingle()
 
             if (latestMsg && latestMsg.message_id !== currentMessageId) {
-                console.log('[ai-engine] A newer message already exists — skipping (batched)')
+                console.log('[ai-engine] A newer message already exists — skipping reply (batched, but read receipt sent)')
                 return
             }
         }
         console.log('[ai-engine] Proceeding to reply')
 
         // ── Show "typing..." while the LLM thinks ──
-        // Fires only for the surviving (last) message after debounce.
-        // Best-effort — never blocks the reply.
+        // Only for the surviving (last) message that will actually reply.
         if (currentMessageId) {
             await engineSendTyping({ userId, incomingMessageId: currentMessageId })
         }
