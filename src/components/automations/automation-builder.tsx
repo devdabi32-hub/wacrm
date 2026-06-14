@@ -11,6 +11,7 @@ import {
   GripVertical,
   MessageSquare,
   FileText,
+  ImageIcon,
   Tag,
   TagIcon,
   UserCheck,
@@ -79,6 +80,7 @@ interface StepMeta {
 const STEP_META: Record<AutomationStepType, StepMeta> = {
   send_message: { label: "Send Message", icon: MessageSquare, border: "border-l-[#0084ff]" },
   send_template: { label: "Send Template", icon: FileText, border: "border-l-[#0084ff]" },
+  send_media: { label: "Send Media", icon: ImageIcon, border: "border-l-[#0084ff]" },
   add_tag: { label: "Add Tag", icon: Tag, border: "border-l-[#0084ff]" },
   remove_tag: { label: "Remove Tag", icon: TagIcon, border: "border-l-[#0084ff]" },
   assign_conversation: { label: "Assign Conversation", icon: UserCheck, border: "border-l-[#0084ff]" },
@@ -93,6 +95,7 @@ const STEP_META: Record<AutomationStepType, StepMeta> = {
 const ADDABLE_STEPS: AutomationStepType[] = [
   "send_message",
   "send_template",
+  "send_media",
   "add_tag",
   "remove_tag",
   "assign_conversation",
@@ -133,6 +136,8 @@ function blankConfig(type: AutomationStepType): Record<string, unknown> {
       return { text: "" }
     case "send_template":
       return { template_name: "", language: "en_US" }
+    case "send_media":
+      return { media_type: "image", link: "", caption: "" }
     case "add_tag":
     case "remove_tag":
       return { tag_id: "" }
@@ -821,6 +826,28 @@ function StepEditor({
           </FieldBlock>
         </>
       )
+    case "send_media":
+      return (
+        <>
+          <FieldBlock label="Media type">
+            <select value={(cfg.media_type as string) ?? "image"} onChange={(e) => set({ media_type: e.target.value })} className={selectCls} {...stop}>
+              <option value="image">Image</option>
+              <option value="document">Document</option>
+            </select>
+          </FieldBlock>
+          <FieldBlock label="File URL (public HTTPS)">
+            <input type="text" value={(cfg.link as string) ?? ""} onChange={(e) => set({ link: e.target.value })} placeholder="https://…/poster.jpg" className={inputCls} {...stop} />
+          </FieldBlock>
+          <FieldBlock label="Caption (optional)">
+            <textarea value={(cfg.caption as string) ?? ""} onChange={(e) => set({ caption: e.target.value })} placeholder="Manali 5N/6D — ₹18,999 per person" className={textareaCls} {...stop} />
+          </FieldBlock>
+          {cfg.media_type === "document" && (
+            <FieldBlock label="Filename (optional)">
+              <input type="text" value={(cfg.filename as string) ?? ""} onChange={(e) => set({ filename: e.target.value })} placeholder="itinerary.pdf" className={inputCls} {...stop} />
+            </FieldBlock>
+          )}
+        </>
+      )
     case "add_tag":
     case "remove_tag":
       return (
@@ -978,6 +1005,8 @@ function previewFor(step: BuilderStep): string {
       return (step.step_config.text as string) || "no text yet"
     case "send_template":
       return (step.step_config.template_name as string) || "pick a template"
+    case "send_media":
+      return (step.step_config.link as string) || "no media url"
     case "wait":
       return `${step.step_config.amount ?? "?"} ${step.step_config.unit ?? ""}`
     case "condition":
