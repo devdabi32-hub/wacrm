@@ -8,6 +8,7 @@ import type {
   FieldUpdatedTriggerConfig,
   SendMessageStepConfig,
   SendTemplateStepConfig,
+  SendMediaStepConfig,
   SendWebhookStepConfig,
   TagStepConfig,
   UpdateContactFieldStepConfig,
@@ -16,7 +17,7 @@ import type {
   AssignConversationStepConfig,
 } from '@/types'
 import { supabaseAdmin } from './admin-client'
-import { engineSendText, engineSendTemplate } from './meta-send'
+import { engineSendText, engineSendTemplate, engineSendMedia } from './meta-send'
 
 // ------------------------------------------------------------
 // Public API
@@ -350,6 +351,24 @@ async function runStep(step: AutomationStep, args: ExecuteArgs): Promise<string>
         params,
       })
       return `template sent via Meta (${whatsapp_message_id})`
+    }
+
+    case 'send_media': {
+      const cfg = step.step_config as SendMediaStepConfig
+      if (!args.contactId) throw new Error('send_media needs a contact')
+      if (!cfg.link) throw new Error('send_media needs a link')
+      const conversationId = await resolveConversationId(args)
+      const caption = cfg.caption ? interpolate(cfg.caption, args) : undefined
+      const { whatsapp_message_id } = await engineSendMedia({
+        userId: args.automation.user_id,
+        conversationId,
+        contactId: args.contactId,
+        mediaType: cfg.media_type,
+        link: cfg.link,
+        caption,
+        filename: cfg.filename,
+      })
+      return `${cfg.media_type} sent via Meta (${whatsapp_message_id})`
     }
 
     case 'add_tag': {
