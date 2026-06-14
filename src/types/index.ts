@@ -225,6 +225,7 @@ export type AutomationTriggerType =
 export type AutomationStepType =
   | 'send_message'
   | 'send_template'
+  | 'send_media'
   | 'add_tag'
   | 'remove_tag'
   | 'assign_conversation'
@@ -277,7 +278,16 @@ export interface SendTemplateStepConfig {
   language?: string;
   variables?: Record<string, string>;
 }
-
+export interface SendMediaStepConfig {
+  /** 'image' or 'document'. */
+  media_type: 'image' | 'document';
+  /** Publicly reachable HTTPS URL of the file Meta will fetch. */
+  link: string;
+  /** Optional caption shown under the media. */
+  caption?: string;
+  /** Filename shown for documents (ignored for images). */
+  filename?: string;
+}
 export interface TagStepConfig {
   tag_id: string;
 }
@@ -327,6 +337,7 @@ export interface SendWebhookStepConfig {
 export type AutomationStepConfig =
   | SendMessageStepConfig
   | SendTemplateStepConfig
+  | SendMediaStepConfig
   | TagStepConfig
   | AssignConversationStepConfig
   | UpdateContactFieldStepConfig
