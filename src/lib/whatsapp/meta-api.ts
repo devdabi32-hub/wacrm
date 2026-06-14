@@ -168,6 +168,61 @@ export async function sendTemplateMessage(
 }
 
 // ============================================================
+// Sending — media (image / document) by hosted link
+// ============================================================
+
+export interface SendMediaMessageArgs {
+  phoneNumberId: string
+  accessToken: string
+  to: string
+  /** 'image' or 'document'. */
+  mediaType: 'image' | 'document'
+  /** Publicly reachable HTTPS URL Meta fetches the file from. */
+  link: string
+  /** Optional caption shown under the media. */
+  caption?: string
+  /** Filename shown for documents (ignored for images). */
+  filename?: string
+}
+
+/**
+ * Send an image or document by hosted link (no upload step).
+ * Meta fetches the file from `link`, which must be a publicly reachable
+ * HTTPS URL. Like sendTextMessage, free-form media only delivers inside
+ * the 24-hour customer service window.
+ */
+export async function sendMediaMessage(
+  args: SendMediaMessageArgs
+): Promise<MetaSendResult> {
+  const { phoneNumberId, accessToken, to, mediaType, link, caption, filename } = args
+  const url = `${META_API_BASE}/${phoneNumberId}/messages`
+
+  const mediaObject: Record<string, string> = { link }
+  if (caption) mediaObject.caption = caption
+  if (mediaType === 'document' && filename) mediaObject.filename = filename
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      recipient_type: 'individual',
+      to,
+      type: mediaType,
+      [mediaType]: mediaObject,
+    }),
+  })
+  if (!response.ok) {
+    await throwMetaError(response, `Meta API error: ${response.status}`)
+  }
+  const data = await response.json()
+  return { messageId: data.messages[0].id }
+}
+
+// ============================================================
 // Media
 // ============================================================
 
