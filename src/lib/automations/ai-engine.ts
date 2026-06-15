@@ -23,7 +23,7 @@
 
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { decrypt } from '@/lib/whatsapp/encryption'
-import { engineSendText, engineSendTyping } from '@/lib/automations/meta-send'
+import { engineSendText, engineSendTyping, engineSendMedia } from '@/lib/automations/meta-send'
 
 // ─────────────────────────────────────────────
 // Types
@@ -299,6 +299,247 @@ function parseAIResult(raw: string): AIResult {
     }
 }
 
+// ── Action execution (Step 4) ──────────────────────────────
+// Turns a parsed AIAction into real WhatsApp sends, all data-driven from
+// the destinations table + whatsapp_config settings. Best-effort: a media
+// failure never blocks the follow-up text.
+
+interface DestinationRow {
+    id: string
+    name: string
+    slug: string
+    keywords: string[] | null
+    summary: string | null
+    highlights: string[] | null
+    departures: string[] | null
+    poster_url: string | null
+    itinerary_url: string | null
+    price_from: number | null
+    currency: string | null
+    nights: number | null
+    days: number | null
+}
+
+interface ActionCfg {
+    business_name?: string | null
+    support_phone?: string | null
+    upi_id?: string | null
+    payment_qr_url?: string | null
+    payment_note?: string | null
+}
+
+interface ActionContext {
+    userId: string
+    conversationId: string
+    contactId: string
+    cfg: ActionCfg
+}
+
+/** Resolve an AI/customer destination reference (slug, name, keyword, phrase). */
+async function findDestination(userId: string, ref: string): Promise<DestinationRow | null> {
+    const needle = (ref ?? '').trim().toLowerCase()
+    if (!needle) return null
+    const { data } = await supabaseAdmin()
+        .from('destinations')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('active', true)
+    const rows = (data ?? []) as DestinationRow[]
+    if (rows.length === 0) return null
+    return (
+        rows.find((d) => d.slug?.toLowerCase() === needle) ??
+        rows.find((d) => d.name?.toLowerCase() === needle) ??
+        rows.find((d) => (d.keywords ?? []).some((k) => String(k).toLowerCase() === needle)) ??
+        rows.find(
+            (d) =>
+                d.name?.toLowerCase().includes(needle) ||
+                (d.keywords ?? []).some((k) => needle.includes(String(k).toLowerCase())),
+        ) ??
+        null
+    )
+}
+
+async function actionSendMenu(ctx: ActionContext): Promise<void> {
+    const { data } = await supabaseAdmin()
+        .from('destinations')
+        .select('name, summary, price_from, currency, nights, days')
+        .eq('user_id', ctx.userId)
+        .eq('active', true)
+        .order('sort_order', { ascending: true })
+    const rows = (data ?? []) as DestinationRow[]
+
+    if (rows.length === 0) {
+        await engineSendText({
+            userId: ctx.userId,
+            conversationId: ctx.conversationId,
+            contactId: ctx.contactId,
+            text: 'Abhi koi package available nahi hai. Thodi der baad try karein. 🙏',
+        })
+        return
+    }
+
+    const brand = ctx.cfg.business_name?.trim() || 'our travel desk'
+    const lines = rows.map((d) => {
+        const dur = d.nights && d.days ? ` ${d.nights}N/${d.days}D` : ''
+        const price = d.price_from ? ` · from ${d.currency || 'INR'} ${d.price_from}` : ''
+        const summary = d.summary ? ` — ${d.summary}` : ''
+        return `*${d.name}*${dur}${price}${summary}`
+    })
+    const text = `✨ *${brand}* — our packages 👇\n\n${lines.join('\n')}\n\nReply with a destination name to get its poster + full itinerary.`
+    await engineSendText({
+        userId: ctx.userId,
+        conversationId: ctx.conversationId,
+        contactId: ctx.contactId,
+        text,
+    })
+}
+
+async function actionSendDestination(ctx: ActionContext, ref?: string): Promise<void> {
+    if (!ref) {
+        await actionSendMenu(ctx)
+        return
+    }
+    const dest = await findDestination(ctx.userId, ref)
+    if (!dest) {
+        await engineSendText({
+            userId: ctx.userId,
+            conversationId: ctx.conversationId,
+            contactId: ctx.contactId,
+            text: `Hmm, "${ref}" abhi list me nahi mila. Yahan hamare available packages hain 👇`,
+        })
+        await actionSendMenu(ctx)
+        return
+    }
+
+    const dur = dest.nights && dest.days ? ` ${dest.nights}N/${dest.days}D` : ''
+    if (dest.poster_url) {
+        try {
+            await engineSendMedia({
+                userId: ctx.userId,
+                conversationId: ctx.conversationId,
+                contactId: ctx.contactId,
+                mediaType: 'image',
+                link: dest.poster_url,
+                caption: `${dest.name}${dur} 🏔️`,
+            })
+        } catch (err) {
+            console.error('[ai-engine] poster send failed:', err)
+        }
+    }
+
+    const parts: string[] = [`*${dest.name}*${dur}`]
+    if (dest.highlights && dest.highlights.length) parts.push(`✨ ${dest.highlights.join(' · ')}`)
+    if (dest.itinerary_url) parts.push(`\n👉 Full itinerary: ${dest.itinerary_url}`)
+    parts.push(`\nReply *confirm* to book ✅`)
+    await engineSendText({
+        userId: ctx.userId,
+        conversationId: ctx.conversationId,
+        contactId: ctx.contactId,
+        text: parts.join('\n'),
+    })
+}
+
+async function actionSendPayment(ctx: ActionContext, ref?: string): Promise<void> {
+    const upi = ctx.cfg.upi_id?.trim()
+    const qr = ctx.cfg.payment_qr_url?.trim()
+    const note = ctx.cfg.payment_note?.trim()
+
+    if (!upi && !qr) {
+        await engineSendText({
+            userId: ctx.userId,
+            conversationId: ctx.conversationId,
+            contactId: ctx.contactId,
+            text: 'Booking confirm karne ke liye hamari team aapse jaldi connect karegi. 🙏',
+        })
+        return
+    }
+
+    let destName = ''
+    if (ref) {
+        const d = await findDestination(ctx.userId, ref)
+        if (d) destName = d.name
+    }
+
+    const capLines: string[] = [`🎉 ${destName ? destName + ' — ' : ''}booking confirm karein`]
+    if (upi) capLines.push(`📲 UPI: ${upi}`)
+    if (note) capLines.push(note)
+    const caption = capLines.join('\n')
+
+    if (qr) {
+        try {
+            await engineSendMedia({
+                userId: ctx.userId,
+                conversationId: ctx.conversationId,
+                contactId: ctx.contactId,
+                mediaType: 'image',
+                link: qr,
+                caption,
+            })
+        } catch (err) {
+            console.error('[ai-engine] QR send failed:', err)
+            await engineSendText({
+                userId: ctx.userId,
+                conversationId: ctx.conversationId,
+                contactId: ctx.contactId,
+                text: caption,
+            })
+        }
+    } else {
+        await engineSendText({
+            userId: ctx.userId,
+            conversationId: ctx.conversationId,
+            contactId: ctx.contactId,
+            text: caption,
+        })
+    }
+
+    await engineSendText({
+        userId: ctx.userId,
+        conversationId: ctx.conversationId,
+        contactId: ctx.contactId,
+        text: 'Payment ke baad screenshot bhej dein — main aapki booking turant confirm kar deta hoon ✅',
+    })
+}
+
+async function actionHandoff(ctx: ActionContext): Promise<void> {
+    const phone = ctx.cfg.support_phone?.trim()
+    const text = phone
+        ? `Bilkul! Aap hamari team se yahan baat kar sakte hain: ${phone} 📞 Woh aapko jaldi assist karenge. 🙏`
+        : 'Bilkul! Main aapko hamari team se connect kar raha hoon — woh jaldi reply karenge. 🙏'
+    await engineSendText({
+        userId: ctx.userId,
+        conversationId: ctx.conversationId,
+        contactId: ctx.contactId,
+        text,
+    })
+    // Pause AI so a human can take over this conversation.
+    await supabaseAdmin()
+        .from('conversations')
+        .update({ ai_paused: true, updated_at: new Date().toISOString() })
+        .eq('id', ctx.conversationId)
+}
+
+async function dispatchAIAction(ctx: ActionContext, action: AIAction): Promise<void> {
+    try {
+        switch (action.type) {
+            case 'send_menu':
+                await actionSendMenu(ctx)
+                break
+            case 'send_destination':
+                await actionSendDestination(ctx, action.destination)
+                break
+            case 'send_payment':
+                await actionSendPayment(ctx, action.destination)
+                break
+            case 'handoff':
+                await actionHandoff(ctx)
+                break
+        }
+    } catch (err) {
+        console.error('[ai-engine] action dispatch failed:', action.type, err)
+    }
+}
+
 export async function runAIReply(input: AIReplyInput): Promise<void> {
     const { userId, contactId, conversationId, messageText, wasNewContact, currentMessageId, currentMessageCreatedAt } = input
     const db = supabaseAdmin()
@@ -314,7 +555,8 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
          ai_system_prompt, ai_webhook_url,
          welcome_enabled, welcome_text,
          ooo_enabled, ooo_start, ooo_end, ooo_text,
-         phone_number_id, access_token`
+         phone_number_id, access_token,
+         business_name, support_phone, upi_id, payment_qr_url, payment_note`
             )
             .eq('user_id', userId)
             .maybeSingle()
@@ -485,11 +727,26 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
         // Parse into { reply, action } — defensive, never throws.
         const result = parseAIResult(aiText)
 
-        // Step 3 scope: send the conversational reply only. Action execution
-        // (send_menu / send_destination / send_payment / handoff) is wired in
-        // Step 4; result.action is intentionally not consumed yet.
+        // Send the conversational reply (lead-in), then run any action.
         if (result.reply) {
             await sendReply(result.reply, provider)
+        }
+        if (result.action) {
+            await dispatchAIAction(
+                {
+                    userId,
+                    conversationId,
+                    contactId,
+                    cfg: {
+                        business_name: cfg.business_name,
+                        support_phone: cfg.support_phone,
+                        upi_id: cfg.upi_id,
+                        payment_qr_url: cfg.payment_qr_url,
+                        payment_note: cfg.payment_note,
+                    },
+                },
+                result.action,
+            )
         }
 
     } catch (err) {
