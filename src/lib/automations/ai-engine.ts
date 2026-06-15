@@ -44,6 +44,23 @@ interface ChatMessage {
     content: string
 }
 
+// Structured AI output (Step 3): model returns { reply, action }.
+// action=null for plain replies; else a typed action the engine runs (Step 4).
+export type AIActionType = 'send_menu' | 'send_destination' | 'send_payment' | 'handoff'
+
+export interface AIAction {
+    type: AIActionType
+    /** slug/name of destination, for send_destination / send_payment. */
+    destination?: string
+    /** short reason, for handoff. */
+    reason?: string
+}
+
+export interface AIResult {
+    reply: string
+    action: AIAction | null
+}
+
 // ─────────────────────────────────────────────
 // Provider / Model constants (mirrors Replora UI)
 // ─────────────────────────────────────────────
@@ -224,6 +241,64 @@ async function callAI(
 // Called from webhook route after automations fire
 // ─────────────────────────────────────────────
 
+// Structured-output contract + defensive parser (Step 3). JSON via prompt
+// (provider-agnostic — one code path), parser never throws: bad output
+// degrades to a plain-text reply.
+const RESPONSE_FORMAT_INSTRUCTION = `Respond with a SINGLE valid JSON object and nothing else — no markdown, no code fences, no text before or after.
+Schema: {"reply": "<message to the customer>", "action": null}
+Set "action" only when the customer's intent clearly calls for it; otherwise keep it null and just answer in "reply". Allowed actions:
+- {"type":"send_menu"} — customer greets, asks what packages/tours are available, or wants options.
+- {"type":"send_destination","destination":"<slug>"} — customer picks/asks about a specific destination (send its poster + itinerary).
+- {"type":"send_payment","destination":"<slug>"} — customer wants to book/confirm/pay.
+- {"type":"handoff","reason":"<short reason>"} — customer asks to talk to a human/agent or call.
+When you set an action, keep "reply" to a short natural lead-in (the system sends the poster/itinerary/payment separately). If unsure, use action null.`
+
+function parseAIResult(raw: string): AIResult {
+    const text = (raw ?? '').trim()
+    const fallback: AIResult = {
+        reply: text || "Sorry, I couldn't respond right now.",
+        action: null,
+    }
+    if (!text) return fallback
+
+    // Extract JSON: strip ```json fences, else take first {...last} span.
+    let candidate = text
+    const fence = candidate.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)
+    if (fence) candidate = fence[1].trim()
+    if (!candidate.startsWith('{')) {
+        const first = candidate.indexOf('{')
+        const last = candidate.lastIndexOf('}')
+        if (first === -1 || last === -1 || last <= first) return fallback
+        candidate = candidate.slice(first, last + 1)
+    }
+
+    try {
+        const obj = JSON.parse(candidate) as {
+            reply?: unknown
+            action?: { type?: unknown; destination?: unknown; reason?: unknown } | null
+        }
+        const reply = typeof obj.reply === 'string' ? obj.reply.trim() : ''
+
+        let action: AIAction | null = null
+        const a = obj.action
+        if (a && typeof a === 'object' && typeof a.type === 'string') {
+            const allowed: AIActionType[] = ['send_menu', 'send_destination', 'send_payment', 'handoff']
+            if ((allowed as string[]).includes(a.type)) {
+                action = {
+                    type: a.type as AIActionType,
+                    destination: typeof a.destination === 'string' ? a.destination : undefined,
+                    reason: typeof a.reason === 'string' ? a.reason : undefined,
+                }
+            }
+        }
+
+        if (!reply && !action) return fallback
+        return { reply, action }
+    } catch {
+        return fallback
+    }
+}
+
 export async function runAIReply(input: AIReplyInput): Promise<void> {
     const { userId, contactId, conversationId, messageText, wasNewContact, currentMessageId, currentMessageCreatedAt } = input
     const db = supabaseAdmin()
@@ -390,21 +465,32 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
                 ? `You are a helpful WhatsApp assistant for a Tour & Travel company. This is a NEW customer reaching out for the first time. Greet them warmly and ask about their travel interests, dates, group size, and budget. Keep it conversational — ask ONE question at a time. Max 2-3 sentences.`
                 : DEFAULT_SYSTEM_PROMPT)
 
+        // Append the structured-output contract so the model returns {reply, action}.
+        const finalSystemPrompt = `${systemPrompt}\n\n${RESPONSE_FORMAT_INSTRUCTION}`
+
         // Fetch conversation history for context (excludes current message)
         const history = await getConversationHistory(conversationId, currentMessageId, 5)
         console.log(`[ai-engine] History: ${history.length} messages, provider: ${provider}`)
 
-        // Call LLM
+        // Call LLM (returns raw text; will be JSON per the response-format contract)
         const aiText = await callAI(
             provider,
             apiKey,
             cfg.ai_model || null,
-            systemPrompt,
+            finalSystemPrompt,
             messageText,
             history
         )
 
-        await sendReply(aiText, provider)
+        // Parse into { reply, action } — defensive, never throws.
+        const result = parseAIResult(aiText)
+
+        // Step 3 scope: send the conversational reply only. Action execution
+        // (send_menu / send_destination / send_payment / handoff) is wired in
+        // Step 4; result.action is intentionally not consumed yet.
+        if (result.reply) {
+            await sendReply(result.reply, provider)
+        }
 
     } catch (err) {
         // Never throw — must not break webhook flow
