@@ -540,6 +540,50 @@ async function dispatchAIAction(ctx: ActionContext, action: AIAction): Promise<v
     }
 }
 
+// ── Catalogue injection (Step 5) ───────────────────────────
+// Feeds the client's live destinations + business info into the system
+// prompt so the AI knows what to offer and which slug to use in
+// send_destination / send_payment. Scales by data, not code.
+async function buildCatalogueContext(userId: string, cfg: ActionCfg): Promise<string> {
+    const { data } = await supabaseAdmin()
+        .from('destinations')
+        .select('name, slug, summary, price_from, currency, nights, days')
+        .eq('user_id', userId)
+        .eq('active', true)
+        .order('sort_order', { ascending: true })
+    const rows = (data ?? []) as DestinationRow[]
+
+    const brand = cfg.business_name?.trim() || 'this Tour & Travel business'
+    const lines: string[] = [`BUSINESS NAME: ${brand}`]
+
+    if (rows.length === 0) {
+        lines.push(
+            'AVAILABLE DESTINATIONS: none configured yet — invite the customer to share their travel interest and use the send_menu action.',
+        )
+    } else {
+        lines.push(
+            'AVAILABLE DESTINATIONS (use the EXACT slug in send_destination / send_payment actions):',
+        )
+        for (const d of rows) {
+            const dur = d.nights && d.days ? `${d.nights}N/${d.days}D` : ''
+            const price = d.price_from ? `from ${d.currency || 'INR'} ${d.price_from}` : ''
+            const meta = [dur, price, d.summary].filter(Boolean).join(' · ')
+            lines.push(`- slug:"${d.slug}" name:"${d.name}"${meta ? ' — ' + meta : ''}`)
+        }
+        lines.push(
+            'If a customer asks about a destination NOT listed above, tell them it is not currently available and use the send_menu action.',
+        )
+    }
+
+    if (cfg.support_phone?.trim()) {
+        lines.push(
+            `SUPPORT CONTACT (use the handoff action when a customer asks for a human/agent/call): ${cfg.support_phone.trim()}`,
+        )
+    }
+
+    return lines.join('\n')
+}
+
 export async function runAIReply(input: AIReplyInput): Promise<void> {
     const { userId, contactId, conversationId, messageText, wasNewContact, currentMessageId, currentMessageCreatedAt } = input
     const db = supabaseAdmin()
@@ -707,8 +751,12 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
                 ? `You are a helpful WhatsApp assistant for a Tour & Travel company. This is a NEW customer reaching out for the first time. Greet them warmly and ask about their travel interests, dates, group size, and budget. Keep it conversational — ask ONE question at a time. Max 2-3 sentences.`
                 : DEFAULT_SYSTEM_PROMPT)
 
-        // Append the structured-output contract so the model returns {reply, action}.
-        const finalSystemPrompt = `${systemPrompt}\n\n${RESPONSE_FORMAT_INSTRUCTION}`
+        // Inject the client's live catalogue + settings, then the output contract.
+        const catalogue = await buildCatalogueContext(userId, {
+            business_name: cfg.business_name,
+            support_phone: cfg.support_phone,
+        })
+        const finalSystemPrompt = `${systemPrompt}\n\n${catalogue}\n\n${RESPONSE_FORMAT_INSTRUCTION}`
 
         // Fetch conversation history for context (excludes current message)
         const history = await getConversationHistory(conversationId, currentMessageId, 5)
