@@ -255,8 +255,13 @@ When you set an action, keep "reply" to a short natural lead-in (the system send
 
 function parseAIResult(raw: string): AIResult {
     const text = (raw ?? '').trim()
+    // Never leak raw JSON to the customer: if the model returned something
+    // JSON-ish we ultimately can't use, show a friendly line instead.
+    const looksLikeJson = text.startsWith('{') || text.startsWith('[')
     const fallback: AIResult = {
-        reply: text || "Sorry, I couldn't respond right now.",
+        reply: looksLikeJson
+            ? 'Sorry, thoda dobara bata sakte hain? 🙏'
+            : text || "Sorry, I couldn't respond right now.",
         action: null,
     }
     if (!text) return fallback
@@ -276,11 +281,21 @@ function parseAIResult(raw: string): AIResult {
         const obj = JSON.parse(candidate) as {
             reply?: unknown
             action?: { type?: unknown; destination?: unknown; reason?: unknown } | null
+            type?: unknown
+            destination?: unknown
+            reason?: unknown
         }
         const reply = typeof obj.reply === 'string' ? obj.reply.trim() : ''
 
+        // Normal envelope is { reply, action }. Some models drop the envelope
+        // and emit the bare action object ({ type, destination }). Tolerate it.
+        const a =
+            obj.action && typeof obj.action === 'object'
+                ? obj.action
+                : typeof obj.type === 'string'
+                    ? { type: obj.type, destination: obj.destination, reason: obj.reason }
+                    : null
         let action: AIAction | null = null
-        const a = obj.action
         if (a && typeof a === 'object' && typeof a.type === 'string') {
             const allowed: AIActionType[] = ['send_menu', 'send_destination', 'send_payment', 'handoff']
             if ((allowed as string[]).includes(a.type)) {
