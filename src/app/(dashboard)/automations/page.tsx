@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
@@ -761,14 +761,22 @@ function CatalogueSection() {
   const [deleting, setDeleting] = useState(false)
   const [togglingId, setTogglingId] = useState<string | null>(null)
   const [importOpen, setImportOpen] = useState(false)
+  // Guards against out-of-order responses: if a second load() (e.g. after an
+  // import) resolves before an in-flight one, the stale older response must
+  // not overwrite the newer state — that previously made just-deleted rows
+  // reappear after a fast delete-then-refresh sequence.
+  const loadSeq = useRef(0)
 
   async function load() {
+    const seq = ++loadSeq.current
     try {
       const res = await fetch("/api/destinations")
       const body = await res.json()
       if (!res.ok) throw new Error(body?.error ?? "Failed to load catalogue")
+      if (seq !== loadSeq.current) return
       setDestinations((body.destinations ?? []) as Destination[])
     } catch (err) {
+      if (seq !== loadSeq.current) return
       setError(err instanceof Error ? err.message : "Failed to load catalogue")
     }
   }
