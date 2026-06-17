@@ -3,6 +3,11 @@ import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { slugify, uniqueSlug, toStringArray } from '@/lib/destinations/utils'
 
+// Catalogue data must never be cached — the Catalogue UI's "delete then
+// refetch" flow depends on every GET seeing the latest row immediately.
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export async function GET() {
   const supabase = await createClient()
   const {
@@ -16,7 +21,7 @@ export async function GET() {
     .order('sort_order', { ascending: true })
     .order('name', { ascending: true })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ destinations: data ?? [] })
+  return NextResponse.json({ destinations: data ?? [] }, { headers: { 'Cache-Control': 'no-store' } })
 }
 
 export async function POST(request: Request) {

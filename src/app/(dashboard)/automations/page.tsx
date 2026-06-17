@@ -770,7 +770,7 @@ function CatalogueSection() {
   async function load() {
     const seq = ++loadSeq.current
     try {
-      const res = await fetch("/api/destinations")
+      const res = await fetch("/api/destinations", { cache: "no-store" })
       const body = await res.json()
       if (!res.ok) throw new Error(body?.error ?? "Failed to load catalogue")
       if (seq !== loadSeq.current) return
