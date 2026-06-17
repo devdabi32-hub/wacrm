@@ -392,3 +392,31 @@ export interface AutomationLog {
   created_at: string;
   contact?: Contact;
 }
+
+// ============================================================
+// Catalogue / Destinations (migration 009) — AI engine reads
+// these rows live to drive menu/destination/payment replies.
+// ============================================================
+
+export interface Destination {
+  id: string;
+  user_id: string;
+  name: string;
+  slug: string;
+  keywords: string[];
+  summary?: string | null;
+  description?: string | null;
+  highlights: string[];
+  departures: string[];
+  poster_url?: string | null;
+  /** Drive/Dropbox link to the full itinerary (incl. hotel photos). */
+  itinerary_url?: string | null;
+  price_from?: number | null;
+  currency: string;
+  nights?: number | null;
+  days?: number | null;
+  sort_order: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
