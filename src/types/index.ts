@@ -417,6 +417,8 @@ export interface Destination {
   days?: number | null;
   sort_order: number;
   active: boolean;
+  /** True when this row came from a CSV/XLSX bulk import (Step 4), not the manual Add Destination dialog. */
+  imported: boolean;
   created_at: string;
   updated_at: string;
 }

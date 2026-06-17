@@ -84,6 +84,7 @@ export async function POST(request: Request) {
       days: typeof row.days === 'number' && !Number.isNaN(row.days) ? row.days : null,
       sort_order: nextSortOrder++,
       active: typeof row.active === 'boolean' ? row.active : true,
+      imported: true,
     })
   }
 

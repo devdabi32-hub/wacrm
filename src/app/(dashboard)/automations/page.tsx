@@ -868,6 +868,9 @@ function CatalogueSection() {
                   <div className="flex items-center gap-2">
                     <span className="truncate text-sm font-semibold text-white">{d.name}</span>
                     <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] text-slate-400">{d.slug}</span>
+                    {d.imported && (
+                      <span className="rounded-full border border-[#0084ff]/40 bg-[#0084ff]/10 px-2 py-0.5 text-[11px] text-[#0084ff]">Imported</span>
+                    )}
                     {!d.active && (
                       <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[11px] text-slate-500">Inactive</span>
                     )}

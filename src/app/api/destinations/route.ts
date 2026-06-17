@@ -65,6 +65,7 @@ export async function POST(request: Request) {
       days: typeof body.days === 'number' ? body.days : null,
       sort_order: nextSortOrder,
       active: typeof body.active === 'boolean' ? body.active : true,
+      imported: false,
     })
     .select()
     .single()
