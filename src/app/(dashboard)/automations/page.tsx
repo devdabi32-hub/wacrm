@@ -7,8 +7,9 @@ import {
   Zap, Plus, MoreVertical, Copy, Pencil, Trash2,
   FileText, MessageCircle, Clock, Users, PhoneCall,
   Loader2, Bot, Eye, EyeOff, ExternalLink, Info,
-  Settings, MapPin,
+  Settings, MapPin, Upload, Download, ArrowRight, ArrowLeft, CheckCircle2,
 } from "lucide-react"
+import * as XLSX from "xlsx"
 
 import { createClient } from "@/lib/supabase/client"
 import type { Automation, Destination } from "@/types"
@@ -695,6 +696,62 @@ function splitList(s: string): string[] {
   return s.split(",").map((x) => x.trim()).filter(Boolean)
 }
 
+// ─────────────────────────────────────────────
+// CSV/XLSX Import — template + field config (Step 4)
+// ─────────────────────────────────────────────
+
+const DESTINATION_FIELDS: { key: string; label: string; required?: boolean }[] = [
+  { key: "name", label: "Name", required: true },
+  { key: "slug", label: "Slug" },
+  { key: "summary", label: "Summary" },
+  { key: "description", label: "Description" },
+  { key: "keywords", label: "Keywords" },
+  { key: "highlights", label: "Highlights" },
+  { key: "departures", label: "Departures" },
+  { key: "poster_url", label: "Poster URL" },
+  { key: "itinerary_url", label: "Itinerary Link" },
+  { key: "price_from", label: "Price From" },
+  { key: "currency", label: "Currency" },
+  { key: "nights", label: "Nights" },
+  { key: "days", label: "Days" },
+  { key: "active", label: "Active" },
+]
+
+function csvEscape(v: string): string {
+  return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v
+}
+
+function downloadDestinationTemplate() {
+  const headers = DESTINATION_FIELDS.map((f) => f.key)
+  const example = [
+    "Manali Honeymoon Package", "manali-honeymoon", "5N/6D snow & romance getaway",
+    "Full day-by-day itinerary details go here.", "manali, honeymoon, himachal",
+    "Snow point, candlelight dinner, cab included", "5 Jul, 12 Jul, 19 Jul",
+    "https://example.com/poster.jpg", "https://drive.google.com/your-itinerary-link",
+    "14999", "INR", "5", "6", "TRUE",
+  ]
+  const csv = [headers, example].map((row) => row.map(csvEscape).join(",")).join("\r\n")
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = "destinations_template.csv"
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function parseBoolCell(v: string | undefined): boolean {
+  const s = (v ?? "").trim().toLowerCase()
+  if (!s) return true
+  return ["true", "yes", "1", "active", "y"].includes(s)
+}
+
+function guessColumn(headers: string[], field: { key: string; label: string }): number {
+  const norm = (s: string) => s.trim().toLowerCase().replace(/[^a-z0-9]/g, "")
+  const targets = [norm(field.key), norm(field.label)]
+  return headers.findIndex((h) => targets.includes(norm(h)))
+}
+
 function CatalogueSection() {
   const [destinations, setDestinations] = useState<Destination[] | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -703,6 +760,7 @@ function CatalogueSection() {
   const [pendingDelete, setPendingDelete] = useState<Destination | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [importOpen, setImportOpen] = useState(false)
 
   async function load() {
     try {
@@ -773,9 +831,17 @@ function CatalogueSection() {
 
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-white">Destinations</h3>
-        <Button onClick={openAdd} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">
-          <Plus className="h-4 w-4" /> Add Destination
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={downloadDestinationTemplate}>
+            <Download className="h-4 w-4" /> Template
+          </Button>
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Upload className="h-4 w-4" /> Import
+          </Button>
+          <Button onClick={openAdd} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">
+            <Plus className="h-4 w-4" /> Add Destination
+          </Button>
+        </div>
       </div>
 
       {destinations === null ? (
@@ -841,6 +907,12 @@ function CatalogueSection() {
         destination={editing}
         onClose={() => setDialogOpen(false)}
         onSaved={() => { setDialogOpen(false); load() }}
+      />
+
+      <ImportDialog
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImported={() => { setImportOpen(false); load() }}
       />
 
       <Dialog open={!!pendingDelete} onOpenChange={(v) => !v && setPendingDelete(null)}>
@@ -1016,6 +1088,247 @@ function DestinationDialog({ open, destination, onClose, onSaved }: {
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {saving ? "Saving…" : destination ? "Save changes" : "Add destination"}
           </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ─────────────────────────────────────────────
+// ImportDialog — CSV/XLSX bulk import (Step 4)
+// ─────────────────────────────────────────────
+
+type ImportStep = "upload" | "map" | "result"
+
+function buildImportRow(row: string[], mapping: Record<string, number>): Record<string, unknown> {
+  const get = (key: string): string => {
+    const idx = mapping[key]
+    return idx != null && idx >= 0 ? (row[idx] ?? "").trim() : ""
+  }
+  return {
+    name: get("name"),
+    slug: get("slug") || undefined,
+    summary: get("summary") || null,
+    description: get("description") || null,
+    keywords: get("keywords"),
+    highlights: get("highlights"),
+    departures: get("departures"),
+    poster_url: get("poster_url") || null,
+    itinerary_url: get("itinerary_url") || null,
+    price_from: get("price_from") ? Number(get("price_from")) : null,
+    currency: get("currency") || "INR",
+    nights: get("nights") ? Number(get("nights")) : null,
+    days: get("days") ? Number(get("days")) : null,
+    active: parseBoolCell(get("active")),
+  }
+}
+
+function ImportDialog({ open, onClose, onImported }: {
+  open: boolean
+  onClose: () => void
+  onImported: () => void
+}) {
+  const [step, setStep] = useState<ImportStep>("upload")
+  const [parsing, setParsing] = useState(false)
+  const [fileError, setFileError] = useState<string | null>(null)
+  const [headers, setHeaders] = useState<string[]>([])
+  const [rows, setRows] = useState<string[][]>([])
+  const [mapping, setMapping] = useState<Record<string, number>>({})
+  const [importing, setImporting] = useState(false)
+  const [result, setResult] = useState<{ inserted: number; skipped: { row: number; reason: string }[] } | null>(null)
+
+  // Reset the wizard every time the dialog is (re)opened. Legitimate
+  // prop-driven sync (same pattern as DestinationDialog/deal-form.tsx).
+  useEffect(() => {
+    if (open) {
+      setStep("upload")
+      setParsing(false)
+      setFileError(null)
+      setHeaders([])
+      setRows([])
+      setMapping({})
+      setImporting(false)
+      setResult(null)
+    }
+  }, [open])
+
+  async function handleFile(file: File) {
+    setParsing(true)
+    setFileError(null)
+    try {
+      const buf = await file.arrayBuffer()
+      const wb = XLSX.read(buf, { type: "array" })
+      const sheet = wb.Sheets[wb.SheetNames[0]]
+      const grid = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: "" }) as string[][]
+      if (grid.length === 0) {
+        setFileError("This file looks empty.")
+        return
+      }
+      const [headerRow, ...dataRows] = grid
+      const cleanedHeaders = headerRow.map((h) => String(h ?? "").trim())
+      const cleanedRows = dataRows
+        .map((r) => cleanedHeaders.map((_, i) => String(r[i] ?? "").trim()))
+        .filter((r) => r.some((c) => c !== ""))
+      if (cleanedRows.length === 0) {
+        setFileError("No data rows found below the header row.")
+        return
+      }
+      const guess: Record<string, number> = {}
+      for (const f of DESTINATION_FIELDS) guess[f.key] = guessColumn(cleanedHeaders, f)
+      setHeaders(cleanedHeaders)
+      setRows(cleanedRows)
+      setMapping(guess)
+      setStep("map")
+    } catch {
+      setFileError("Could not read this file. Make sure it's a valid CSV/XLSX export.")
+    } finally {
+      setParsing(false)
+    }
+  }
+
+  async function handleConfirm() {
+    if (mapping.name == null || mapping.name < 0) {
+      toast.error("Map the Name column before importing")
+      return
+    }
+    setImporting(true)
+    const payloadRows = rows.map((r) => buildImportRow(r, mapping))
+    const res = await fetch("/api/destinations/bulk", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ rows: payloadRows }),
+    })
+    const resBody = await res.json().catch(() => ({}))
+    setImporting(false)
+    if (!res.ok) {
+      toast.error(resBody?.error ?? "Import failed")
+      return
+    }
+    setResult({ inserted: resBody.inserted ?? 0, skipped: resBody.skipped ?? [] })
+    setStep("result")
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Import destinations</DialogTitle>
+          <DialogDescription>
+            Upload a CSV or Excel export of your packages — preview and confirm before anything is saved.
+          </DialogDescription>
+        </DialogHeader>
+
+        {step === "upload" && (
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-slate-400">
+              Don&apos;t have a file yet? Download the template, fill it in your spreadsheet tool, then upload it here.
+            </p>
+            <label className="flex h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/50 text-slate-400 transition-colors hover:border-[#0084ff]/50 hover:text-white">
+              {parsing ? <Loader2 className="h-6 w-6 animate-spin" /> : <Upload className="h-6 w-6" />}
+              <span className="text-sm">{parsing ? "Reading file…" : "Click to choose a .csv or .xlsx file"}</span>
+              <input
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                className="hidden"
+                disabled={parsing}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = "" }}
+              />
+            </label>
+            {fileError && <p className="text-sm text-red-400">{fileError}</p>}
+          </div>
+        )}
+
+        {step === "map" && (
+          <div className="space-y-4 py-2">
+            <p className="text-sm text-slate-400">{rows.length} row(s) detected. Map your columns to destination fields, then review the preview below.</p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {DESTINATION_FIELDS.map((f) => (
+                <div key={f.key}>
+                  <label className={labelCls}>{f.label}{f.required ? " *" : ""}</label>
+                  <select
+                    value={mapping[f.key] ?? -1}
+                    onChange={(e) => setMapping((m) => ({ ...m, [f.key]: Number(e.target.value) }))}
+                    className={inputCls}
+                  >
+                    <option value={-1} className="bg-slate-900">— Not mapped —</option>
+                    {headers.map((h, i) => (
+                      <option key={i} value={i} className="bg-slate-900">{h || `Column ${i + 1}`}</option>
+                    ))}
+                  </select>
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <p className={labelCls}>Preview (first 5 rows)</p>
+              <div className="overflow-x-auto rounded-lg border border-slate-800">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-800/60 text-slate-400">
+                    <tr>
+                      {DESTINATION_FIELDS.map((f) => (
+                        <th key={f.key} className="whitespace-nowrap px-3 py-2 font-medium">{f.label}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.slice(0, 5).map((r, i) => {
+                      const built = buildImportRow(r, mapping)
+                      return (
+                        <tr key={i} className="border-t border-slate-800 text-slate-300">
+                          {DESTINATION_FIELDS.map((f) => (
+                            <td key={f.key} className="max-w-[160px] truncate whitespace-nowrap px-3 py-2">
+                              {String(built[f.key] ?? "")}
+                            </td>
+                          ))}
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === "result" && result && (
+          <div className="space-y-4 py-2">
+            <div className="flex items-center gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3">
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
+              <p className="text-sm text-slate-200">
+                {result.inserted} destination{result.inserted === 1 ? "" : "s"} imported and live.
+              </p>
+            </div>
+            {result.skipped.length > 0 && (
+              <div>
+                <p className={labelCls}>Skipped rows ({result.skipped.length})</p>
+                <div className="max-h-40 overflow-y-auto rounded-lg border border-slate-800 p-2 text-xs text-slate-400">
+                  {result.skipped.map((s, i) => (
+                    <div key={i}>Row {s.row}: {s.reason}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <DialogFooter>
+          {step === "upload" && (
+            <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          )}
+          {step === "map" && (
+            <>
+              <Button variant="ghost" onClick={() => setStep("upload")} disabled={importing}>
+                <ArrowLeft className="h-4 w-4" /> Back
+              </Button>
+              <Button onClick={handleConfirm} disabled={importing} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">
+                {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
+                {importing ? "Importing…" : `Import ${rows.length} row(s)`}
+              </Button>
+            </>
+          )}
+          {step === "result" && (
+            <Button onClick={onImported} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">Done</Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

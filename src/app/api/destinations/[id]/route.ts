@@ -1,37 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/automations/admin-client'
-
-function slugify(input: string): string {
-  return input
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    || 'destination'
-}
-
-async function uniqueSlug(userId: string, base: string, excludeId?: string): Promise<string> {
-  const admin = supabaseAdmin()
-  let candidate = base
-  let n = 2
-  for (;;) {
-    let query = admin
-      .from('destinations')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('slug', candidate)
-    if (excludeId) query = query.neq('id', excludeId)
-    const { data } = await query.maybeSingle()
-    if (!data) return candidate
-    candidate = `${base}-${n++}`
-  }
-}
-
-function toStringArray(v: unknown): string[] {
-  if (!Array.isArray(v)) return []
-  return v.filter((x): x is string => typeof x === 'string' && x.trim().length > 0)
-}
+import { slugify, uniqueSlug, toStringArray } from '@/lib/destinations/utils'
 
 async function requireUser() {
   const supabase = await createClient()
@@ -72,7 +42,7 @@ export async function PATCH(
   }
   if ('slug' in body) {
     const base = slugify(typeof body.slug === 'string' && body.slug.trim() ? body.slug : String(update.name ?? ''))
-    update.slug = await uniqueSlug(user.id, base, id)
+    update.slug = await uniqueSlug(user.id, base, { excludeId: id })
   }
   if ('summary' in body) update.summary = typeof body.summary === 'string' ? body.summary : null
   if ('description' in body) update.description = typeof body.description === 'string' ? body.description : null
