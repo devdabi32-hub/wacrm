@@ -25,6 +25,13 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
+  // Root - no landing page. Send straight to the dashboard or login.
+  if (request.nextUrl.pathname === '/') {
+    const url = request.nextUrl.clone()
+    url.pathname = user ? '/dashboard' : '/login'
+    return NextResponse.redirect(url)
+  }
+
   // Auth pages - redirect to dashboard if already logged in
   if (user && (
     request.nextUrl.pathname === '/login' ||

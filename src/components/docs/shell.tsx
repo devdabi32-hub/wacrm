@@ -4,7 +4,7 @@ import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { DocsSidebar } from './sidebar'
-import { GithubIcon } from '@/components/landing/github-icon'
+import { GithubIcon } from '@/components/docs/github-icon'
 import { MessageSquare } from 'lucide-react'
 import type { DocPage } from '@/lib/docs/content'
 

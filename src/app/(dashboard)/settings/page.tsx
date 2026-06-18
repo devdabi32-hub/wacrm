@@ -42,43 +42,49 @@ export default function SettingsPage() {
       </div>
 
       <Tabs value={tab} onValueChange={(v) => onChange(v as TabValue)}>
-        <TabsList className="bg-slate-900 border border-slate-700">
-          <TabsTrigger
-            value="profile"
-            className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
-          >
-            <User className="size-4" />
-            Profile
-          </TabsTrigger>
-          <TabsTrigger
-            value="whatsapp"
-            className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
-          >
-            <Settings className="size-4" />
-            WhatsApp Config
-          </TabsTrigger>
-          <TabsTrigger
-            value="templates"
-            className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
-          >
-            <MessageSquare className="size-4" />
-            Templates
-          </TabsTrigger>
-          <TabsTrigger
-            value="tags"
-            className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
-          >
-            <Tag className="size-4" />
-            Tags
-          </TabsTrigger>
-          <TabsTrigger
-            value="fields"
-            className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
-          >
-            <SlidersHorizontal className="size-4" />
-            Custom Fields
-          </TabsTrigger>
-        </TabsList>
+        {/* Horizontally scrollable on mobile — 5 tabs with labels don't
+            fit a narrow viewport, and TabsList itself doesn't wrap
+            (whitespace-nowrap triggers per tab). Icon-only below sm
+            keeps the row compact; sm+ restores full labels. */}
+        <div className="overflow-x-auto">
+          <TabsList className="bg-slate-900 border border-slate-700">
+            <TabsTrigger
+              value="profile"
+              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+            >
+              <User className="size-4" />
+              <span className="hidden sm:inline">Profile</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="whatsapp"
+              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+            >
+              <Settings className="size-4" />
+              <span className="hidden sm:inline">WhatsApp Config</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="templates"
+              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+            >
+              <MessageSquare className="size-4" />
+              <span className="hidden sm:inline">Templates</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="tags"
+              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+            >
+              <Tag className="size-4" />
+              <span className="hidden sm:inline">Tags</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="fields"
+              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+            >
+              <SlidersHorizontal className="size-4" />
+              <span className="hidden sm:inline">Custom Fields</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="profile" className="space-y-6">
           <ProfileForm />
