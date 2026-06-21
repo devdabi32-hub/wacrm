@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Settings, MessageSquare, Tag, User, SlidersHorizontal } from 'lucide-react';
+import { Settings, MessageSquare, Tag, User, SlidersHorizontal, Users } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { WhatsAppConfig } from '@/components/settings/whatsapp-config';
 import { TemplateManager } from '@/components/settings/template-manager';
@@ -10,8 +10,10 @@ import { ProfileForm } from '@/components/settings/profile-form';
 import { PasswordForm } from '@/components/settings/password-form';
 import { SessionsCard } from '@/components/settings/sessions-card';
 import { CustomFieldManager } from '@/components/settings/custom-field-manager';
+import { TeamManager } from '@/components/settings/team-manager';
+import { useAuth } from '@/hooks/use-auth';
 
-const TAB_VALUES = ['profile', 'whatsapp', 'templates', 'tags', 'fields'] as const;
+const TAB_VALUES = ['profile', 'whatsapp', 'templates', 'tags', 'fields', 'team'] as const;
 type TabValue = (typeof TAB_VALUES)[number];
 
 function isTabValue(v: string | null): v is TabValue {
@@ -21,9 +23,14 @@ function isTabValue(v: string | null): v is TabValue {
 export default function SettingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  // The Team tab is owner-only — invited members never see it.
+  const { isOwner } = useAuth();
 
   const queryTab = searchParams.get('tab');
-  const tab: TabValue = isTabValue(queryTab) ? queryTab : 'profile';
+  const requestedTab: TabValue = isTabValue(queryTab) ? queryTab : 'profile';
+  // Guard against a member deep-linking ?tab=team.
+  const tab: TabValue =
+    requestedTab === 'team' && !isOwner ? 'profile' : requestedTab;
 
   const onChange = (next: TabValue) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -83,6 +90,15 @@ export default function SettingsPage() {
               <SlidersHorizontal className="size-4" />
               <span className="hidden sm:inline">Custom Fields</span>
             </TabsTrigger>
+            {isOwner && (
+              <TabsTrigger
+                value="team"
+                className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+              >
+                <Users className="size-4" />
+                <span className="hidden sm:inline">Team</span>
+              </TabsTrigger>
+            )}
           </TabsList>
         </div>
 
@@ -107,6 +123,12 @@ export default function SettingsPage() {
         <TabsContent value="fields">
           <CustomFieldManager />
         </TabsContent>
+
+        {isOwner && (
+          <TabsContent value="team">
+            <TeamManager />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );

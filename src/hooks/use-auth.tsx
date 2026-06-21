@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getOwnerId } from "@/lib/workspace/owner";
 import type { User } from "@supabase/supabase-js";
 
 interface Profile {
@@ -22,6 +23,13 @@ interface Profile {
 interface AuthContextValue {
   user: User | null;
   profile: Profile | null;
+  /** Workspace owner id for the current user — own id for an owner, the
+   *  owner's id for an invited member. `null` until resolved. Use
+   *  `isOwner` for "is this user the workspace owner?" checks. */
+  ownerId: string | null;
+  /** True once resolved AND the current user is the workspace owner
+   *  (not an invited member). False while still resolving. */
+  isOwner: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
   /** Re-fetch the current user's profile row — call after a save from
@@ -40,7 +48,19 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [ownerId, setOwnerId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Resolve the workspace owner for the signed-in user (self for owners,
+  // the owner's id for active members). Drives the owner-only Team tab.
+  const resolveOwner = useCallback(async (userId: string) => {
+    const supabase = createClient();
+    try {
+      setOwnerId(await getOwnerId(supabase, userId));
+    } catch (err) {
+      console.error("[AuthProvider] resolveOwner threw:", err);
+    }
+  }, []);
 
   // Shared across init, auth-state-change listener, and the exposed
   // refreshProfile() callback. Reads the current session's user id and
@@ -98,6 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Don't block loading on profile fetch — let the UI render
           // with the user info we already have, profile enriches async.
           fetchProfile(currentUser.id);
+          resolveOwner(currentUser.id);
         }
       } catch (err) {
         console.error("[AuthProvider] init threw:", err);
@@ -118,8 +139,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (currentUser) {
         fetchProfile(currentUser.id);
+        resolveOwner(currentUser.id);
       } else {
         setProfile(null);
+        setOwnerId(null);
       }
 
       setLoading(false);
@@ -137,6 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    setOwnerId(null);
     window.location.href = "/login";
   }, []);
 
@@ -145,9 +169,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await fetchProfile(user.id);
   }, [user?.id, fetchProfile]);
 
+  const isOwner = !!user && ownerId !== null && ownerId === user.id;
+
   return (
     <AuthContext.Provider
-      value={{ user, profile, loading, signOut, refreshProfile }}
+      value={{ user, profile, ownerId, isOwner, loading, signOut, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>
@@ -166,6 +192,8 @@ export function useAuth(): AuthContextValue {
     return {
       user: null,
       profile: null,
+      ownerId: null,
+      isOwner: false,
       loading: false,
       signOut: async () => {
         window.location.href = "/login";
