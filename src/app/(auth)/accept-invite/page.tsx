@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,7 @@ export default function AcceptInvitePage() {
 
   const [checking, setChecking] = useState(true);
   const [hasSession, setHasSession] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -36,34 +38,59 @@ export default function AcceptInvitePage() {
   useEffect(() => {
     let active = true;
 
-    // The session arrives asynchronously once the client parses the invite
-    // token from the URL — check now and also listen for the auth event.
-    supabase.auth.getSession().then(({ data }) => {
-      if (active && data.session) {
-        setHasSession(true);
-        setChecking(false);
+    async function establish() {
+      const url = new URL(window.location.href);
+      const params = url.searchParams;
+      // Supabase can report failures via query or hash.
+      const errDesc =
+        params.get("error_description") ??
+        new URLSearchParams(url.hash.replace(/^#/, "")).get("error_description");
+      if (errDesc) {
+        if (active) {
+          setLinkError(decodeURIComponent(errDesc));
+          setChecking(false);
+        }
+        return;
       }
-    });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const tokenHash = params.get("token_hash");
+      const type = params.get("type");
+      const code = params.get("code");
+
+      // 1. token_hash flow (recommended for server-generated invites — no
+      //    PKCE code_verifier needed, works across devices/browsers).
+      if (tokenHash && type) {
+        const { error: otpErr } = await supabase.auth.verifyOtp({
+          type: type as EmailOtpType,
+          token_hash: tokenHash,
+        });
+        if (!active) return;
+        if (otpErr) setLinkError(otpErr.message);
+        else setHasSession(true);
+        setChecking(false);
+        return;
+      }
+
+      // 2. PKCE code flow (works when the flow started in this browser).
+      if (code) {
+        const { error: exErr } = await supabase.auth.exchangeCodeForSession(code);
+        if (!active) return;
+        if (exErr) setLinkError(exErr.message);
+        else setHasSession(true);
+        setChecking(false);
+        return;
+      }
+
+      // 3. Implicit hash tokens or an already-established session.
+      const { data } = await supabase.auth.getSession();
       if (!active) return;
-      if (session) {
-        setHasSession(true);
-        setChecking(false);
-      }
-    });
+      setHasSession(!!data.session);
+      setChecking(false);
+    }
 
-    // Give the URL-token exchange a moment before declaring the link invalid.
-    const timer = setTimeout(() => {
-      if (active) setChecking(false);
-    }, 2500);
-
+    establish();
     return () => {
       active = false;
-      subscription.unsubscribe();
-      clearTimeout(timer);
     };
   }, [supabase]);
 
@@ -112,6 +139,11 @@ export default function AcceptInvitePage() {
             <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
               This invite link is invalid or has expired. Ask the workspace
               owner to send a new invite.
+              {linkError && (
+                <span className="mt-2 block text-xs text-red-400/70">
+                  ({linkError})
+                </span>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
