@@ -100,16 +100,23 @@ export function TeamManager() {
     }
   }
 
-  async function handleRevoke(member: Member) {
+  async function handleRemove(member: Member) {
+    if (
+      !window.confirm(
+        `Remove ${member.invited_name || member.invited_email}? Their account and access are permanently deleted. You can invite this email again afterwards.`,
+      )
+    ) {
+      return;
+    }
     setRevokingId(member.id);
     try {
       const res = await fetch(`/api/team/${member.id}`, { method: 'DELETE' });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error ?? 'Revoke failed');
-      toast.success(`Access revoked for ${member.invited_email}`);
+      if (!res.ok) throw new Error(json.error ?? 'Remove failed');
+      toast.success(`Removed ${member.invited_email}`);
       load();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Revoke failed');
+      toast.error(err instanceof Error ? err.message : 'Remove failed');
     } finally {
       setRevokingId(null);
     }
@@ -213,21 +220,20 @@ export function TeamManager() {
                         <StatusIcon className="size-3" />
                         {meta.label}
                       </Badge>
-                      {m.status !== 'revoked' && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleRevoke(m)}
-                          disabled={revokingId === m.id}
-                          className="text-slate-400 hover:bg-red-500/10 hover:text-red-400"
-                        >
-                          {revokingId === m.id ? (
-                            <Loader2 className="size-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="size-4" />
-                          )}
-                        </Button>
-                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemove(m)}
+                        disabled={revokingId === m.id}
+                        title="Remove member"
+                        className="text-slate-400 hover:bg-red-500/10 hover:text-red-400"
+                      >
+                        {revokingId === m.id ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-4" />
+                        )}
+                      </Button>
                     </div>
                   </li>
                 );

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { getOwnerId } from '@/lib/workspace/owner'
+import { findAuthUserByEmail } from '@/lib/workspace/admin-users'
 
 export const dynamic = 'force-dynamic'
 
@@ -94,7 +95,8 @@ export async function POST(request: Request) {
   }
 
   // Upsert the row to 'invited' (covers fresh invite + re-inviting a
-  // previously revoked/pending email). member_id stays null until accept.
+  // previously revoked/pending email). member_id is set after the invite.
+  let rowId: string
   if (existing) {
     const { error: updErr } = await admin
       .from('workspace_members')
@@ -102,43 +104,68 @@ export async function POST(request: Request) {
         status: 'invited',
         role: 'member',
         invited_name: name || null,
+        member_id: null,
+        accepted_at: null,
         invited_at: new Date().toISOString(),
       })
       .eq('id', existing.id)
     if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
+    rowId = existing.id
   } else {
-    const { error: insErr } = await admin.from('workspace_members').insert({
-      owner_id: auth.ownerId,
-      invited_email: rawEmail,
-      invited_name: name || null,
-      role: 'member',
-      status: 'invited',
-    })
-    if (insErr) return NextResponse.json({ error: insErr.message }, { status: 500 })
+    const { data: inserted, error: insErr } = await admin
+      .from('workspace_members')
+      .insert({
+        owner_id: auth.ownerId,
+        invited_email: rawEmail,
+        invited_name: name || null,
+        role: 'member',
+        status: 'invited',
+      })
+      .select('id')
+      .single()
+    if (insErr || !inserted) {
+      return NextResponse.json({ error: insErr?.message ?? 'insert failed' }, { status: 500 })
+    }
+    rowId = inserted.id
   }
 
   // Send the Supabase invite email. The link drops the invitee on
   // /accept-invite with a session so they can set a password.
   const origin = new URL(request.url).origin
-  const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(rawEmail, {
-    // full_name flows into raw_user_meta_data → profile via handle_new_user().
-    data: name ? { full_name: name } : undefined,
-    redirectTo: `${origin}/accept-invite`,
-  })
+  const sendInvite = () =>
+    admin.auth.admin.inviteUserByEmail(rawEmail, {
+      // full_name flows into raw_user_meta_data → profile via handle_new_user().
+      data: name ? { full_name: name } : undefined,
+      redirectTo: `${origin}/accept-invite`,
+    })
+
+  let { data: inviteData, error: inviteErr } = await sendInvite()
+
+  // If an orphaned auth user from a previous invite is blocking the resend,
+  // remove it and try once more — this makes re-inviting "just work".
+  if (inviteErr && /already|registered|exist/i.test(inviteErr.message)) {
+    const orphanId = await findAuthUserByEmail(admin, rawEmail)
+    if (orphanId) {
+      await admin.auth.admin.deleteUser(orphanId)
+      ;({ data: inviteData, error: inviteErr } = await sendInvite())
+    }
+  }
 
   if (inviteErr) {
-    // The membership row is saved; the most common failure is that an auth
-    // user already exists for this email. Surface a clear message.
-    const alreadyExists = /already|registered|exist/i.test(inviteErr.message)
     return NextResponse.json(
-      {
-        error: alreadyExists
-          ? 'An account with this email already exists. Ask them to sign in — they will need to be linked manually.'
-          : `Invite saved but email failed to send: ${inviteErr.message}`,
-        partial: true,
-      },
-      { status: alreadyExists ? 409 : 502 },
+      { error: `Couldn't send the invite: ${inviteErr.message}` },
+      { status: 502 },
     )
+  }
+
+  // Link the new auth user to the membership row deterministically (don't
+  // rely on the signup trigger), so the member gets workspace access the
+  // moment they accept and sign in.
+  if (inviteData?.user?.id) {
+    await admin
+      .from('workspace_members')
+      .update({ member_id: inviteData.user.id, status: 'active', accepted_at: new Date().toISOString() })
+      .eq('id', rowId)
   }
 
   return NextResponse.json({ ok: true }, { status: 201 })
