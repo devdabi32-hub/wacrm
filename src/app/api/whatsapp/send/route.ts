@@ -13,6 +13,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from '@/lib/rate-limit'
+import { getOwnerId } from '@/lib/workspace/owner'
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +37,9 @@ export async function POST(request: Request) {
     if (!limit.success) {
       return rateLimitResponse(limit)
     }
+
+    // Conversation + WhatsApp config are owned by the workspace owner.
+    const ownerId = await getOwnerId(supabase, user.id)
 
     const body = await request.json()
     const {
@@ -73,7 +77,7 @@ export async function POST(request: Request) {
       .from('conversations')
       .select('*, contact:contacts(*)')
       .eq('id', conversation_id)
-      .eq('user_id', user.id)
+      .eq('user_id', ownerId)
       .single()
 
     if (convError || !conversation) {
@@ -104,7 +108,7 @@ export async function POST(request: Request) {
     const { data: config, error: configError } = await supabase
       .from('whatsapp_config')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', ownerId)
       .single()
 
     if (configError || !config) {

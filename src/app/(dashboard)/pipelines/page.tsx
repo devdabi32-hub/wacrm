@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { getOwnerId } from "@/lib/workspace/owner";
 import type { Pipeline, PipelineStage, Deal } from "@/types";
 import { PipelineBoard } from "@/components/pipelines/pipeline-board";
 import { PipelineSettings } from "@/components/pipelines/pipeline-settings";
@@ -103,10 +104,11 @@ export default function PipelinesPage() {
     } = await supabase.auth.getSession();
     const user = session?.user;
     if (!user) return null;
+    const ownerId = await getOwnerId(supabase, user.id);
 
     const { data: pipeline, error } = await supabase
       .from("pipelines")
-      .insert({ user_id: user.id, name: "Tour & Travel Pipeline" })
+      .insert({ user_id: ownerId, name: "Tour & Travel Pipeline" })
       .select()
       .single();
 
@@ -246,10 +248,11 @@ export default function PipelinesPage() {
       setCreating(false);
       return;
     }
+    const ownerId = await getOwnerId(supabase, user.id);
 
     const { data: pipeline, error } = await supabase
       .from("pipelines")
-      .insert({ user_id: user.id, name })
+      .insert({ user_id: ownerId, name })
       .select()
       .single();
 

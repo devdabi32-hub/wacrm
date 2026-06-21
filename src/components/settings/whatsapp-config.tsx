@@ -15,6 +15,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { getOwnerId } from '@/lib/workspace/owner';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,11 +63,13 @@ export function WhatsAppConfig() {
   const fetchConfig = useCallback(async (userId: string) => {
     setLoading(true);
     try {
-      // Load form values from Supabase (shows what's in DB)
+      // Load form values from Supabase (shows what's in DB — the
+      // workspace owner's config, shared across members).
+      const ownerId = await getOwnerId(supabase, userId);
       const { data, error } = await supabase
         .from('whatsapp_config')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', ownerId)
         .maybeSingle();
 
       if (error) {

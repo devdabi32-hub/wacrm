@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Plus, Trash2, Loader2, RefreshCw } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { getOwnerId } from '@/lib/workspace/owner';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -115,10 +116,11 @@ export function TemplateManager() {
     try {
       setLoading(true);
 
+      const ownerId = await getOwnerId(supabase, userId);
       const { data, error } = await supabase
         .from('message_templates')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', ownerId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -148,8 +150,9 @@ export function TemplateManager() {
         return;
       }
 
+      const ownerId = await getOwnerId(supabase, user.id);
       const payload = {
-        user_id: user.id,
+        user_id: ownerId,
         name: form.name.trim(),
         category: form.category,
         language: form.language.trim() || 'en_US',

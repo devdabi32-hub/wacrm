@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { runAutomationsForTrigger } from '@/lib/automations/engine'
+import { getOwnerId } from '@/lib/workspace/owner'
 
 /**
  * Saves a contact's custom field values, then fires the `field_updated`
@@ -18,6 +19,11 @@ export async function POST(request: Request) {
         data: { user },
     } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    // Automations + the contact are owned by the workspace owner, so the
+    // engine must run under the owner id (not the acting member's id) or a
+    // member's edit would find no automations to fire.
+    const ownerId = await getOwnerId(supabase, user.id)
 
     const body = (await request.json().catch(() => null)) as {
         contact_id?: string
@@ -86,7 +92,7 @@ export async function POST(request: Request) {
     for (const fieldId of changedFieldIds) {
         const newVal = (incoming[fieldId] ?? '').trim()
         await runAutomationsForTrigger({
-            userId: user.id,
+            userId: ownerId,
             triggerType: 'field_updated',
             contactId,
             context: {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { getOwnerId } from '@/lib/workspace/owner';
 import { toast } from 'sonner';
 import type { Contact, Tag, ContactTag, ContactNote, CustomField, ContactCustomValue, Deal } from '@/types';
 import {
@@ -302,10 +303,11 @@ export function ContactDetailView({
       setSavingNote(false);
       return;
     }
+    const ownerId = await getOwnerId(supabase, user.id);
 
     const { error } = await supabase.from('contact_notes').insert({
       contact_id: contactId,
-      user_id: user.id,
+      user_id: ownerId,
       note_text: newNote.trim(),
     });
 

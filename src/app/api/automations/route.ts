@@ -7,6 +7,7 @@ import {
   validateStepsForActivation,
   validateTriggerForActivation,
 } from '@/lib/automations/validate'
+import { getOwnerId } from '@/lib/workspace/owner'
 
 export async function GET() {
   const supabase = await createClient()
@@ -78,11 +79,12 @@ export async function POST(request: Request) {
     }
   }
 
+  const ownerId = await getOwnerId(supabase, user.id)
   const admin = supabaseAdmin()
   const { data: automation, error: insertErr } = await admin
     .from('automations')
     .insert({
-      user_id: user.id,
+      user_id: ownerId,
       name: effectiveName,
       description: effectiveDescription ?? null,
       trigger_type: effectiveTriggerType,

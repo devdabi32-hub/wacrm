@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { getOwnerId } from '@/lib/workspace/owner';
 import { toast } from 'sonner';
 import type { Contact, Tag, ContactTag } from '@/types';
 import {
@@ -91,6 +92,7 @@ export function ContactForm({
       } = await supabase.auth.getSession();
       const user = session?.user;
       if (!user) throw new Error('Not authenticated');
+      const ownerId = await getOwnerId(supabase, user.id);
 
       let contactId = contact?.id;
 
@@ -110,7 +112,7 @@ export function ContactForm({
         const { data, error } = await supabase
           .from('contacts')
           .insert({
-            user_id: user.id,
+            user_id: ownerId,
             name: name.trim() || null,
             phone: phone.trim(),
             email: email.trim() || null,

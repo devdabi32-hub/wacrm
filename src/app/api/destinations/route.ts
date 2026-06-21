@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { slugify, uniqueSlug, toStringArray } from '@/lib/destinations/utils'
+import { getOwnerId } from '@/lib/workspace/owner'
 
 // Catalogue data must never be cached — the Catalogue UI's "delete then
 // refetch" flow depends on every GET seeing the latest row immediately.
@@ -37,15 +38,19 @@ export async function POST(request: Request) {
   const name = typeof body.name === 'string' ? body.name.trim() : ''
   if (!name) return NextResponse.json({ error: 'name is required' }, { status: 400 })
 
+  // Stamp every row with the workspace owner so members share the
+  // owner's catalogue (and slugs stay unique per workspace, not per member).
+  const ownerId = await getOwnerId(supabase, user.id)
+
   const admin = supabaseAdmin()
   const baseSlug = slugify(typeof body.slug === 'string' && body.slug.trim() ? body.slug : name)
-  const slug = await uniqueSlug(user.id, baseSlug)
+  const slug = await uniqueSlug(ownerId, baseSlug)
 
   // New destinations go to the end of the list by default.
   const { data: maxRow } = await admin
     .from('destinations')
     .select('sort_order')
-    .eq('user_id', user.id)
+    .eq('user_id', ownerId)
     .order('sort_order', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -54,7 +59,7 @@ export async function POST(request: Request) {
   const { data: destination, error: insertErr } = await admin
     .from('destinations')
     .insert({
-      user_id: user.id,
+      user_id: ownerId,
       name,
       slug,
       keywords: toStringArray(body.keywords),

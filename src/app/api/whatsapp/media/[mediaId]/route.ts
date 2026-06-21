@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getMediaUrl, downloadMedia } from '@/lib/whatsapp/meta-api'
 import { decrypt } from '@/lib/whatsapp/encryption'
+import { getOwnerId } from '@/lib/workspace/owner'
 
 export async function GET(
   request: Request,
@@ -31,11 +32,12 @@ export async function GET(
       )
     }
 
-    // Fetch and decrypt WhatsApp config
+    // Fetch and decrypt WhatsApp config (workspace owner's config)
+    const ownerId = await getOwnerId(supabase, user.id)
     const { data: config, error: configError } = await supabase
       .from('whatsapp_config')
       .select('*')
-      .eq('user_id', user.id)
+      .eq('user_id', ownerId)
       .single()
 
     if (configError || !config) {

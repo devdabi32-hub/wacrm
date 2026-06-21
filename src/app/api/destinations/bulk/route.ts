@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { slugify, uniqueSlug, toStringArray } from '@/lib/destinations/utils'
+import { getOwnerId } from '@/lib/workspace/owner'
 
 interface SkippedRow {
   row: number
@@ -37,11 +38,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Max ${MAX_ROWS} rows per import` }, { status: 400 })
   }
 
+  const ownerId = await getOwnerId(supabase, user.id)
+
   const admin = supabaseAdmin()
   const { data: maxRow } = await admin
     .from('destinations')
     .select('sort_order')
-    .eq('user_id', user.id)
+    .eq('user_id', ownerId)
     .order('sort_order', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -65,10 +68,10 @@ export async function POST(request: Request) {
     }
 
     const baseSlug = slugify(typeof row.slug === 'string' && row.slug.trim() ? row.slug : name)
-    const slug = await uniqueSlug(user.id, baseSlug, { taken: takenSlugs })
+    const slug = await uniqueSlug(ownerId, baseSlug, { taken: takenSlugs })
 
     toInsert.push({
-      user_id: user.id,
+      user_id: ownerId,
       name,
       slug,
       keywords: toStringArray(row.keywords),

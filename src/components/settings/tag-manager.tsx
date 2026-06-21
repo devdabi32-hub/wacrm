@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Plus, X, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { getOwnerId } from '@/lib/workspace/owner';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,10 +59,11 @@ export function TagManager() {
     try {
       setLoading(true);
 
+      const ownerId = await getOwnerId(supabase, userId);
       const { data, error } = await supabase
         .from('tags')
         .select('*')
-        .eq('user_id', userId)
+        .eq('user_id', ownerId)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -87,10 +89,11 @@ export function TagManager() {
         return;
       }
 
+      const ownerId = await getOwnerId(supabase, user.id);
       const { error } = await supabase
         .from('tags')
         .insert({
-          user_id: user.id,
+          user_id: ownerId,
           name: newTagName.trim(),
           color: selectedColor,
         });

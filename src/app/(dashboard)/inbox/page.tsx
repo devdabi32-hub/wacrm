@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getOwnerId } from "@/lib/workspace/owner";
 import type { Conversation, Message, Contact, ConversationStatus } from "@/types";
 import { useRealtime } from "@/hooks/use-realtime";
 import { ConversationList } from "@/components/inbox/conversation-list";
@@ -47,13 +48,14 @@ export default function InboxPage() {
       const user = session?.user;
 
       if (!user) return;
+      const ownerId = await getOwnerId(supabase, user.id);
 
       // Table is `whatsapp_config` (singular) — the previous "whatsapp_configs"
       // query always returned no rows, so the banner always showed "not connected".
       const { data } = await supabase
         .from("whatsapp_config")
         .select("status")
-        .eq("user_id", user.id)
+        .eq("user_id", ownerId)
         .maybeSingle();
 
       setWhatsappConnected(data?.status === "connected");

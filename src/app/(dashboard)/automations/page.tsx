@@ -12,6 +12,7 @@ import {
 import * as XLSX from "xlsx"
 
 import { createClient } from "@/lib/supabase/client"
+import { getOwnerId } from "@/lib/workspace/owner"
 import type { Automation, Destination } from "@/types"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -367,11 +368,12 @@ function AIEngineTab() {
     const fetchConfig = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) { setLoading(false); return }
+      const ownerId = await getOwnerId(supabase, user.id)
 
       const { data } = await supabase
         .from("whatsapp_config")
         .select("ai_enabled, ai_provider, ai_model, ai_api_key, ai_system_prompt, ai_webhook_url, welcome_enabled, welcome_text, ooo_enabled, ooo_start, ooo_end, ooo_text")
-        .eq("user_id", user.id)
+        .eq("user_id", ownerId)
         .maybeSingle()
 
       if (data) {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { getOwnerId } from "@/lib/workspace/owner";
 import type {
   Contact,
   Conversation,
@@ -185,9 +186,10 @@ export function DealForm({
         setSaving(false);
         return;
       }
+      const ownerId = await getOwnerId(supabase, user.id);
       const { error } = await supabase
         .from("deals")
-        .insert({ ...payload, user_id: user.id, status: "open" });
+        .insert({ ...payload, user_id: ownerId, status: "open" });
       if (error) {
         toast.error("Failed to create deal");
         setSaving(false);

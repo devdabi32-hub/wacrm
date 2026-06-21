@@ -2,13 +2,17 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { supabaseAdmin } from '@/lib/automations/admin-client'
 import { slugify, uniqueSlug, toStringArray } from '@/lib/destinations/utils'
+import { getOwnerId } from '@/lib/workspace/owner'
 
-async function requireUser() {
+// Returns the workspace owner id for the caller (self for owners, the
+// owner's id for members) so members operate on the shared catalogue.
+async function requireOwner() {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  return user
+  if (!user) return null
+  return getOwnerId(supabase, user.id)
 }
 
 export async function PATCH(
@@ -16,8 +20,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const user = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const ownerId = await requireOwner()
+  if (!ownerId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
@@ -29,7 +33,7 @@ export async function PATCH(
     .select('id, user_id, slug')
     .eq('id', id)
     .maybeSingle()
-  if (!existing || existing.user_id !== user.id) {
+  if (!existing || existing.user_id !== ownerId) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
@@ -42,7 +46,7 @@ export async function PATCH(
   }
   if ('slug' in body) {
     const base = slugify(typeof body.slug === 'string' && body.slug.trim() ? body.slug : String(update.name ?? ''))
-    update.slug = await uniqueSlug(user.id, base, { excludeId: id })
+    update.slug = await uniqueSlug(ownerId, base, { excludeId: id })
   }
   if ('summary' in body) update.summary = typeof body.summary === 'string' ? body.summary : null
   if ('description' in body) update.description = typeof body.description === 'string' ? body.description : null
@@ -81,14 +85,14 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const user = await requireUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const ownerId = await requireOwner()
+  if (!ownerId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { error } = await supabaseAdmin()
     .from('destinations')
     .delete()
     .eq('id', id)
-    .eq('user_id', user.id)
+    .eq('user_id', ownerId)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

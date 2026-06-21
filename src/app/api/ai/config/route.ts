@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { encrypt } from '@/lib/whatsapp/encryption'
+import { getOwnerId } from '@/lib/workspace/owner'
 
 /**
  * POST /api/ai/config
@@ -17,6 +18,8 @@ export async function POST(request: Request) {
         if (authError || !user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
+
+        const ownerId = await getOwnerId(supabase, user.id)
 
         const body = await request.json()
 
@@ -70,7 +73,7 @@ export async function POST(request: Request) {
         const { data: existing } = await supabase
             .from('whatsapp_config')
             .select('id')
-            .eq('user_id', user.id)
+            .eq('user_id', ownerId)
             .maybeSingle()
 
         if (!existing) {
@@ -83,7 +86,7 @@ export async function POST(request: Request) {
         const { error: updateError } = await supabase
             .from('whatsapp_config')
             .update(patch)
-            .eq('user_id', user.id)
+            .eq('user_id', ownerId)
 
         if (updateError) {
             console.error('[ai/config] Update failed:', updateError)

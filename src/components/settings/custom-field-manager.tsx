@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2, Loader2, SlidersHorizontal, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
+import { getOwnerId } from '@/lib/workspace/owner';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -90,10 +91,11 @@ export function CustomFieldManager() {
     async function fetchFields(userId: string) {
         try {
             setLoading(true);
+            const ownerId = await getOwnerId(supabase, userId);
             const { data, error } = await supabase
                 .from('custom_fields')
                 .select('*')
-                .eq('user_id', userId)
+                .eq('user_id', ownerId)
                 .order('created_at', { ascending: true });
 
             if (error) throw error;
@@ -140,10 +142,11 @@ export function CustomFieldManager() {
 
         try {
             setSaving(true);
+            const ownerId = await getOwnerId(supabase, user.id);
             const { data, error } = await supabase
                 .from('custom_fields')
                 .insert({
-                    user_id: user.id,
+                    user_id: ownerId,
                     field_name: name,
                     field_type: newFieldType,
                     field_options: options,
