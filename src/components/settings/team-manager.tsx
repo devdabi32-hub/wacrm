@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 interface Member {
   id: string;
   invited_email: string;
+  invited_name: string | null;
   role: string;
   status: 'invited' | 'active' | 'revoked';
   member_id: string | null;
@@ -49,6 +50,7 @@ export function TeamManager() {
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [inviting, setInviting] = useState(false);
   const [revokingId, setRevokingId] = useState<string | null>(null);
 
@@ -83,12 +85,13 @@ export function TeamManager() {
       const res = await fetch('/api/team', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: value }),
+        body: JSON.stringify({ email: value, name: name.trim() }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? 'Invite failed');
       toast.success(`Invite sent to ${value}`);
       setEmail('');
+      setName('');
       load();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Invite failed');
@@ -124,25 +127,41 @@ export function TeamManager() {
             They&apos;ll get an email to set their own password. Once they accept,
             they can access this workspace&apos;s inbox, contacts and pipelines.
           </p>
-          <form onSubmit={handleInvite} className="flex flex-col gap-3 sm:flex-row">
-            <div className="flex-1">
-              <Label htmlFor="invite-email" className="sr-only">
-                Email
-              </Label>
-              <Input
-                id="invite-email"
-                type="email"
-                placeholder="teammate@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={inviting}
-                className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
-              />
+          <form onSubmit={handleInvite} className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="flex-1">
+                <Label htmlFor="invite-name" className="sr-only">
+                  Name
+                </Label>
+                <Input
+                  id="invite-name"
+                  type="text"
+                  placeholder="Member name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={inviting}
+                  className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
+                />
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="invite-email" className="sr-only">
+                  Email
+                </Label>
+                <Input
+                  id="invite-email"
+                  type="email"
+                  placeholder="teammate@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={inviting}
+                  className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
+                />
+              </div>
             </div>
             <Button
               type="submit"
               disabled={inviting}
-              className="bg-[#0084ff] text-white hover:bg-[#0066cc] disabled:opacity-50"
+              className="self-start bg-[#0084ff] text-white hover:bg-[#0066cc] disabled:opacity-50"
             >
               {inviting ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -179,9 +198,10 @@ export function TeamManager() {
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-white">
-                        {m.invited_email}
+                        {m.invited_name || m.invited_email}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="truncate text-xs text-slate-500">
+                        {m.invited_name ? `${m.invited_email} · ` : ''}
                         Invited {new Date(m.invited_at).toLocaleDateString()}
                       </p>
                     </div>

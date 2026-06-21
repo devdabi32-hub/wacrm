@@ -37,7 +37,7 @@ export async function GET() {
 
   const { data, error } = await supabaseAdmin()
     .from('workspace_members')
-    .select('id, invited_email, role, status, member_id, invited_at, accepted_at')
+    .select('id, invited_email, invited_name, role, status, member_id, invited_at, accepted_at')
     .eq('owner_id', auth.ownerId)
     .order('invited_at', { ascending: false })
 
@@ -63,6 +63,7 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => null)
   const rawEmail = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : ''
+  const name = typeof body?.name === 'string' ? body.name.trim() : ''
   if (!rawEmail || !EMAIL_RE.test(rawEmail)) {
     return NextResponse.json({ error: 'A valid email is required' }, { status: 400 })
   }
@@ -97,13 +98,19 @@ export async function POST(request: Request) {
   if (existing) {
     const { error: updErr } = await admin
       .from('workspace_members')
-      .update({ status: 'invited', role: 'member', invited_at: new Date().toISOString() })
+      .update({
+        status: 'invited',
+        role: 'member',
+        invited_name: name || null,
+        invited_at: new Date().toISOString(),
+      })
       .eq('id', existing.id)
     if (updErr) return NextResponse.json({ error: updErr.message }, { status: 500 })
   } else {
     const { error: insErr } = await admin.from('workspace_members').insert({
       owner_id: auth.ownerId,
       invited_email: rawEmail,
+      invited_name: name || null,
       role: 'member',
       status: 'invited',
     })
@@ -114,6 +121,8 @@ export async function POST(request: Request) {
   // /accept-invite with a session so they can set a password.
   const origin = new URL(request.url).origin
   const { error: inviteErr } = await admin.auth.admin.inviteUserByEmail(rawEmail, {
+    // full_name flows into raw_user_meta_data → profile via handle_new_user().
+    data: name ? { full_name: name } : undefined,
     redirectTo: `${origin}/accept-invite`,
   })
 
