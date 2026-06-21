@@ -66,10 +66,10 @@ export function DocsShell({ pages, children }: DocsShellProps) {
               <GithubIcon className="h-4 w-4" />
             </a>
             <Link
-              href="/signup"
+              href="/login"
               className="inline-flex items-center justify-center rounded-lg bg-[#0084ff] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#0066cc]"
             >
-              Get started
+              Sign in
             </Link>
           </div>
         </div>

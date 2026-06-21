@@ -32,10 +32,19 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // Public signup is disabled — access is provisioned by the admin
+  // (email + password handed to the client). Anyone hitting /signup is
+  // sent to /login (or the dashboard if already authenticated) so no
+  // random visitor can self-register just by knowing the domain.
+  if (request.nextUrl.pathname === '/signup') {
+    const url = request.nextUrl.clone()
+    url.pathname = user ? '/dashboard' : '/login'
+    return NextResponse.redirect(url)
+  }
+
   // Auth pages - redirect to dashboard if already logged in
   if (user && (
     request.nextUrl.pathname === '/login' ||
-    request.nextUrl.pathname === '/signup' ||
     request.nextUrl.pathname === '/forgot-password'
   )) {
     const url = request.nextUrl.clone()
