@@ -10,6 +10,8 @@ import {
   UserPlus,
   Clock,
   ArrowLeft,
+  Bot,
+  BotOff,
 } from "lucide-react";
 import { format, isToday, isYesterday, differenceInHours } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +35,7 @@ interface MessageThreadProps {
   onNewMessage: (message: Message) => void;
   onUpdateMessage: (id: string, updates: Partial<Message>) => void;
   onStatusChange: (conversationId: string, status: ConversationStatus) => void;
+  onAiToggle?: (conversationId: string, paused: boolean) => void;
   /**
    * On mobile, the thread is shown full-screen with the conversation list
    * hidden. This callback lets the page deselect the active conversation
@@ -80,6 +83,7 @@ export function MessageThread({
   onNewMessage,
   onUpdateMessage,
   onStatusChange,
+  onAiToggle,
   onBack,
 }: MessageThreadProps) {
   const [loading, setLoading] = useState(false);
@@ -261,6 +265,22 @@ export function MessageThread({
     [conversation, onStatusChange]
   );
 
+  const handleAiToggle = useCallback(async () => {
+    if (!conversation) return;
+    const newPaused = !conversation.ai_paused;
+    const supabase = createClient();
+    const { error } = await supabase
+      .from('conversations')
+      .update({ ai_paused: newPaused })
+      .eq('id', conversation.id);
+    if (error) {
+      toast.error('Failed to update AI status.');
+      return;
+    }
+    onAiToggle?.(conversation.id, newPaused);
+    toast.success(newPaused ? 'AI paused — you have taken over.' : 'AI resumed.');
+  }, [conversation, onAiToggle]);
+
   const handleOpenTemplates = useCallback(() => {
     setTemplateModalOpen(true);
     // Template modal implementation would go here
@@ -328,6 +348,23 @@ export function MessageThread({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* AI Toggle — Take Over / Resume AI */}
+          <button
+            type="button"
+            onClick={handleAiToggle}
+            aria-label={conversation.ai_paused ? 'Resume AI' : 'Take over from AI'}
+            title={conversation.ai_paused ? 'Resume AI' : 'Take over from AI'}
+            className={cn(
+              'flex h-7 items-center gap-1 rounded-md px-2 text-xs hover:bg-slate-800',
+              conversation.ai_paused ? 'text-amber-400' : 'text-[#0084ff]'
+            )}
+          >
+            {conversation.ai_paused ? (
+              <><BotOff className="h-3.5 w-3.5" aria-hidden="true" /><span className="hidden sm:inline">Resume AI</span></>
+            ) : (
+              <><Bot className="h-3.5 w-3.5" aria-hidden="true" /><span className="hidden sm:inline">Take Over</span></>
+            )}
+          </button>
           {/* Status dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger className={cn(

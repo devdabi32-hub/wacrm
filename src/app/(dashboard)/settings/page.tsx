@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Settings, MessageSquare, Tag, User, SlidersHorizontal, Users } from 'lucide-react';
+import { Settings, MessageSquare, Tag, User, SlidersHorizontal, Users, Building2 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { WhatsAppConfig } from '@/components/settings/whatsapp-config';
 import { TemplateManager } from '@/components/settings/template-manager';
@@ -11,9 +11,10 @@ import { PasswordForm } from '@/components/settings/password-form';
 import { SessionsCard } from '@/components/settings/sessions-card';
 import { CustomFieldManager } from '@/components/settings/custom-field-manager';
 import { TeamManager } from '@/components/settings/team-manager';
+import { BusinessSettingsForm } from '@/components/settings/business-settings-form';
 import { useAuth } from '@/hooks/use-auth';
 
-const TAB_VALUES = ['profile', 'whatsapp', 'templates', 'tags', 'fields', 'team'] as const;
+const TAB_VALUES = ['profile', 'whatsapp', 'business', 'templates', 'tags', 'fields', 'team'] as const;
 type TabValue = (typeof TAB_VALUES)[number];
 
 function isTabValue(v: string | null): v is TabValue {
@@ -70,6 +71,13 @@ export default function SettingsPage() {
               <span className="hidden sm:inline">WhatsApp Config</span>
             </TabsTrigger>
             <TabsTrigger
+              value="business"
+              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+            >
+              <Building2 className="size-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Business</span>
+            </TabsTrigger>
+            <TabsTrigger
               value="templates"
               className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
             >
@@ -110,6 +118,10 @@ export default function SettingsPage() {
 
         <TabsContent value="whatsapp">
           <WhatsAppConfig />
+        </TabsContent>
+
+        <TabsContent value="business">
+          <BusinessSettingsForm />
         </TabsContent>
 
         <TabsContent value="templates">

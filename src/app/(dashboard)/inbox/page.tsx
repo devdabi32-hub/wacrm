@@ -258,6 +258,18 @@ export default function InboxPage() {
     [activeConversation]
   );
 
+  const handleAiToggle = useCallback(
+    (conversationId: string, paused: boolean) => {
+      setConversations((prev) =>
+        prev.map((c) => (c.id === conversationId ? { ...c, ai_paused: paused } : c))
+      );
+      if (activeConversation?.id === conversationId) {
+        setActiveConversation((prev) => (prev ? { ...prev, ai_paused: paused } : prev));
+      }
+    },
+    [activeConversation?.id]
+  );
+
   // On mobile (<lg) we show a SINGLE pane — either the list or the
   // thread — rather than cramming both side-by-side. Selecting a
   // conversation slides the thread in; the thread's back button pops
@@ -314,6 +326,7 @@ export default function InboxPage() {
             onNewMessage={handleNewMessage}
             onUpdateMessage={handleUpdateMessage}
             onStatusChange={handleStatusChange}
+            onAiToggle={handleAiToggle}
             onBack={handleCloseConversation}
           />
         </div>
