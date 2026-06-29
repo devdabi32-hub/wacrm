@@ -45,3 +45,6 @@ supabase/.temp/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# personal / internal docs — never commit
+CUSTOMER_ONBOARDING.md
