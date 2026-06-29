@@ -306,11 +306,11 @@ export default function PipelinesPage() {
             <DropdownMenuTrigger
               className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800 transition-colors data-[popup-open]:bg-slate-800"
             >
-              <GitBranch className="h-4 w-4 text-[#0084ff]" />
+              <GitBranch className="h-4 w-4 text-[#0084ff]" aria-hidden="true" />
               <span className="font-semibold">
                 {selectedPipeline?.name ?? "Select Pipeline"}
               </span>
-              <ChevronDown className="h-4 w-4 text-slate-400" />
+              <ChevronDown className="h-4 w-4 text-slate-400" aria-hidden="true" />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
@@ -372,7 +372,7 @@ export default function PipelinesPage() {
       {/* Board */}
       {pipelines.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700 py-20">
-          <GitBranch className="h-12 w-12 text-slate-600" />
+          <GitBranch className="h-12 w-12 text-slate-600" aria-hidden="true" />
           <h3 className="mt-4 text-lg font-medium text-white">
             No pipelines yet
           </h3>
@@ -407,8 +407,11 @@ export default function PipelinesPage() {
             <DialogTitle className="text-white">New Pipeline</DialogTitle>
           </DialogHeader>
           <div className="py-2">
-            <Label className="text-slate-300">Pipeline Name</Label>
+            <Label htmlFor="pipeline-name" className="text-slate-300">Pipeline Name</Label>
             <Input
+              id="pipeline-name"
+              name="pipeline-name"
+              autoComplete="off"
               value={newPipelineName}
               onChange={(e) => setNewPipelineName(e.target.value)}
               placeholder="e.g., Enterprise Sales"
@@ -434,7 +437,7 @@ export default function PipelinesPage() {
               disabled={creating || !newPipelineName.trim()}
               className="bg-[#0084ff] text-white hover:bg-[#0055cc]"
             >
-              {creating ? "Creating..." : "Create Pipeline"}
+              {creating ? "Creating…" : "Create Pipeline"}
             </Button>
           </DialogFooter>
         </DialogContent>

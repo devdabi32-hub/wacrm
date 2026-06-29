@@ -162,7 +162,7 @@ export default function AutomationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Automations</h1>
+          <h1 className="text-2xl font-bold text-white text-balance">Automations</h1>
           <p className="mt-1 text-sm text-slate-400">
             Build workflows and configure AI engine for WhatsApp.
           </p>
@@ -546,8 +546,8 @@ function AIEngineTab() {
                     className={inputCls + " pr-20 font-mono"}
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    <button onClick={() => setShowKey(!showKey)} className="flex h-7 w-7 items-center justify-center text-slate-400 hover:text-white">
-                      {showKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <button onClick={() => setShowKey(!showKey)} aria-label={showKey ? "Hide API key" : "Show API key"} className="flex h-7 w-7 items-center justify-center text-slate-400 hover:text-white">
+                      {showKey ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                     </button>
                   </div>
                 </div>

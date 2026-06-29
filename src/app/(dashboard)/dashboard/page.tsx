@@ -119,7 +119,7 @@ export default function DashboardPage() {
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-white text-balance">Dashboard</h1>
         <p className="mt-1 text-sm text-slate-400">
           Live analytics across conversations, contacts, deals, broadcasts, and automations.
         </p>

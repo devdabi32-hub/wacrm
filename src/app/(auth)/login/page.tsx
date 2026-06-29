@@ -48,7 +48,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md border-slate-800 bg-slate-900">
         <CardHeader className="items-center text-center">
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0084ff]/10">
-            <MessageSquare className="h-6 w-6 text-[#0084ff]" />
+            <MessageSquare className="h-6 w-6 text-[#0084ff]" aria-hidden="true" />
           </div>
           <CardTitle className="text-xl text-white">Welcome back</CardTitle>
           <CardDescription className="text-slate-400">
@@ -70,6 +70,9 @@ export default function LoginPage() {
               <Input
                 id="email"
                 type="email"
+                name="email"
+                autoComplete="email"
+                spellCheck={false}
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -93,6 +96,8 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
+                name="password"
+                autoComplete="current-password"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -106,7 +111,7 @@ export default function LoginPage() {
               disabled={loading}
               className="mt-2 h-10 w-full bg-[#0084ff] text-white hover:bg-[#0066cc] disabled:opacity-50"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
         </CardContent>

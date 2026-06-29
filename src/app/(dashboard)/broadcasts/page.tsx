@@ -128,7 +128,7 @@ export default function BroadcastsPage() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-[#0084ff]" />
+        <Loader2 className="h-6 w-6 animate-spin text-[#0084ff]" aria-hidden="true" />
       </div>
     );
   }
@@ -176,7 +176,7 @@ export default function BroadcastsPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Broadcasts</h1>
+          <h1 className="text-2xl font-bold text-white text-balance">Broadcasts</h1>
           <p className="mt-1 text-sm text-slate-400">
             Send bulk messages to your contacts using approved templates.
           </p>
@@ -192,7 +192,7 @@ export default function BroadcastsPage() {
 
       {broadcasts.length === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-slate-800 bg-slate-900">
-          <Radio className="mb-3 h-10 w-10 text-slate-600" />
+          <Radio className="mb-3 h-10 w-10 text-slate-600" aria-hidden="true" />
           <p className="text-sm font-medium text-white">No broadcasts yet</p>
           <p className="mt-1 text-xs text-slate-400">
             Create your first broadcast to reach your contacts at scale.

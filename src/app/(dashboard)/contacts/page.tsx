@@ -210,7 +210,7 @@ export default function ContactsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Contacts</h1>
+          <h1 className="text-2xl font-bold text-white text-balance">Contacts</h1>
           <p className="text-sm text-slate-400 mt-1">
             Manage your contact list. {totalCount > 0 && `${totalCount} total contacts.`}
           </p>
@@ -236,8 +236,10 @@ export default function ContactsPage() {
 
       {/* Search */}
       <div className="relative max-w-sm">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-slate-500" />
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-4 text-slate-500" aria-hidden="true" />
         <Input
+          name="search"
+          autoComplete="off"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -245,7 +247,7 @@ export default function ContactsPage() {
             // set shrinks/grows, page N may no longer be valid.
             setPage(0);
           }}
-          placeholder="Search by name, phone, or email..."
+          placeholder="Search by name, phone, or email…"
           className="pl-8 bg-slate-900 border-slate-700 text-white placeholder:text-slate-500"
         />
       </div>
@@ -269,8 +271,8 @@ export default function ContactsPage() {
               <TableRow className="border-slate-800">
                 <TableCell colSpan={7} className="text-center py-12">
                   <div className="flex flex-col items-center gap-2">
-                    <Loader2 className="size-6 animate-spin text-[#0084ff]" />
-                    <p className="text-sm text-slate-500">Loading contacts...</p>
+                    <Loader2 className="size-6 animate-spin text-[#0084ff]" aria-hidden="true" />
+                    <p className="text-sm text-slate-500">Loading contacts…</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -278,7 +280,7 @@ export default function ContactsPage() {
               <TableRow className="border-slate-800">
                 <TableCell colSpan={7} className="text-center py-12">
                   <div className="flex flex-col items-center gap-2">
-                    <Users className="size-8 text-slate-600" />
+                    <Users className="size-8 text-slate-600" aria-hidden="true" />
                     <p className="text-sm text-slate-500">
                       {search ? 'No contacts match your search.' : 'No contacts yet.'}
                     </p>
@@ -407,11 +409,12 @@ export default function ContactsPage() {
             <Button
               variant="outline"
               size="icon-sm"
+              aria-label="Previous page"
               disabled={!hasPrev}
               onClick={() => setPage((p) => p - 1)}
               className="border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-30"
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-4" aria-hidden="true" />
             </Button>
             <span className="text-xs text-slate-400 px-2">
               Page {page + 1} of {totalPages}
@@ -419,11 +422,12 @@ export default function ContactsPage() {
             <Button
               variant="outline"
               size="icon-sm"
+              aria-label="Next page"
               disabled={!hasNext}
               onClick={() => setPage((p) => p + 1)}
               className="border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white disabled:opacity-30"
             >
-              <ChevronRight className="size-4" />
+              <ChevronRight className="size-4" aria-hidden="true" />
             </Button>
           </div>
         </div>

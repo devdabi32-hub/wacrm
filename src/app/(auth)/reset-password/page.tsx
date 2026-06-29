@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
       <Card className="w-full max-w-md border-slate-800 bg-slate-900">
         <CardHeader className="items-center text-center">
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0084ff]/10">
-            <MessageSquare className="h-6 w-6 text-[#0084ff]" />
+            <MessageSquare className="h-6 w-6 text-[#0084ff]" aria-hidden="true" />
           </div>
           <CardTitle className="text-xl text-white">Set new password</CardTitle>
           <CardDescription className="text-slate-400">
@@ -125,7 +125,7 @@ export default function ResetPasswordPage() {
         <CardContent>
           {checking ? (
             <div className="flex items-center justify-center py-8 text-slate-400">
-              <Loader2 className="size-5 animate-spin" />
+              <Loader2 className="size-5 animate-spin" aria-hidden="true" />
             </div>
           ) : linkError ? (
             <div className="flex flex-col gap-4">
@@ -155,6 +155,8 @@ export default function ResetPasswordPage() {
                 <Input
                   id="password"
                   type="password"
+                  name="password"
+                  autoComplete="new-password"
                   placeholder="At least 8 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -170,6 +172,8 @@ export default function ResetPasswordPage() {
                 <Input
                   id="confirm"
                   type="password"
+                  name="confirm"
+                  autoComplete="new-password"
                   placeholder="Re-enter password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
@@ -183,7 +187,7 @@ export default function ResetPasswordPage() {
                 disabled={saving}
                 className="mt-2 h-10 w-full bg-[#0084ff] text-white hover:bg-[#0066cc] disabled:opacity-50"
               >
-                {saving ? "Saving..." : "Update password"}
+                {saving ? "Saving…" : "Update password"}
               </Button>
             </form>
           )}
