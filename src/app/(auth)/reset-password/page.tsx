@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,21 +20,70 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const supabase = createClient();
 
-  const [ready, setReady] = useState(false);
-  const [sessionError, setSessionError] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+  const [hasSession, setHasSession] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        setReady(true);
-      } else {
-        setSessionError("Reset link is invalid or has expired. Please request a new one.");
+    let active = true;
+
+    async function establish() {
+      const url = new URL(window.location.href);
+      const params = url.searchParams;
+
+      // Check for error in query or hash
+      const errDesc =
+        params.get("error_description") ??
+        new URLSearchParams(url.hash.replace(/^#/, "")).get("error_description");
+      if (errDesc) {
+        if (active) {
+          setLinkError(decodeURIComponent(errDesc));
+          setChecking(false);
+        }
+        return;
       }
-    });
+
+      const tokenHash = params.get("token_hash");
+      const type = params.get("type");
+      const code = params.get("code");
+
+      // token_hash flow (Supabase recovery email)
+      if (tokenHash && type) {
+        const { error: otpErr } = await supabase.auth.verifyOtp({
+          type: type as EmailOtpType,
+          token_hash: tokenHash,
+        });
+        if (!active) return;
+        if (otpErr) setLinkError(otpErr.message);
+        else setHasSession(true);
+        setChecking(false);
+        return;
+      }
+
+      // PKCE code flow
+      if (code) {
+        const { error: exErr } = await supabase.auth.exchangeCodeForSession(code);
+        if (!active) return;
+        if (exErr) setLinkError(exErr.message);
+        else setHasSession(true);
+        setChecking(false);
+        return;
+      }
+
+      // Implicit hash flow or already-established session
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      setHasSession(!!data.session);
+      if (!data.session) setLinkError("Reset link is invalid or has expired.");
+      setChecking(false);
+    }
+
+    establish();
+    return () => { active = false; };
   }, [supabase]);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -73,14 +123,14 @@ export default function ResetPasswordPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {!ready && !sessionError ? (
+          {checking ? (
             <div className="flex items-center justify-center py-8 text-slate-400">
               <Loader2 className="size-5 animate-spin" />
             </div>
-          ) : sessionError ? (
+          ) : linkError ? (
             <div className="flex flex-col gap-4">
               <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-                {sessionError}
+                {linkError}
               </div>
               <Button
                 variant="outline"
