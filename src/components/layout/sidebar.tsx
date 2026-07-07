@@ -115,7 +115,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
               <MessageSquare className="h-4 w-4 text-white" />
             </div>
             <span className="text-sm font-semibold text-white">
-              CRM Template for WhatsApp
+              Automation Guru
             </span>
           </Link>
           <button
@@ -192,6 +192,11 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
             })}
           </ul>
         </nav>
+
+        {/* Watermark */}
+        <div className="shrink-0 px-4 py-1.5 text-center">
+          <p className="text-[10px] text-slate-600">Product by Automation Guru</p>
+        </div>
 
         {/* User section */}
         <div className="shrink-0 border-t border-slate-800 p-3">

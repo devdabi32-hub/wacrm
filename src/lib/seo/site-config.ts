@@ -9,7 +9,7 @@
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || 'https://wacrm.tech'
 
-export const SITE_NAME = 'Tour and Travel CRM'
+export const SITE_NAME = 'Automation Guru'
 
 export const SITE_TAGLINE = 'Manage your Tour & Travel business from one inbox'
 
@@ -40,7 +40,7 @@ export const OG_IMAGE_ALT = `${SITE_NAME} — ${SITE_TAGLINE}`
 /** Organization info surfaced in JSON-LD. */
 export const ORG_INFO = {
   name: SITE_NAME,
-  legalName: 'Tour and Travel CRM',
+  legalName: 'Automation Guru',
   url: SITE_URL,
   logo: `${SITE_URL}/icon`,
 }

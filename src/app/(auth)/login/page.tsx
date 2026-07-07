@@ -44,7 +44,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-950 px-4">
       <Card className="w-full max-w-md border-slate-800 bg-slate-900">
         <CardHeader className="items-center text-center">
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0084ff]/10">
@@ -116,6 +116,7 @@ export default function LoginPage() {
           </form>
         </CardContent>
       </Card>
+      <p className="text-xs text-slate-600">Product by Automation Guru</p>
     </div>
   );
 }
