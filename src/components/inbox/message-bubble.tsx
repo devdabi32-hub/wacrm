@@ -22,15 +22,15 @@ interface MessageBubbleProps {
 function StatusIcon({ status }: { status: Message["status"] }) {
   switch (status) {
     case "sending":
-      return <Clock className="h-3 w-3 text-muted-foreground" />;
+      return <Clock className="h-3 w-3 text-primary-foreground/60" />;
     case "sent":
-      return <Check className="h-3 w-3 text-muted-foreground" />;
+      return <Check className="h-3 w-3 text-primary-foreground/60" />;
     case "delivered":
-      return <CheckCheck className="h-3 w-3 text-muted-foreground" />;
+      return <CheckCheck className="h-3 w-3 text-primary-foreground/60" />;
     case "read":
-      return <CheckCheck className="h-3 w-3 text-blue-400" />;
+      return <CheckCheck className="h-3 w-3 text-primary-foreground" />;
     case "failed":
-      return <XCircle className="h-3 w-3 text-red-400" />;
+      return <XCircle className="h-3 w-3 text-red-300" />;
     default:
       return null;
   }
@@ -226,8 +226,8 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         className={cn(
           "relative max-w-[75%] rounded-2xl px-3 py-2",
           isAgent
-            ? "rounded-br-md bg-primary text-foreground"
-            : "rounded-bl-md bg-secondary text-foreground"
+            ? "rounded-br-md bg-primary text-primary-foreground"
+            : "rounded-bl-md border border-border bg-card text-foreground"
         )}
       >
         <MessageContent message={message} />
@@ -237,7 +237,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
             isAgent ? "justify-end" : "justify-start"
           )}
         >
-          <span className="text-[10px] text-foreground/60">{time}</span>
+          <span className={cn("text-[10px]", isAgent ? "text-primary-foreground/70" : "text-muted-foreground")}>{time}</span>
           {isAgent && <StatusIcon status={message.status} />}
         </div>
       </div>

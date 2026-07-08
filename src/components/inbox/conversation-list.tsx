@@ -26,7 +26,7 @@ interface ConversationListProps {
 const STATUS_COLORS: Record<ConversationStatus, string> = {
   open: "bg-primary",
   pending: "bg-amber-500",
-  closed: "bg-slate-500",
+  closed: "bg-muted",
 };
 
 const FILTER_OPTIONS: { label: string; value: ConversationStatus | "all" }[] = [
@@ -145,7 +145,7 @@ export function ConversationList({
             value={search}
             onChange={handleSearchChange}
             placeholder="Search conversations..."
-            className="border-border bg-secondary pl-9 text-sm text-foreground placeholder-slate-500 focus:border-primary/50"
+            className="border-border bg-secondary pl-9 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary/50"
           />
         </div>
 
