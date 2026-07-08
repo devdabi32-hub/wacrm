@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 import {
@@ -11,9 +11,10 @@ import {
   SITE_URL,
 } from "@/lib/seo/site-config";
 
-const inter = Inter({
+const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 // Consolidated site-wide metadata. Page-specific metadata (landing,
@@ -78,10 +79,12 @@ export const metadata: Metadata = {
   },
 };
 
-// Dark theme color for the mobile browser chrome.
 export const viewport: Viewport = {
-  themeColor: "#020617",
-  colorScheme: "dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F0F2F8" },
+    { media: "(prefers-color-scheme: dark)", color: "#0F1117" },
+  ],
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
@@ -90,19 +93,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full bg-slate-950 text-white font-sans">
+    <html lang="en" className={`${plusJakartaSans.variable} h-full antialiased`} suppressHydrationWarning>
+      <head>
+        {/* Anti-FOUC: apply saved theme before first paint */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('replora-theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t==='dark'||(t===null&&d)){document.documentElement.classList.add('dark')}}catch(e){}})()`,
+          }}
+        />
+      </head>
+      <body className="min-h-full bg-background text-foreground font-sans">
         {children}
         <Toaster
-          theme="dark"
+          theme="system"
           position="top-right"
-          toastOptions={{
-            style: {
-              background: "rgb(30 41 59)",
-              border: "1px solid rgb(51 65 85)",
-              color: "white",
-            },
-          }}
         />
       </body>
     </html>

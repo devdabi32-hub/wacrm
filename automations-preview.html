@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Replora — Automations</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#6366F1;
+  --primary-hover:#4F46E5;
+  --primary-bg:rgba(99,102,241,.1);
+  --primary-border:rgba(99,102,241,.25);
+  --success:#10B981;
+  --success-bg:rgba(16,185,129,.1);
+  --success-border:rgba(16,185,129,.25);
+  --warning:#F59E0B;
+  --warning-bg:rgba(245,158,11,.1);
+  --error:#EF4444;
+  --error-bg:rgba(239,68,68,.1);
+  --error-border:rgba(239,68,68,.25);
+  --blue:#3B82F6;
+  --blue-bg:rgba(59,130,246,.1);
+
+  /* Light tokens */
+  --bg:#F0F2F8;
+  --page-bg:#F0F2F8;
+  --card:#FFFFFF;
+  --card-nested:#F8F9FC;
+  --sidebar:#FFFFFF;
+  --border:#E5E7EB;
+  --border-input:#D1D5DB;
+  --text:#111827;
+  --text-2:#374151;
+  --muted:#6B7280;
+  --dim:#9CA3AF;
+  --input-bg:#F9FAFB;
+  --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.12);
+  --font:'Plus Jakarta Sans',sans-serif;
+  --radius:10px;
+  --radius-sm:6px;
+  --radius-lg:14px;
+}
+[data-theme="dark"]{
+  --bg:#0F1117;
+  --page-bg:#0F1117;
+  --card:#1A1D27;
+  --card-nested:#22263A;
+  --sidebar:#13151F;
+  --border:#252836;
+  --border-input:#2D3148;
+  --text:#F1F5F9;
+  --text-2:#CBD5E1;
+  --muted:#64748B;
+  --dim:#475569;
+  --input-bg:#0F1117;
+  --shadow:0 1px 3px rgba(0,0,0,.4);
+  --shadow-md:0 4px 12px rgba(0,0,0,.4);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.55);
+  --primary-bg:rgba(99,102,241,.12);
+  --success-bg:rgba(16,185,129,.12);
+  --warning-bg:rgba(245,158,11,.12);
+  --error-bg:rgba(239,68,68,.12);
+  --blue-bg:rgba(59,130,246,.12);
+}
+*,*::before,*::after{transition:background-color .18s ease,border-color .18s ease,color .18s ease,box-shadow .18s ease}
+a,button,input,select,textarea,.toggle-slider,.nav-tab,.sub-tab,.auto-card,.dest-row{transition-duration:.1s}
+
+body{font-family:var(--font);background:var(--page-bg);color:var(--text);font-size:14px;line-height:1.5;display:flex;min-height:100vh}
+
+/* ══ SIDEBAR ══ */
+.sidebar{width:220px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:18px 16px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border)}
+.logo-mark{width:32px;height:32px;background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0}
+.logo-name{font-weight:800;font-size:15px;color:var(--text)}
+.nav-section{padding:12px 10px 3px;font-size:10px;font-weight:700;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;margin:1px 6px;position:relative}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--primary-bg);color:var(--primary);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:-6px;top:50%;transform:translateY(-50%);width:3px;height:16px;background:var(--primary);border-radius:2px}
+.nav-item svg{width:16px;height:16px;flex-shrink:0;opacity:.7}
+.nav-item.active svg{opacity:1}
+.nav-badge{margin-left:auto;border-radius:9px;min-width:17px;height:17px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.nb-red{background:var(--error);color:#fff}
+.nb-green{background:var(--success);color:#fff}
+.nb-grey{background:var(--border);color:var(--muted)}
+.sidebar-foot{margin-top:auto;padding:12px;border-top:1px solid var(--border)}
+.user-row{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer}
+.user-row:hover{background:var(--bg)}
+.user-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:var(--text)}
+.user-role{font-size:10px;color:var(--muted)}
+
+/* ══ TOPBAR ══ */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{background:var(--sidebar);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:var(--shadow)}
+.search{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;width:220px}
+.search input{border:none;background:transparent;font-family:var(--font);font-size:13px;color:var(--text);width:100%;outline:none}
+.search input::placeholder{color:var(--dim)}
+.tb-spacer{flex:1}
+.tb-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text-2)}
+.tb-btn:hover{border-color:var(--primary);color:var(--primary)}
+.tb-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--card);box-shadow:0 0 0 1.5px var(--border)}
+.theme-toggle{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 11px;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;color:var(--muted)}
+.theme-toggle:hover{border-color:var(--primary);color:var(--primary)}
+.tt-track{width:34px;height:19px;border-radius:10px;background:var(--border);position:relative;flex-shrink:0}
+.tt-thumb{width:13px;height:13px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:transform .22s cubic-bezier(.4,0,.2,1);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+[data-theme="dark"] .tt-track{background:var(--primary)}
+[data-theme="dark"] .tt-thumb{transform:translateX(15px)}
+
+/* ══ CONTENT ══ */
+.content{flex:1;overflow-y:auto;padding:24px}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
+.breadcrumb{font-size:11px;color:var(--muted);margin-bottom:3px}
+.breadcrumb span{color:var(--text);font-weight:500}
+.page-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.page-desc{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* ══ BUTTONS ══ */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;border:none;white-space:nowrap}
+.btn-primary{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff}
+.btn-primary:hover{background:linear-gradient(135deg,#4F46E5,#7C3AED)}
+.btn-secondary{background:var(--card);color:var(--text-2);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}
+.btn-ghost:hover{background:var(--bg);color:var(--text)}
+.btn-danger{background:var(--error-bg);color:var(--error);border:1px solid var(--error-border)}
+.btn-danger:hover{background:rgba(239,68,68,.18)}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:5px}
+.btn-xs{padding:3px 9px;font-size:11px;border-radius:4px}
+
+/* ══ TAB SWITCHER ══ */
+.tabs{display:inline-flex;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px;margin-bottom:20px;box-shadow:var(--shadow)}
+.nav-tab{display:flex;align-items:center;gap:6px;padding:7px 16px;border-radius:5px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);border:none;background:transparent;font-family:var(--font)}
+.nav-tab:hover{color:var(--text);background:var(--bg)}
+.nav-tab.active{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;font-weight:600}
+.nav-tab svg{width:14px;height:14px;flex-shrink:0}
+.sub-tabs{display:inline-flex;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;gap:2px;margin-bottom:18px;box-shadow:var(--shadow)}
+.sub-tab{display:flex;align-items:center;gap:5px;padding:5px 13px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;color:var(--muted);border:none;background:transparent;font-family:var(--font)}
+.sub-tab:hover{color:var(--text);background:var(--bg)}
+.sub-tab.active{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;font-weight:600}
+.sub-tab svg{width:13px;height:13px}
+
+/* ══ TOGGLE SWITCH ══ */
+.toggle{position:relative;width:38px;height:21px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:var(--border);border-radius:11px;cursor:pointer}
+.toggle-slider:before{content:'';position:absolute;width:15px;height:15px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .18s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle input:checked+.toggle-slider{background:var(--primary)}
+.toggle input:checked+.toggle-slider:before{transform:translateX(17px)}
+
+/* ══ BADGE / PILL ══ */
+.pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill-indigo{background:var(--primary-bg);color:var(--primary);border:1px solid var(--primary-border)}
+.pill-green{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
+.pill-amber{background:var(--warning-bg);color:var(--warning);border:1px solid rgba(245,158,11,.25)}
+.pill-red{background:var(--error-bg);color:var(--error);border:1px solid var(--error-border)}
+.pill-blue{background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.pill-grey{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+
+/* ══ CARD ══ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
+.card-body{padding:20px}
+.card-title{font-size:14px;font-weight:700;color:var(--text)}
+.card-desc{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* ══ INFO BANNER ══ */
+.info-banner{display:flex;align-items:flex-start;gap:10px;border-radius:var(--radius);border:1px solid var(--primary-border);background:var(--primary-bg);padding:12px 16px;margin-bottom:16px}
+.info-banner p{font-size:13px;color:var(--text-2);line-height:1.55}
+.info-banner svg{width:15px;height:15px;flex-shrink:0;margin-top:1px;color:var(--primary)}
+
+/* ══ TEMPLATE CARDS ══ */
+.templates-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.template-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;text-align:left;box-shadow:var(--shadow);font-family:var(--font)}
+.template-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.t-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;background:var(--primary-bg)}
+.t-icon svg{width:18px;height:18px;color:var(--primary)}
+.t-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.t-desc{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* ══ AUTOMATION ROW ══ */
+.auto-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow);cursor:pointer}
+.auto-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md)}
+.auto-card+.auto-card{margin-top:10px}
+.auto-icon-wrap{width:40px;height:40px;border-radius:9px;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.auto-icon-wrap svg{width:18px;height:18px;color:var(--primary)}
+.auto-icon-wrap.green{background:var(--success-bg)}
+.auto-icon-wrap.green svg{color:var(--success)}
+.auto-icon-wrap.amber{background:var(--warning-bg)}
+.auto-icon-wrap.amber svg{color:var(--warning)}
+.auto-info{flex:1;min-width:0}
+.auto-name{font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px}
+.active-dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px rgba(16,185,129,.2);flex-shrink:0}
+.auto-desc{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.auto-meta{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:6px}
+.auto-meta span{font-size:11px;color:var(--dim)}
+.auto-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.icon-btn{width:32px;height:32px;border-radius:var(--radius-sm);background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.icon-btn:hover{background:var(--bg);color:var(--text)}
+.icon-btn svg{width:15px;height:15px}
+
+/* ══ AI ENGINE FORM ══ */
+.form-label{display:block;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px}
+.form-input{width:100%;background:var(--input-bg);border:1px solid var(--border-input);border-radius:var(--radius-sm);padding:8px 12px;font-family:var(--font);font-size:13px;color:var(--text);outline:none}
+.form-input:focus{border-color:var(--primary);background:var(--card)}
+.form-input::placeholder{color:var(--dim)}
+select.form-input option{background:var(--card);color:var(--text)}
+.form-textarea{width:100%;background:var(--input-bg);border:1px solid var(--border-input);border-radius:var(--radius-sm);padding:9px 12px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;resize:vertical}
+.form-textarea:focus{border-color:var(--primary);background:var(--card)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+.form-group{margin-bottom:16px}
+.form-group:last-child{margin-bottom:0}
+.char-count{text-align:right;font-size:11px;color:var(--dim);margin-top:4px}
+.key-hint{display:flex;justify-content:space-between;align-items:center;margin-top:5px}
+.key-hint span{font-size:11px;color:var(--muted)}
+.key-hint a{font-size:11px;color:var(--primary);text-decoration:none;display:flex;align-items:center;gap:3px}
+.key-hint a:hover{text-decoration:underline}
+.input-wrap{position:relative}
+.input-wrap .form-input{padding-right:36px}
+.eye-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);padding:4px}
+.eye-btn:hover{color:var(--text)}
+.eye-btn svg{width:15px;height:15px}
+
+/* ══ TOGGLE ROW ══ */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.tr-label{font-size:14px;font-weight:600;color:var(--text)}
+.tr-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.tr-status{font-size:11px;color:var(--muted)}
+
+/* ══ DESTINATION ROWS ══ */
+.dest-row{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.dest-row:hover{border-color:var(--primary);box-shadow:var(--shadow-md)}
+.dest-row+.dest-row{margin-top:10px}
+.dest-icon-wrap{width:38px;height:38px;border-radius:9px;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dest-icon-wrap svg{width:17px;height:17px;color:var(--primary)}
+.dest-info{flex:1;min-width:0;cursor:pointer}
+.dest-name-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.dest-name{font-size:13px;font-weight:700;color:var(--text)}
+.dest-slug{font-size:11px;background:var(--bg);color:var(--muted);padding:1px 7px;border-radius:20px}
+.dest-meta{font-size:11px;color:var(--dim);margin-top:3px}
+
+/* ══ CATALOGUE TOOLBAR ══ */
+.catalogue-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.catalogue-toolbar-title{font-size:14px;font-weight:700;color:var(--text)}
+
+/* ══ EMPTY STATE ══ */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 24px;border:2px dashed var(--border);border-radius:var(--radius-lg);text-align:center}
+.empty-icon{width:48px;height:48px;border-radius:12px;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.empty-icon svg{width:22px;height:22px;color:var(--primary)}
+.empty-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.empty-desc{font-size:12px;color:var(--muted)}
+
+/* ══ MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.modal.wide{max-width:720px}
+.modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border)}
+.modal-title{font-size:16px;font-weight:800;color:var(--text)}
+.modal-desc{font-size:13px;color:var(--muted);margin-top:3px}
+.modal-body{padding:20px 24px}
+.modal-foot{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px}
+.drop-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;height:128px;border:2px dashed var(--border-input);border-radius:var(--radius);cursor:pointer;color:var(--muted)}
+.drop-zone:hover{border-color:var(--primary);color:var(--primary)}
+.drop-zone svg{width:24px;height:24px}
+.drop-zone span{font-size:13px;font-weight:500}
+.result-banner{display:flex;align-items:center;gap:10px;border-radius:var(--radius);border:1px solid var(--success-border);background:var(--success-bg);padding:12px 16px}
+.result-banner p{font-size:13px;color:var(--text-2)}
+.result-banner svg{width:18px;height:18px;flex-shrink:0;color:var(--success)}
+
+/* ══ IMPORT STEP BAR ══ */
+.step-bar{display:flex;align-items:center;gap:0;margin-bottom:20px}
+.step{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--dim)}
+.step-num{width:24px;height:24px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.step.done .step-num{background:var(--success);border-color:var(--success);color:#fff}
+.step.active .step-num{background:var(--primary);border-color:var(--primary);color:#fff}
+.step.active{color:var(--primary)}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 8px}
+
+/* ══ TABLE (import preview) ══ */
+.mini-table{width:100%;border-collapse:collapse;font-size:11px}
+.mini-table th{text-align:left;padding:8px 10px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.mini-table td{padding:7px 10px;color:var(--text-2);border-bottom:1px solid var(--border);white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+.mini-table tr:last-child td{border-bottom:none}
+.mini-table tr:hover td{background:var(--bg)}
+.table-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-sm)}
+
+/* ══ MAP GRID ══ */
+.map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+
+/* ══ DROPDOWN MENU ══ */
+.dropdown{position:relative;display:inline-block}
+.dropdown-menu{position:absolute;right:0;top:100%;margin-top:4px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-lg);min-width:160px;z-index:50;display:none;overflow:hidden}
+.dropdown:hover .dropdown-menu{display:block}
+.dropdown-item{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:13px;color:var(--text-2);cursor:pointer;white-space:nowrap}
+.dropdown-item:hover{background:var(--bg);color:var(--text)}
+.dropdown-item.danger{color:var(--error)}
+.dropdown-item.danger:hover{background:var(--error-bg)}
+.dropdown-item svg{width:14px;height:14px}
+.dropdown-sep{height:1px;background:var(--border);margin:3px 0}
+
+/* ══ SECTION TITLE ══ */
+.section-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;margin-top:20px}
+.section-title:first-child{margin-top:0}
+
+/* ══ NOTIFICATION DOT ══ */
+.notif-wrap{position:relative}
+.notif-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;background:var(--error);border-radius:50%;border:1.5px solid var(--card)}
+
+/* scroll */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">R</div>
+    <div class="logo-name">Replora</div>
+  </div>
+  <div class="nav-section">Main</div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Inbox <span class="nav-badge nb-red">7</span>
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Contacts
+  </div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Pipelines
+  </div>
+  <div class="nav-section">Marketing</div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.92 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.84 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91"/></svg>
+    Broadcasts <span class="nav-badge nb-grey">3</span>
+  </div>
+  <div class="nav-item active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+    Automations <span class="nav-badge nb-green">2</span>
+  </div>
+  <div class="nav-section">System</div>
+  <div class="nav-item">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </div>
+  <div class="sidebar-foot">
+    <div class="user-row">
+      <div class="user-av">DD</div>
+      <div><div class="user-name">Dev Dabi</div><div class="user-role">Admin</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="search">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input placeholder="Search...">
+    </div>
+    <div class="tb-spacer"></div>
+    <button class="theme-toggle" onclick="toggleTheme()">
+      <span id="themeIcon">☀️</span>
+      <div class="tt-track"><div class="tt-thumb"></div></div>
+      <span id="themeLabel">Light</span>
+    </button>
+    <div class="notif-wrap">
+      <button class="tb-btn" style="padding:7px;border-radius:7px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="tb-avatar">DD</div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div>
+        <div class="breadcrumb">Replora / <span>Automations</span></div>
+        <div class="page-title">Automations</div>
+        <div class="page-desc">Build workflows and configure AI engine for WhatsApp.</div>
+      </div>
+      <button class="btn btn-primary" id="createBtn" onclick="showCreateBtn()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Create Automation
+      </button>
+    </div>
+
+    <!-- MAIN TABS -->
+    <div class="tabs">
+      <button class="nav-tab active" id="tab-workflows" onclick="switchTab('workflows')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Workflows
+      </button>
+      <button class="nav-tab" id="tab-ai" onclick="switchTab('ai')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M4 14v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M2 14h20"/><path d="M9 14v2"/><path d="M15 14v2"/><path d="M9 8h6"/><path d="M9 11h6"/></svg>
+        AI Engine
+      </button>
+    </div>
+
+    <!-- ══════════ TAB: WORKFLOWS ══════════ -->
+    <div id="pane-workflows">
+
+      <!-- Quick-start templates -->
+      <div class="section-title">Quick-start templates</div>
+      <div class="templates-grid">
+        <button class="template-card" onclick="alert('Opens /automations/new?template=welcome_message')">
+          <div class="t-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="t-name">Welcome Message</div>
+          <div class="t-desc">Greet new contacts with a warm message on their first WhatsApp.</div>
+        </button>
+        <button class="template-card" onclick="alert('Opens /automations/new?template=out_of_office')">
+          <div class="t-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="t-name">Out of Office</div>
+          <div class="t-desc">Auto-reply outside business hours so no lead goes cold.</div>
+        </button>
+        <button class="template-card" onclick="alert('Opens /automations/new?template=lead_qualifier')">
+          <div class="t-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="t-name">Lead Qualifier</div>
+          <div class="t-desc">Collect destination, dates, and group size automatically.</div>
+        </button>
+        <button class="template-card" onclick="alert('Opens /automations/new?template=follow_up_reminder')">
+          <div class="t-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.92 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.84 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91"/></svg>
+          </div>
+          <div class="t-name">Follow-up Reminder</div>
+          <div class="t-desc">Nudge cold leads who haven't replied in 48 hours.</div>
+        </button>
+      </div>
+
+      <!-- Active automations list -->
+      <div class="section-title">Your Automations</div>
+
+      <!-- WF3 -->
+      <div class="auto-card">
+        <div class="auto-icon-wrap green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </div>
+        <div class="auto-info">
+          <div class="auto-name">
+            WF3 — Booking Confirmation
+            <div class="active-dot"></div>
+          </div>
+          <div class="auto-desc">Sends booking confirmation message when booking_status field is updated to Confirmed</div>
+          <div class="auto-meta">
+            <span class="pill pill-green">field_updated</span>
+            <span>23 runs</span>
+            <span>·</span>
+            <span>last 2 days ago</span>
+          </div>
+        </div>
+        <div class="auto-actions">
+          <label class="toggle"><input type="checkbox" checked onchange="this.closest('.auto-card').querySelector('.active-dot').style.display=this.checked?'block':'none'"><div class="toggle-slider"></div></label>
+          <div class="dropdown">
+            <button class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </button>
+            <div class="dropdown-menu">
+              <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</div>
+              <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicate</div>
+              <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>View Logs</div>
+              <div class="dropdown-sep"></div>
+              <div class="dropdown-item danger" onclick="openDeleteModal('WF3 — Booking Confirmation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WF4 -->
+      <div class="auto-card">
+        <div class="auto-icon-wrap green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <div class="auto-info">
+          <div class="auto-name">
+            WF4 — Post-Trip Review
+            <div class="active-dot"></div>
+          </div>
+          <div class="auto-desc">Sends review request 24 hrs after travel_stage is updated to completed</div>
+          <div class="auto-meta">
+            <span class="pill pill-green">field_updated</span>
+            <span>41 runs</span>
+            <span>·</span>
+            <span>last 1 day ago</span>
+          </div>
+        </div>
+        <div class="auto-actions">
+          <label class="toggle"><input type="checkbox" checked onchange="this.closest('.auto-card').querySelector('.active-dot').style.display=this.checked?'block':'none'"><div class="toggle-slider"></div></label>
+          <div class="dropdown">
+            <button class="icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+            </button>
+            <div class="dropdown-menu">
+              <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</div>
+              <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Duplicate</div>
+              <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>View Logs</div>
+              <div class="dropdown-sep"></div>
+              <div class="dropdown-item danger" onclick="openDeleteModal('WF4 — Post-Trip Review')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /pane-workflows -->
+
+    <!-- ══════════ TAB: AI ENGINE ══════════ -->
+    <div id="pane-ai" style="display:none">
+
+      <!-- Sub-tabs -->
+      <div class="sub-tabs">
+        <button class="sub-tab active" id="subtab-settings" onclick="switchSubTab('settings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </button>
+        <button class="sub-tab" id="subtab-catalogue" onclick="switchSubTab('catalogue')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Catalogue
+        </button>
+      </div>
+
+      <!-- ─── SETTINGS PANE ─── -->
+      <div id="subpane-settings">
+
+        <div class="info-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p>AI Engine automatically replies to incoming WhatsApp messages. Configure your LLM provider below. AI replies only when no agent is assigned and the contact is not a confirmed traveller.</p>
+        </div>
+
+        <!-- Card 1: AI Auto-Reply Engine -->
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:38px;height:38px;border-radius:9px;background:var(--primary-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M12 8V4H8"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M4 14v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M2 14h20"/><path d="M9 14v2"/><path d="M15 14v2"/><path d="M9 8h6"/><path d="M9 11h6"/></svg>
+              </div>
+              <div>
+                <div class="card-title">AI Auto-Reply Engine</div>
+                <div class="card-desc">LLM-powered replies to incoming messages</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="tr-status" id="aiStatusLabel">Active</span>
+              <label class="toggle"><input type="checkbox" checked onchange="document.getElementById('aiStatusLabel').textContent=this.checked?'Active':'Paused'"><div class="toggle-slider"></div></label>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="grid-2 form-group">
+              <div>
+                <label class="form-label">AI Provider</label>
+                <select class="form-input" id="providerSelect" onchange="updateProvider()">
+                  <option value="groq">⚡ Groq (Free)</option>
+                  <option value="gemini">🔵 Google Gemini</option>
+                  <option value="openai">OpenAI / ChatGPT</option>
+                  <option value="deepseek">DeepSeek</option>
+                  <option value="claude">Anthropic Claude</option>
+                  <option value="webhook">n8n / Custom Webhook</option>
+                </select>
+              </div>
+              <div id="modelGroup">
+                <label class="form-label">Model</label>
+                <select class="form-input" id="modelSelect">
+                  <option>llama-3.1-8b-instant ⚡ Free</option>
+                  <option>llama3-8b-8192</option>
+                  <option>llama-3.3-70b-versatile</option>
+                  <option>gemma2-9b-it</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" id="apiKeyGroup">
+              <label class="form-label">API Key</label>
+              <div class="input-wrap">
+                <input type="password" class="form-input" id="apiKeyInput" value="••••••••••••••••" style="font-family:monospace" placeholder="Paste your provider API key…">
+                <button class="eye-btn" onclick="toggleKey()" type="button">
+                  <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <div class="key-hint">
+                <span>🔒 Encrypted with AES-256-GCM before storage.</span>
+                <a href="https://console.groq.com/keys" target="_blank">Get free API key <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+              </div>
+            </div>
+
+            <div id="webhookGroup" style="display:none" class="form-group">
+              <label class="form-label">n8n Webhook URL</label>
+              <input class="form-input" placeholder="https://your-n8n.com/webhook/...">
+              <p style="margin-top:5px;font-size:11px;color:var(--muted)">WaCRM will POST contact + message JSON to this URL on every inbound message.</p>
+            </div>
+
+            <div id="promptGroup" class="form-group" style="margin-bottom:0">
+              <label class="form-label">System Prompt</label>
+              <textarea class="form-textarea" rows="4" id="systemPrompt" oninput="document.getElementById('charCount').textContent=this.value.length">You are a helpful WhatsApp assistant for a Tour &amp; Travel company. Keep replies short, clear, and friendly. Maximum 2-3 sentences. Always reply in the same language the customer uses. For new inquiries, ask about travel dates, group size, and destination.</textarea>
+              <div class="char-count"><span id="charCount">197</span> / 1000</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Welcome Message -->
+        <div class="card" style="margin-bottom:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:38px;height:38px;border-radius:9px;background:var(--success-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <div>
+                <div class="card-title">Welcome Message</div>
+                <div class="card-desc">Send to new contacts on their very first message</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" checked onchange="toggleWelcome(this.checked)"><div class="toggle-slider"></div></label>
+          </div>
+          <div id="welcomeBody" style="border-top:1px solid var(--border);padding:16px 20px">
+            <label class="form-label">Message Text</label>
+            <textarea class="form-textarea" rows="3">Hi! Thanks for reaching out. We'll get back to you with the best tour packages shortly. Can you tell us your travel dates and destination? 🌍</textarea>
+          </div>
+        </div>
+
+        <!-- Card 3: Out of Office -->
+        <div class="card" style="margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <div style="width:38px;height:38px;border-radius:9px;background:var(--warning-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--warning)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <div class="card-title">Out of Office</div>
+                <div class="card-desc">Auto-reply outside business hours (uses IST timezone)</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" onchange="toggleOoo(this.checked)"><div class="toggle-slider"></div></label>
+          </div>
+          <div id="oooBody" style="display:none;border-top:1px solid var(--border);padding:16px 20px">
+            <div class="grid-2 form-group">
+              <div>
+                <label class="form-label">Offline From</label>
+                <input type="time" class="form-input" value="20:00">
+              </div>
+              <div>
+                <label class="form-label">Back Online At</label>
+                <input type="time" class="form-input" value="09:00">
+              </div>
+            </div>
+            <div>
+              <label class="form-label">OOO Message</label>
+              <textarea class="form-textarea" rows="2">Hi! We're currently offline. Our team will reply during business hours (9am–8pm IST). For urgent queries, please call us.</textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save -->
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn btn-primary" onclick="alert('AI Engine configuration saved ✓')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Save AI Engine Config
+          </button>
+          <span style="font-size:12px;color:var(--muted)">Last saved: 5 minutes ago</span>
+        </div>
+
+      </div><!-- /subpane-settings -->
+
+      <!-- ─── CATALOGUE PANE ─── -->
+      <div id="subpane-catalogue" style="display:none">
+
+        <div class="info-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p>Manage the packages your AI offers customers on WhatsApp. Add a destination here and it's instantly live — no code changes needed.</p>
+        </div>
+
+        <div class="catalogue-toolbar">
+          <div class="catalogue-toolbar-title">Destinations <span style="font-weight:500;color:var(--muted)">(9 active)</span></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm" onclick="alert('Downloads destinations_template.csv')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Template
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openImportModal()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Import
+            </button>
+            <button class="btn btn-primary btn-sm" onclick="openDestModal(false)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Destination
+            </button>
+          </div>
+        </div>
+
+        <!-- Destination rows -->
+        <div id="destList">
+          <div class="dest-row" onclick="openDestModal(true, 'Manali Winter Package', 'manali-winter', '6N/7D · from INR 42,000')">
+            <div class="dest-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="dest-info">
+              <div class="dest-name-row">
+                <span class="dest-name">Manali Winter Package</span>
+                <span class="dest-slug">manali-winter</span>
+                <span class="pill pill-green">Active</span>
+              </div>
+              <div class="dest-meta">6N/7D · from INR 42,000 · Snow & romance getaway in Himachal</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()">
+              <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+              <div class="dropdown">
+                <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+                <div class="dropdown-menu">
+                  <div class="dropdown-item" onclick="openDestModal(true,'Manali Winter Package','manali-winter','6N/7D · from INR 42,000')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</div>
+                  <div class="dropdown-sep"></div>
+                  <div class="dropdown-item danger" onclick="openDeleteModal('Manali Winter Package')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dest-row" onclick="openDestModal(true,'Goa Beach Escape','goa-beach','4N/5D · from INR 28,000')">
+            <div class="dest-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="dest-info">
+              <div class="dest-name-row">
+                <span class="dest-name">Goa Beach Escape</span>
+                <span class="dest-slug">goa-beach</span>
+                <span class="pill pill-green">Active</span>
+                <span class="pill pill-indigo" style="font-size:10px">Imported</span>
+              </div>
+              <div class="dest-meta">4N/5D · from INR 28,000 · Sun, sand & seafood on Goa's coastline</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()">
+              <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+              <div class="dropdown">
+                <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+                <div class="dropdown-menu">
+                  <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</div>
+                  <div class="dropdown-sep"></div>
+                  <div class="dropdown-item danger" onclick="openDeleteModal('Goa Beach Escape')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dest-row" onclick="openDestModal(true,'Kerala Backwaters','kerala-backwaters','6N/7D · from INR 52,000')">
+            <div class="dest-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="dest-info">
+              <div class="dest-name-row">
+                <span class="dest-name">Kerala Backwaters</span>
+                <span class="dest-slug">kerala-backwaters</span>
+                <span class="pill pill-green">Active</span>
+              </div>
+              <div class="dest-meta">6N/7D · from INR 52,000 · Houseboats, spice gardens & Ayurveda</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()">
+              <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+              <div class="dropdown">
+                <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+                <div class="dropdown-menu">
+                  <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</div>
+                  <div class="dropdown-sep"></div>
+                  <div class="dropdown-item danger" onclick="openDeleteModal('Kerala Backwaters')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dest-row" onclick="openDestModal(true,'Ladakh Adventure','ladakh-adventure','8N/9D · from INR 65,000')">
+            <div class="dest-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            </div>
+            <div class="dest-info">
+              <div class="dest-name-row">
+                <span class="dest-name">Ladakh Adventure</span>
+                <span class="dest-slug">ladakh-adventure</span>
+                <span class="pill pill-grey">Inactive</span>
+              </div>
+              <div class="dest-meta">8N/9D · from INR 65,000 · High altitude passes, monasteries & Pangong</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()">
+              <label class="toggle"><input type="checkbox"><div class="toggle-slider"></div></label>
+              <div class="dropdown">
+                <button class="icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+                <div class="dropdown-menu">
+                  <div class="dropdown-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Edit</div>
+                  <div class="dropdown-sep"></div>
+                  <div class="dropdown-item danger" onclick="openDeleteModal('Ladakh Adventure')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>Delete</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /subpane-catalogue -->
+
+    </div><!-- /pane-ai -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+
+<!-- ══ MODAL: ADD/EDIT DESTINATION ══ -->
+<div class="modal-overlay" id="destModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="destModalTitle">Add destination</div>
+      <div class="modal-desc">This shows up live in the AI's menu and replies — no deploy needed.</div>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2 form-group">
+        <div>
+          <label class="form-label">Name *</label>
+          <input class="form-input" id="destName" placeholder="Manali Honeymoon Package">
+        </div>
+        <div>
+          <label class="form-label">Slug</label>
+          <input class="form-input" id="destSlug" placeholder="auto from name">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Summary</label>
+        <input class="form-input" id="destSummary" placeholder="Short one-line shown in the menu">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" rows="3" placeholder="Full day-by-day itinerary details..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Keywords (comma-separated)</label>
+        <input class="form-input" placeholder="manali, honeymoon, himachal">
+        <p style="margin-top:4px;font-size:11px;color:var(--muted)">Used to match this package when a customer mentions it.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Highlights (comma-separated)</label>
+        <input class="form-input" placeholder="Snow point, candlelight dinner, cab included">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Departure dates (comma-separated)</label>
+        <input class="form-input" placeholder="5 Jul, 12 Jul, 19 Jul">
+      </div>
+      <div class="grid-2 form-group">
+        <div>
+          <label class="form-label">Poster image URL</label>
+          <input class="form-input" placeholder="https://...">
+        </div>
+        <div>
+          <label class="form-label">Itinerary link</label>
+          <input class="form-input" placeholder="Google Drive / Dropbox link">
+        </div>
+      </div>
+      <div class="grid-4 form-group">
+        <div><label class="form-label">Price from</label><input type="number" class="form-input" placeholder="14999"></div>
+        <div><label class="form-label">Currency</label><input class="form-input" value="INR"></div>
+        <div><label class="form-label">Nights</label><input type="number" class="form-input" placeholder="5"></div>
+        <div><label class="form-label">Days</label><input type="number" class="form-input" placeholder="6"></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px">
+        <span style="font-size:13px;color:var(--text-2)">Active (visible to AI + customers)</span>
+        <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('destModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('destModal');alert('Destination saved ✓')">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: IMPORT ══ -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal wide">
+    <div class="modal-head">
+      <div class="modal-title">Import destinations</div>
+      <div class="modal-desc">Upload a CSV or Excel export of your packages — preview and confirm before anything is saved.</div>
+    </div>
+    <div class="modal-body">
+      <!-- Step bar -->
+      <div class="step-bar" style="margin-bottom:20px">
+        <div class="step active" id="step1"><div class="step-num">1</div> Upload</div>
+        <div class="step-line"></div>
+        <div class="step" id="step2"><div class="step-num">2</div> Map columns</div>
+        <div class="step-line"></div>
+        <div class="step" id="step3"><div class="step-num">3</div> Result</div>
+      </div>
+
+      <!-- Step 1: Upload -->
+      <div id="importStep1">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Don't have a file yet? Download the template, fill it in your spreadsheet tool, then upload it here.</p>
+        <label class="drop-zone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <span>Click to choose a .csv or .xlsx file</span>
+          <input type="file" accept=".csv,.xlsx,.xls" class="hidden" style="display:none" onchange="goStep2()">
+        </label>
+      </div>
+
+      <!-- Step 2: Map (hidden) -->
+      <div id="importStep2" style="display:none">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">3 rows detected. Map your columns to destination fields, then review the preview below.</p>
+        <div class="map-grid" style="margin-bottom:16px">
+          <div><label class="form-label">Name *</label><select class="form-input"><option>Column A: name</option><option>— Not mapped —</option></select></div>
+          <div><label class="form-label">Slug</label><select class="form-input"><option>Column B: slug</option><option>— Not mapped —</option></select></div>
+          <div><label class="form-label">Summary</label><select class="form-input"><option>Column C: summary</option><option>— Not mapped —</option></select></div>
+          <div><label class="form-label">Price From</label><select class="form-input"><option>Column J: price_from</option><option>— Not mapped —</option></select></div>
+          <div><label class="form-label">Nights</label><select class="form-input"><option>Column L: nights</option><option>— Not mapped —</option></select></div>
+          <div><label class="form-label">Days</label><select class="form-input"><option>Column M: days</option><option>— Not mapped —</option></select></div>
+        </div>
+        <p class="form-label" style="margin-bottom:8px">Preview (first 3 rows)</p>
+        <div class="table-scroll">
+          <table class="mini-table">
+            <thead><tr><th>Name</th><th>Slug</th><th>Summary</th><th>Price</th><th>N</th><th>D</th></tr></thead>
+            <tbody>
+              <tr><td>Shimla Classic</td><td>shimla-classic</td><td>Toy train & apple orchards</td><td>24000</td><td>3</td><td>4</td></tr>
+              <tr><td>Rajasthan Royal</td><td>rajasthan-royal</td><td>Forts, deserts & heritage hotels</td><td>45000</td><td>7</td><td>8</td></tr>
+              <tr><td>Andaman Blue</td><td>andaman-blue</td><td>Coral reefs, white sand beaches</td><td>55000</td><td>5</td><td>6</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Step 3: Result (hidden) -->
+      <div id="importStep3" style="display:none">
+        <div class="result-banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <p>3 destinations imported and live.</p>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot" id="importFoot1">
+      <button class="btn btn-ghost" onclick="closeModal('importModal')">Cancel</button>
+    </div>
+    <div class="modal-foot" id="importFoot2" style="display:none">
+      <button class="btn btn-ghost" onclick="goStep1()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <button class="btn btn-primary" onclick="goStep3()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        Import 3 rows
+      </button>
+    </div>
+    <div class="modal-foot" id="importFoot3" style="display:none">
+      <button class="btn btn-primary" onclick="closeModal('importModal')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: DELETE CONFIRM ══ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head">
+      <div class="modal-title">Delete automation</div>
+      <div class="modal-desc">This permanently removes <strong id="deleteTarget"></strong> and its execution history. This cannot be undone.</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('deleteModal')">Cancel</button>
+      <button class="btn btn-danger" onclick="closeModal('deleteModal');alert('Deleted ✓')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ── THEME ── */
+const root=document.documentElement,icon=document.getElementById('themeIcon'),label=document.getElementById('themeLabel')
+function applyTheme(d){root.setAttribute('data-theme',d?'dark':'light');icon.textContent=d?'🌙':'☀️';label.textContent=d?'Dark':'Light';localStorage.setItem('r-theme',d?'dark':'light')}
+function toggleTheme(){applyTheme(root.getAttribute('data-theme')!=='dark')}
+;(function(){const s=localStorage.getItem('r-theme'),p=window.matchMedia('(prefers-color-scheme: dark)').matches;applyTheme(s==='dark'||(s===null&&p))})()
+
+/* ── TABS ── */
+function switchTab(t){
+  ['workflows','ai'].forEach(id=>{
+    document.getElementById('pane-'+id).style.display=id===t?'block':'none'
+    document.getElementById('tab-'+id).classList.toggle('active',id===t)
+  })
+  document.getElementById('createBtn').style.display=t==='workflows'?'flex':'none'
+}
+function showCreateBtn(){alert('Opens /automations/new')}
+
+/* ── SUB-TABS ── */
+function switchSubTab(t){
+  ['settings','catalogue'].forEach(id=>{
+    document.getElementById('subpane-'+id).style.display=id===t?'block':'none'
+    document.getElementById('subtab-'+id).classList.toggle('active',id===t)
+  })
+}
+
+/* ── PROVIDER CHANGE ── */
+const MODELS={groq:['llama-3.1-8b-instant ⚡ Free','llama3-8b-8192','llama-3.3-70b-versatile','gemma2-9b-it'],gemini:['gemini-2.0-flash ⚡ Free','gemini-1.5-flash','gemini-1.5-flash-8b'],openai:['gpt-4o-mini','gpt-4o','gpt-3.5-turbo'],deepseek:['deepseek-chat','deepseek-reasoner'],claude:['claude-3-haiku-20240307','claude-3-5-haiku-20241022','claude-sonnet-4-20250514'],webhook:[]}
+const KEY_URLS={groq:'https://console.groq.com/keys',gemini:'https://aistudio.google.com/app/apikey',openai:'https://platform.openai.com/api-keys',deepseek:'https://platform.deepseek.com/api_keys',claude:'https://console.anthropic.com/settings/keys',webhook:'#'}
+function updateProvider(){
+  const p=document.getElementById('providerSelect').value
+  const mg=document.getElementById('modelGroup'),wg=document.getElementById('webhookGroup'),ag=document.getElementById('apiKeyGroup'),pg=document.getElementById('promptGroup')
+  const isWh=p==='webhook'
+  mg.style.display=isWh?'none':'block'
+  wg.style.display=isWh?'block':'none'
+  ag.style.display=isWh?'none':'block'
+  pg.style.display=isWh?'none':'block'
+  if(!isWh){const sel=document.getElementById('modelSelect');sel.innerHTML=MODELS[p].map(m=>`<option>${m}</option>`).join('')}
+  const ka=document.querySelector('.key-hint a');if(ka)ka.href=KEY_URLS[p]
+}
+
+/* ── API KEY TOGGLE ── */
+let keyVisible=false
+function toggleKey(){keyVisible=!keyVisible;const i=document.getElementById('apiKeyInput');i.type=keyVisible?'text':'password'}
+
+/* ── TOGGLES ── */
+function toggleWelcome(on){document.getElementById('welcomeBody').style.display=on?'block':'none'}
+function toggleOoo(on){document.getElementById('oooBody').style.display=on?'block':'none'}
+
+/* ── MODALS ── */
+function openDestModal(editing,name='',slug='',meta=''){
+  document.getElementById('destModalTitle').textContent=editing?'Edit destination':'Add destination'
+  if(editing){document.getElementById('destName').value=name;document.getElementById('destSlug').value=slug;document.getElementById('destSummary').value=meta.split('·')[2]?.trim()||''}
+  else{document.getElementById('destName').value='';document.getElementById('destSlug').value='';document.getElementById('destSummary').value=''}
+  document.getElementById('destModal').classList.add('open')
+}
+function openDeleteModal(name){document.getElementById('deleteTarget').textContent=name;document.getElementById('deleteModal').classList.add('open')}
+function openImportModal(){goStep1();document.getElementById('importModal').classList.add('open')}
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}))
+
+/* ── IMPORT WIZARD ── */
+function goStep1(){setStep(1)}
+function goStep2(){setStep(2)}
+function goStep3(){setStep(3)}
+function setStep(n){
+  [1,2,3].forEach(i=>{
+    const s=document.getElementById('step'+i),p=document.getElementById('importStep'+i),f=document.getElementById('importFoot'+i)
+    s.classList.toggle('active',i===n);s.classList.toggle('done',i<n)
+    p.style.display=i===n?'block':'none'
+    f.style.display=i===n?'flex':'none'
+  })
+}
+</script>
+</body>
+</html>

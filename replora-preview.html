@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Replora — Full Dashboard Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#6366F1;
+  --primary-light:#EEF2FF;
+  --primary-dark:#4F46E5;
+  --bg:#F0F2F8;
+  --card:#FFFFFF;
+  --sidebar:#FFFFFF;
+  --border:#E5E7EB;
+  --border-2:#D1D5DB;
+  --text:#111827;
+  --text-2:#374151;
+  --muted:#6B7280;
+  --dim:#9CA3AF;
+  --success:#10B981;
+  --success-bg:#ECFDF5;
+  --warning:#F59E0B;
+  --warning-bg:#FFFBEB;
+  --error:#EF4444;
+  --error-bg:#FEF2F2;
+  --info:#3B82F6;
+  --info-bg:#EFF6FF;
+  --orange:#F97316;
+  --orange-bg:#FFF7ED;
+  --purple:#8B5CF6;
+  --purple-bg:#F5F3FF;
+  --teal:#14B8A6;
+  --teal-bg:#F0FDFA;
+  --radius:10px;
+  --radius-sm:6px;
+  --radius-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
+  --shadow-lg:0 8px 24px rgba(0,0,0,.1);
+  --font:'Plus Jakarta Sans',sans-serif;
+}
+
+/* ══ DARK MODE ══ */
+[data-theme="dark"]{
+  --bg:#0F1117;
+  --card:#1A1D27;
+  --sidebar:#13151F;
+  --border:#252836;
+  --border-2:#2D3148;
+  --text:#F1F5F9;
+  --text-2:#CBD5E1;
+  --muted:#64748B;
+  --dim:#475569;
+  --success-bg:rgba(16,185,129,.12);
+  --warning-bg:rgba(245,158,11,.12);
+  --error-bg:rgba(239,68,68,.12);
+  --info-bg:rgba(59,130,246,.12);
+  --orange-bg:rgba(249,115,22,.12);
+  --purple-bg:rgba(139,92,246,.12);
+  --teal-bg:rgba(20,184,166,.12);
+  --primary-light:rgba(99,102,241,.15);
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 12px rgba(0,0,0,.4),0 2px 4px rgba(0,0,0,.25);
+  --shadow-lg:0 8px 24px rgba(0,0,0,.5);
+}
+[data-theme="dark"] .topbar-btn{background:var(--card);color:var(--text-2)}
+[data-theme="dark"] .btn-secondary{background:var(--card);color:var(--text-2)}
+[data-theme="dark"] .form-input,[data-theme="dark"] .form-textarea{background:var(--bg);color:var(--text)}
+[data-theme="dark"] .chat-input,[data-theme="dark"] .conv-search input{background:var(--bg);color:var(--text)}
+[data-theme="dark"] .contacts-toolbar input{background:var(--card)}
+[data-theme="dark"] .avatar-btn{border-color:var(--border)}
+[data-theme="dark"] tr:hover td{background:rgba(255,255,255,.03)}
+[data-theme="dark"] .bubble-in{background:var(--card);border-color:var(--border)}
+[data-theme="dark"] .deal-card{background:var(--card)}
+[data-theme="dark"] .automation-card{background:var(--card)}
+[data-theme="dark"] .dest-card{background:var(--card)}
+[data-theme="dark"] .bstat{background:var(--bg)}
+[data-theme="dark"] .broadcast-card{background:var(--card)}
+[data-theme="dark"] .qa-card{background:var(--card)}
+[data-theme="dark"] .settings-nav{background:var(--card)}
+[data-theme="dark"] .setting-section{background:var(--card)}
+[data-theme="dark"] .motion-item{background:var(--card)}
+[data-theme="dark"] .chat-footer,[data-theme="dark"] .chat-header{background:var(--card)}
+[data-theme="dark"] .chat-body{background:var(--bg)}
+[data-theme="dark"] .chat-panel{background:var(--bg)}
+[data-theme="dark"] .conv-list-header,[data-theme="dark"] .conv-search{background:var(--card)}
+[data-theme="dark"] .conv-list{background:var(--card)}
+[data-theme="dark"] .conv-item:hover{background:rgba(255,255,255,.04)}
+[data-theme="dark"] .conv-item.active{background:rgba(99,102,241,.12)}
+
+/* ══ THEME TOGGLE BUTTON ══ */
+.theme-toggle-btn{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:5px 12px;cursor:pointer;
+  font-family:var(--font);font-size:12px;font-weight:600;
+  color:var(--muted);transition:all .2s;white-space:nowrap;
+}
+.theme-toggle-btn:hover{border-color:var(--primary);color:var(--primary)}
+.toggle-track{
+  width:36px;height:20px;border-radius:10px;background:var(--border-2);
+  position:relative;transition:background .25s;flex-shrink:0;
+}
+.toggle-thumb{
+  width:14px;height:14px;border-radius:50%;background:#fff;
+  position:absolute;top:3px;left:3px;
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+[data-theme="dark"] .toggle-track{background:var(--primary)}
+[data-theme="dark"] .toggle-thumb{transform:translateX(16px)}
+
+/* ══ SMOOTH TRANSITIONS ══ */
+*,*::before,*::after{transition-property:background-color,border-color,color,box-shadow;transition-duration:.2s;transition-timing-function:ease}
+a,button,input,textarea,select,.nav-item,.deal-card,.qa-card,.dest-card,.conv-item{transition-duration:.12s}
+
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;display:flex;height:100vh;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden}
+.sidebar-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border)}
+.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#6366F1,#8B5CF6);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0}
+.logo-text{font-weight:800;font-size:16px;color:var(--text)}
+.sidebar-section{padding:12px 12px 4px;font-size:10px;font-weight:700;color:var(--dim);letter-spacing:.08em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;color:var(--muted);font-size:13px;font-weight:500;margin:1px 8px;transition:all .15s;position:relative}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.nav-item.active::before{content:'';position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--primary);border-radius:2px}
+.nav-icon{width:18px;height:18px;flex-shrink:0;opacity:.7}
+.nav-item.active .nav-icon{opacity:1}
+.nav-badge{margin-left:auto;background:var(--error);color:#fff;border-radius:9px;min-width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.nav-badge.green{background:var(--success)}
+.nav-badge.grey{background:var(--border-2);color:var(--muted)}
+.sidebar-bottom{margin-top:auto;padding:16px;border-top:1px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s}
+.user-card:hover{background:var(--bg)}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:var(--text)}
+.user-role{font-size:11px;color:var(--muted)}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--card);border-bottom:1px solid var(--border);padding:0 24px;height:60px;display:flex;align-items:center;gap:16px;flex-shrink:0;box-shadow:var(--shadow)}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 14px;width:240px;cursor:text}
+.search-bar input{border:none;background:transparent;font-family:var(--font);font-size:13px;color:var(--text);width:100%;outline:none}
+.search-bar input::placeholder{color:var(--dim)}
+.topbar-spacer{flex:1}
+.topbar-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--card);color:var(--text-2);transition:all .15s}
+.topbar-btn:hover{border-color:var(--primary);color:var(--primary)}
+.btn-create{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;border:none;padding:8px 18px;font-weight:600}
+.btn-create:hover{background:linear-gradient(135deg,#4F46E5,#7C3AED);color:#fff}
+.avatar-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;border:2px solid #fff;box-shadow:0 0 0 2px var(--border)}
+
+/* ── PAGE CONTENT ── */
+.page-content{flex:1;overflow-y:auto;padding:24px}
+.page{display:none}
+.page.active{display:block}
+.page-header{margin-bottom:24px}
+.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:4px}
+.breadcrumb span{color:var(--text);font-weight:500}
+.page-title{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.page-subtitle{font-size:13px;color:var(--muted);margin-top:2px}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow);display:flex;align-items:flex-start;gap:14px}
+.stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.stat-info{flex:1}
+.stat-label{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.stat-value{font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1}
+.stat-delta{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;margin-top:6px;padding:2px 7px;border-radius:20px}
+.delta-up{background:var(--success-bg);color:var(--success)}
+.delta-down{background:var(--error-bg);color:var(--error)}
+.delta-neutral{background:var(--bg);color:var(--muted)}
+
+/* ── CARDS / GRID ── */
+.grid-2{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.grid-equal{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:700;color:var(--text)}
+.card-meta{font-size:12px;color:var(--muted)}
+.card-action{font-size:12px;font-weight:600;color:var(--primary);cursor:pointer}
+
+/* ── CHART MOCK ── */
+.chart-area{height:180px;position:relative;overflow:hidden}
+.chart-svg{width:100%;height:100%}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;border-bottom:2px solid var(--border)}
+td{padding:12px 14px;font-size:13px;color:var(--text-2);border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.td-name{font-weight:600;color:var(--text)}
+.td-mono{font-family:monospace;font-size:12px;color:var(--muted)}
+
+/* ── BADGES / TAGS ── */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-purple{background:var(--purple-bg);color:var(--purple)}
+.badge-blue{background:var(--info-bg);color:var(--info)}
+.badge-green{background:var(--success-bg);color:var(--success)}
+.badge-orange{background:var(--orange-bg);color:var(--orange)}
+.badge-red{background:var(--error-bg);color:var(--error)}
+.badge-grey{background:var(--bg);color:var(--muted)}
+.badge-teal{background:var(--teal-bg);color:var(--teal)}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;border-radius:3px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-sm);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff}
+.btn-primary:hover{background:linear-gradient(135deg,#4F46E5,#7C3AED)}
+.btn-secondary{background:var(--card);color:var(--text-2);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--primary);color:var(--primary)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}
+.btn-ghost:hover{background:var(--bg);color:var(--text)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-danger{background:var(--error-bg);color:var(--error);border:1px solid rgba(239,68,68,.15)}
+.btn-success{background:var(--success-bg);color:var(--success)}
+
+/* ── INBOX ── */
+.inbox-layout{display:grid;grid-template-columns:320px 1fr;gap:0;border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-md);height:calc(100vh - 160px)}
+.conv-list{background:var(--card);border-right:1px solid var(--border);display:flex;flex-direction:column}
+.conv-list-header{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.conv-search{padding:12px 16px;border-bottom:1px solid var(--border)}
+.conv-search input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;font-family:var(--font);font-size:12px;color:var(--text);outline:none}
+.conv-item{padding:12px 16px;display:flex;gap:10px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .1s;align-items:flex-start}
+.conv-item:hover{background:var(--bg)}
+.conv-item.active{background:var(--primary-light)}
+.conv-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.conv-content{flex:1;min-width:0}
+.conv-row1{display:flex;justify-content:space-between;margin-bottom:2px}
+.conv-name{font-size:13px;font-weight:600;color:var(--text)}
+.conv-time{font-size:10px;color:var(--dim)}
+.conv-preview{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.conv-tags{display:flex;gap:4px;flex-wrap:wrap}
+.conv-unread{margin-left:auto;background:var(--primary);color:#fff;border-radius:9px;min-width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.chat-panel{background:var(--bg);display:flex;flex-direction:column}
+.chat-header{background:var(--card);padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.chat-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:10px}
+.chat-bubble{max-width:72%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.55}
+.bubble-in{background:var(--card);border:1px solid var(--border);color:var(--text);align-self:flex-start;border-bottom-left-radius:3px;box-shadow:var(--shadow)}
+.bubble-out{background:linear-gradient(135deg,#6366F1,#8B5CF6);color:#fff;align-self:flex-end;border-bottom-right-radius:3px}
+.bubble-time{font-size:10px;opacity:.6;margin-top:4px;text-align:right}
+.chat-footer{background:var(--card);padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:center}
+.chat-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-family:var(--font);font-size:13px;color:var(--text);outline:none}
+.chat-input::placeholder{color:var(--dim)}
+.ai-pill{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(139,92,246,.2);padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.04em}
+
+/* ── PIPELINE ── */
+.kanban{display:flex;gap:16px;overflow-x:auto;padding-bottom:8px}
+.kanban-col{flex-shrink:0;width:220px}
+.kanban-col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding:0 2px}
+.kanban-col-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kanban-count{background:var(--border);color:var(--muted);border-radius:9px;min-width:20px;height:20px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.deal-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.deal-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.deal-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.deal-dest{font-size:11px;color:var(--muted);margin-bottom:8px}
+.deal-footer{display:flex;align-items:center;justify-content:space-between}
+.deal-value{font-size:13px;font-weight:700;color:var(--primary)}
+.deal-pax{font-size:11px;color:var(--dim)}
+
+/* ── CONTACTS ── */
+.contacts-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.contacts-toolbar input{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 14px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;flex:1;max-width:300px}
+.contacts-toolbar input::placeholder{color:var(--dim)}
+
+/* ── AUTOMATION BUILDER ── */
+.automation-card{background:var(--card);border:2px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;cursor:pointer;transition:all .15s}
+.automation-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md)}
+.automation-card.active-auto{border-color:var(--success);background:var(--success-bg)}
+.automation-header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.auto-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.auto-name{font-size:14px;font-weight:700;color:var(--text)}
+.auto-desc{font-size:12px;color:var(--muted)}
+.auto-footer{display:flex;align-items:center;gap:8px;margin-top:10px}
+
+/* ── SETTINGS ── */
+.settings-layout{display:grid;grid-template-columns:220px 1fr;gap:20px}
+.settings-nav{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;box-shadow:var(--shadow);height:fit-content}
+.settings-nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all .15s}
+.settings-nav-item:hover{background:var(--bg);color:var(--text)}
+.settings-nav-item.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+.settings-panel{display:flex;flex-direction:column;gap:16px}
+.setting-section{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;box-shadow:var(--shadow)}
+.setting-section-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.setting-section-desc{font-size:13px;color:var(--muted);margin-bottom:20px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--primary);background:var(--card)}
+.form-input::placeholder{color:var(--dim)}
+.form-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;resize:vertical;min-height:80px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info .toggle-label{font-size:14px;font-weight:600;color:var(--text)}
+.toggle-info .toggle-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.toggle{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:var(--border-2);border-radius:11px;cursor:pointer;transition:background .2s}
+.toggle input:checked + .toggle-slider{background:var(--primary)}
+.toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle input:checked + .toggle-slider:before{transform:translateX(18px)}
+
+/* ── BROADCASTS ── */
+.broadcast-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow);margin-bottom:12px}
+.broadcast-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.broadcast-name{font-size:15px;font-weight:700;color:var(--text)}
+.broadcast-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.broadcast-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.bstat{text-align:center;padding:12px;background:var(--bg);border-radius:var(--radius-sm)}
+.bstat-value{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.02em}
+.bstat-label{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px}
+
+/* ── CATALOGUE ── */
+.dest-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow);transition:all .15s}
+.dest-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.dest-img{height:120px;object-fit:cover;width:100%;background:linear-gradient(135deg,#6366F1,#8B5CF6);display:flex;align-items:center;justify-content:center;font-size:36px}
+.dest-body{padding:14px}
+.dest-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.dest-nights{font-size:12px;color:var(--muted);margin-bottom:10px}
+.dest-price{font-size:16px;font-weight:800;color:var(--primary);margin-bottom:10px}
+.dest-footer{display:flex;gap:6px}
+
+/* ── AVATAR COLORS ── */
+.av-purple{background:linear-gradient(135deg,#8B5CF6,#6366F1)}
+.av-orange{background:linear-gradient(135deg,#F97316,#FBBF24)}
+.av-green{background:linear-gradient(135deg,#10B981,#059669)}
+.av-blue{background:linear(135deg,#3B82F6,#2563EB)}
+.av-teal{background:linear-gradient(135deg,#14B8A6,#0891B2)}
+.av-pink{background:linear-gradient(135deg,#EC4899,#8B5CF6)}
+.av-blue2{background:linear-gradient(135deg,#3B82F6,#6366F1)}
+
+/* ── DIVIDER ── */
+hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+
+/* ── NOTIFICATION DOT ── */
+.notif-dot{width:8px;height:8px;background:var(--error);border-radius:50%;position:absolute;top:4px;right:4px}
+
+/* ── ACTIVITY FEED ── */
+.activity-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.activity-item:last-child{border-bottom:none}
+.activity-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.activity-text{font-size:13px;color:var(--text-2)}
+.activity-text strong{color:var(--text);font-weight:600}
+.activity-time{font-size:11px;color:var(--dim);margin-top:2px}
+
+/* ── QUICK ACTIONS ── */
+.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.qa-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.qa-card:hover{border-color:var(--primary);box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.qa-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin:0 auto 10px}
+.qa-label{font-size:12px;font-weight:600;color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">R</div>
+    <div class="logo-text">Replora</div>
+  </div>
+
+  <div class="sidebar-section">Main</div>
+  <div class="nav-item active" onclick="showPage('dashboard')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </div>
+  <div class="nav-item" onclick="showPage('inbox')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Inbox
+    <div class="nav-badge">7</div>
+  </div>
+  <div class="nav-item" onclick="showPage('contacts')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Contacts
+  </div>
+  <div class="nav-item" onclick="showPage('pipelines')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Pipelines
+  </div>
+
+  <div class="sidebar-section">Marketing</div>
+  <div class="nav-item" onclick="showPage('broadcasts')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.92 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.84 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91"/></svg>
+    Broadcasts
+    <div class="nav-badge grey">3</div>
+  </div>
+  <div class="nav-item" onclick="showPage('automations')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 19.07a10 10 0 0 1 0-14.14"/></svg>
+    Automations
+    <div class="nav-badge green">2</div>
+  </div>
+  <div class="nav-item" onclick="showPage('catalogue')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Catalogue
+  </div>
+
+  <div class="sidebar-section">System</div>
+  <div class="nav-item" onclick="showPage('settings')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    Settings
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="user-avatar">DD</div>
+      <div>
+        <div class="user-name">Dev Dabi</div>
+        <div class="user-role">Admin · Replora</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="search-bar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input placeholder="Search anything...">
+    </div>
+    <div class="topbar-spacer"></div>
+    <button class="topbar-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Messages
+    </button>
+    <button class="topbar-btn" style="color:var(--purple);border-color:rgba(139,92,246,.3);background:var(--purple-bg)">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      AI Brain
+    </button>
+    <button class="btn btn-primary btn-sm">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New Broadcast
+    </button>
+    <!-- THEME TOGGLE -->
+    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle light / dark mode">
+      <span id="themeIcon">☀️</span>
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      <span id="themeLabel">Light</span>
+    </button>
+    <div style="position:relative">
+      <button class="topbar-btn" style="padding:8px;border-radius:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+      <div class="notif-dot"></div>
+    </div>
+    <div class="avatar-btn">DD</div>
+  </div>
+
+  <!-- PAGE CONTENT -->
+  <div class="page-content">
+
+    <!-- ══ DASHBOARD ══ -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="breadcrumb">Replora / <span>Dashboard</span></div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Good morning, Dev! Here's what's happening today.</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--orange-bg)">💬</div>
+          <div class="stat-info">
+            <div class="stat-label">Open Conversations</div>
+            <div class="stat-value">47</div>
+            <div class="stat-delta delta-up">↑ 32.54%</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--info-bg)">🤖</div>
+          <div class="stat-info">
+            <div class="stat-label">AI Brain Sessions</div>
+            <div class="stat-value">31</div>
+            <div class="stat-delta delta-up">↑ 32.54%</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--purple-bg)">💰</div>
+          <div class="stat-info">
+            <div class="stat-label">Pipeline Value</div>
+            <div class="stat-value" style="font-size:20px">₹12.4L</div>
+            <div class="stat-delta delta-up">↑ 32.54%</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:var(--success-bg)">👥</div>
+          <div class="stat-info">
+            <div class="stat-label">New Contacts</div>
+            <div class="stat-value">23</div>
+            <div class="stat-delta delta-up">↑ 32.54%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <div class="qa-card">
+          <div class="qa-icon" style="background:var(--primary-light)">📤</div>
+          <div class="qa-label">Send Broadcast</div>
+        </div>
+        <div class="qa-card">
+          <div class="qa-icon" style="background:var(--success-bg)">➕</div>
+          <div class="qa-label">Add Contact</div>
+        </div>
+        <div class="qa-card">
+          <div class="qa-icon" style="background:var(--orange-bg)">⚡</div>
+          <div class="qa-label">New Automation</div>
+        </div>
+        <div class="qa-card">
+          <div class="qa-icon" style="background:var(--purple-bg)">🗺️</div>
+          <div class="qa-label">Add Destination</div>
+        </div>
+      </div>
+
+      <!-- Chart + Tasks -->
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Conversation Overview</div>
+              <div class="card-meta">📈 89% response rate this month</div>
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm">7D</button>
+              <button class="btn btn-secondary btn-sm" style="background:var(--primary-light);color:var(--primary);border-color:transparent">30D</button>
+              <button class="btn btn-ghost btn-sm">90D</button>
+            </div>
+          </div>
+          <div class="chart-area">
+            <svg class="chart-svg" viewBox="0 0 600 180" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6366F1" stop-opacity=".3"/>
+                  <stop offset="100%" stop-color="#6366F1" stop-opacity="0"/>
+                </linearGradient>
+                <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#10B981" stop-opacity=".2"/>
+                  <stop offset="100%" stop-color="#10B981" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <!-- Grid lines -->
+              <line x1="0" y1="45" x2="600" y2="45" stroke="#E5E7EB" stroke-width="1"/>
+              <line x1="0" y1="90" x2="600" y2="90" stroke="#E5E7EB" stroke-width="1"/>
+              <line x1="0" y1="135" x2="600" y2="135" stroke="#E5E7EB" stroke-width="1"/>
+              <!-- Area 1 (primary) -->
+              <path d="M0,140 C50,120 100,100 150,90 C200,80 250,70 300,60 C350,50 400,45 450,40 C500,35 550,30 600,25 L600,180 L0,180Z" fill="url(#g1)"/>
+              <path d="M0,140 C50,120 100,100 150,90 C200,80 250,70 300,60 C350,50 400,45 450,40 C500,35 550,30 600,25" fill="none" stroke="#6366F1" stroke-width="2.5"/>
+              <!-- Area 2 (success) -->
+              <path d="M0,155 C50,148 100,140 150,130 C200,120 250,115 300,108 C350,100 400,95 450,90 C500,85 550,80 600,75 L600,180 L0,180Z" fill="url(#g2)"/>
+              <path d="M0,155 C50,148 100,140 150,130 C200,120 250,115 300,108 C350,100 400,95 450,90 C500,85 550,80 600,75" fill="none" stroke="#10B981" stroke-width="2.5" stroke-dasharray="5,3"/>
+              <!-- X labels -->
+              <text x="0" y="175" font-size="10" fill="#9CA3AF" font-family="Plus Jakarta Sans">Feb</text>
+              <text x="95" y="175" font-size="10" fill="#9CA3AF" font-family="Plus Jakarta Sans">Mar</text>
+              <text x="190" y="175" font-size="10" fill="#9CA3AF" font-family="Plus Jakarta Sans">Apr</text>
+              <text x="285" y="175" font-size="10" fill="#9CA3AF" font-family="Plus Jakarta Sans">May</text>
+              <text x="380" y="175" font-size="10" fill="#9CA3AF" font-family="Plus Jakarta Sans">Jun</text>
+              <text x="475" y="175" font-size="10" fill="#9CA3AF" font-family="Plus Jakarta Sans">Jul</text>
+            </svg>
+          </div>
+          <div style="display:flex;gap:16px;margin-top:8px">
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><span style="width:12px;height:3px;background:#6366F1;border-radius:2px;display:inline-block"></span>New Inquiries</div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)"><span style="width:12px;height:3px;background:#10B981;border-radius:2px;display:inline-block;background:repeating-linear-gradient(to right,#10B981 0,#10B981 4px,transparent 4px,transparent 7px)"></span>Confirmed Bookings</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Pipeline Status</div>
+            <div class="card-action">Today ▾</div>
+          </div>
+          <div style="text-align:center;margin-bottom:16px">
+            <div style="font-size:48px;font-weight:800;color:var(--text);letter-spacing:-.04em">54</div>
+            <div style="font-size:12px;color:var(--muted);font-weight:500">Active Deals This Month</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:10px;height:10px;background:#6366F1;border-radius:3px;display:inline-block"></span>On Track</div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:700">31</span><div class="badge badge-purple">+12</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:65%;background:#6366F1"></div></div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:10px;height:10px;background:#F59E0B;border-radius:3px;display:inline-block"></span>Follow-Up</div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:700">15</span><div class="badge badge-orange">+5</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:35%;background:#F59E0B"></div></div>
+          </div>
+          <div style="margin-bottom:16px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600"><span style="width:10px;height:10px;background:#10B981;border-radius:3px;display:inline-block"></span>Confirmed</div>
+              <div style="display:flex;align-items:center;gap:8px"><span style="font-size:13px;font-weight:700">8</span><div class="badge badge-green">+3</div></div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:20%;background:#10B981"></div></div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center">View All Deals</button>
+        </div>
+      </div>
+
+      <!-- Recent Activity + Contacts -->
+      <div class="grid-equal">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Recent Activity</div>
+            <div class="card-action">View all →</div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--success-bg)">✅</div>
+            <div>
+              <div class="activity-text"><strong>Priya Sharma</strong> confirmed booking for Manali</div>
+              <div class="activity-time">2 min ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--info-bg)">🤖</div>
+            <div>
+              <div class="activity-text"><strong>AI Brain</strong> handled 3 new inquiries — Goa, Ladakh, Kerala</div>
+              <div class="activity-time">12 min ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--orange-bg)">📤</div>
+            <div>
+              <div class="activity-text"><strong>Winter Special</strong> broadcast sent to 847 contacts</div>
+              <div class="activity-time">1 hr ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--purple-bg)">⚡</div>
+            <div>
+              <div class="activity-text"><strong>WF3</strong> Booking Confirmation automation triggered for Rohit Mehta</div>
+              <div class="activity-time">2 hr ago</div>
+            </div>
+          </div>
+          <div class="activity-item">
+            <div class="activity-icon" style="background:var(--success-bg)">💰</div>
+            <div>
+              <div class="activity-text"><strong>₹42,000</strong> payment received — Sunita Kapoor (Kerala)</div>
+              <div class="activity-time">3 hr ago</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Top Inquiries</div>
+            <div class="card-action">View all →</div>
+          </div>
+          <table>
+            <thead><tr><th>Contact</th><th>Destination</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="conv-avatar av-purple" style="width:28px;height:28px;font-size:10px">PS</div><span class="td-name">Priya Sharma</span></div></td>
+                <td>Manali</td>
+                <td><span class="badge badge-green">Confirmed</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="conv-avatar av-orange" style="width:28px;height:28px;font-size:10px">RM</div><span class="td-name">Rohit Mehta</span></div></td>
+                <td>Goa</td>
+                <td><span class="badge badge-blue">New Inquiry</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="conv-avatar av-teal" style="width:28px;height:28px;font-size:10px">SK</div><span class="td-name">Sunita Kapoor</span></div></td>
+                <td>Kerala</td>
+                <td><span class="badge badge-green">Confirmed</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="conv-avatar av-pink" style="width:28px;height:28px;font-size:10px">AK</div><span class="td-name">Arjun Khanna</span></div></td>
+                <td>Ladakh</td>
+                <td><span class="badge badge-orange">Quoted</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px"><div class="conv-avatar av-blue2" style="width:28px;height:28px;font-size:10px">NG</div><span class="td-name">Nandini Gupta</span></div></td>
+                <td>Goa</td>
+                <td><span class="badge badge-blue">New Inquiry</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ INBOX ══ -->
+    <div class="page" id="page-inbox">
+      <div class="page-header" style="margin-bottom:16px">
+        <div class="breadcrumb">Replora / <span>Inbox</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="page-title">Inbox <span style="font-size:16px;color:var(--muted);font-weight:500">· 7 open</span></div>
+          <div style="display:flex;gap:8px">
+            <span class="badge badge-green" style="font-size:12px;padding:5px 12px">🤖 AI Active</span>
+            <button class="btn btn-secondary btn-sm">Filter</button>
+            <button class="btn btn-primary btn-sm">+ New Conversation</button>
+          </div>
+        </div>
+      </div>
+      <div class="inbox-layout">
+        <div class="conv-list">
+          <div class="conv-list-header">
+            <div style="font-size:14px;font-weight:700">All Conversations</div>
+            <div style="display:flex;gap:6px">
+              <span class="badge badge-blue">All</span>
+              <span class="badge badge-grey">Mine</span>
+            </div>
+          </div>
+          <div class="conv-search"><input placeholder="Search conversations..."></div>
+          <div style="overflow-y:auto;flex:1">
+            <div class="conv-item active">
+              <div class="conv-avatar av-purple">PS</div>
+              <div class="conv-content">
+                <div class="conv-row1"><div class="conv-name">Priya Sharma</div><div class="conv-time">14:32</div></div>
+                <div class="conv-preview">Can you confirm the Manali itinerary?</div>
+                <div class="conv-tags"><span class="badge badge-orange" style="font-size:10px;padding:2px 7px">quoted-sent</span><div class="conv-unread">3</div></div>
+              </div>
+            </div>
+            <div class="conv-item">
+              <div class="conv-avatar av-orange">RM</div>
+              <div class="conv-content">
+                <div class="conv-row1"><div class="conv-name">Rohit Mehta</div><div class="conv-time">13:17</div></div>
+                <div class="conv-preview">We're 6 people, interested in Goa packages</div>
+                <div class="conv-tags"><span class="badge badge-blue" style="font-size:10px;padding:2px 7px">new-inquiry</span><div class="conv-unread">1</div></div>
+              </div>
+            </div>
+            <div class="conv-item">
+              <div class="conv-avatar av-teal">SK</div>
+              <div class="conv-content">
+                <div class="conv-row1"><div class="conv-name">Sunita Kapoor</div><div class="conv-time">11:04</div></div>
+                <div class="conv-preview">Payment done! Please confirm booking</div>
+                <div class="conv-tags"><span class="badge badge-green" style="font-size:10px;padding:2px 7px">confirmed</span></div>
+              </div>
+            </div>
+            <div class="conv-item">
+              <div class="conv-avatar av-pink">AK</div>
+              <div class="conv-content">
+                <div class="conv-row1"><div class="conv-name">Arjun Khanna</div><div class="conv-time">Yesterday</div></div>
+                <div class="conv-preview">What's included in the Ladakh 7-day?</div>
+                <div class="conv-tags"><span class="badge badge-blue" style="font-size:10px;padding:2px 7px">new-inquiry</span><div class="conv-unread">5</div></div>
+              </div>
+            </div>
+            <div class="conv-item">
+              <div class="conv-avatar av-blue2">NG</div>
+              <div class="conv-content">
+                <div class="conv-row1"><div class="conv-name">Nandini Gupta</div><div class="conv-time">Yesterday</div></div>
+                <div class="conv-preview">Hi, looking for honeymoon packages Goa</div>
+                <div class="conv-tags"><span class="badge badge-blue" style="font-size:10px;padding:2px 7px">new-inquiry</span></div>
+              </div>
+            </div>
+            <div class="conv-item">
+              <div class="conv-avatar av-green">VK</div>
+              <div class="conv-content">
+                <div class="conv-row1"><div class="conv-name">Vijay Kumar</div><div class="conv-time">Mon</div></div>
+                <div class="conv-preview">Shimla package for family of 5?</div>
+                <div class="conv-tags"><span class="badge badge-grey" style="font-size:10px;padding:2px 7px">review-requested</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-panel">
+          <div class="chat-header">
+            <div class="conv-avatar av-purple" style="width:38px;height:38px;font-size:12px">PS</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700">Priya Sharma</div>
+              <div style="font-size:11px;color:var(--muted)">+91 98765 43210 · Manali · 4 pax</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="ai-pill">AI Active</span>
+              <button class="btn btn-secondary btn-sm">Assign</button>
+              <button class="btn btn-ghost btn-sm" style="color:var(--error)">Take Over</button>
+            </div>
+          </div>
+          <div class="chat-body">
+            <div class="chat-bubble bubble-in">
+              Hi! I'm interested in the Manali winter package for 4 people. Can you share the itinerary and pricing?
+              <div class="bubble-time">14:28</div>
+            </div>
+            <div class="chat-bubble bubble-out">
+              Hello Priya! 🏔️ Our Manali Winter (6N/7D) for 4 pax:<br><br>
+              ✅ Deluxe hotel accommodation<br>
+              ✅ Breakfast &amp; dinner daily<br>
+              ✅ Volvo Mumbai ↔ Manali<br>
+              ✅ Solang Valley + Rohtang day trips<br><br>
+              💰 ₹42,000 per person (total ₹1,68,000)<br><br>
+              Sending full itinerary PDF now!
+              <div class="bubble-time">14:29 ✓✓</div>
+            </div>
+            <div class="chat-bubble bubble-in">
+              Yes please! Also can we customise the departure date?
+              <div class="bubble-time">14:31</div>
+            </div>
+            <div class="chat-bubble bubble-out">
+              Absolutely! Available dates: Dec 20 and Jan 8 batches. I've sent the itinerary PDF to your number 📋
+              <div class="bubble-time">14:32 ✓✓</div>
+            </div>
+            <div class="chat-bubble bubble-in">
+              Can you confirm the Manali itinerary PDF was received?
+              <div class="bubble-time">14:32</div>
+            </div>
+          </div>
+          <div class="chat-footer">
+            <input class="chat-input" placeholder="Reply to Priya Sharma...">
+            <button class="btn btn-ghost btn-sm">📎</button>
+            <button class="btn btn-primary btn-sm">Send ↑</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONTACTS ══ -->
+    <div class="page" id="page-contacts">
+      <div class="page-header">
+        <div class="breadcrumb">Replora / <span>Contacts</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="page-title">Contacts <span style="font-size:16px;color:var(--muted);font-weight:500">· 1,247 total</span></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm">⬇ Import CSV</button>
+            <button class="btn btn-primary btn-sm">+ Add Contact</button>
+          </div>
+        </div>
+      </div>
+      <div class="contacts-toolbar">
+        <input placeholder="Search by name, phone, destination...">
+        <button class="btn btn-secondary btn-sm">Stage ▾</button>
+        <button class="btn btn-secondary btn-sm">Tags ▾</button>
+        <button class="btn btn-secondary btn-sm">Destination ▾</button>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto;color:var(--muted)">Clear filters</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr>
+              <th><input type="checkbox" style="accent-color:var(--primary)"></th>
+              <th>Contact</th>
+              <th>Phone</th>
+              <th>Destination</th>
+              <th>Stage</th>
+              <th>Budget</th>
+              <th>Group</th>
+              <th>Tags</th>
+              <th>Last Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary)"></td>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="conv-avatar av-purple" style="width:32px;height:32px;font-size:11px">PS</div><div><div class="td-name">Priya Sharma</div><div class="td-mono">priya.s@gmail.com</div></div></div></td>
+              <td class="td-mono">+91 98765 43210</td>
+              <td>Manali</td>
+              <td><span class="badge badge-orange">Itinerary Sent</span></td>
+              <td class="td-mono">₹1,68,000</td>
+              <td>4 pax</td>
+              <td><span class="badge badge-orange" style="font-size:10px">quoted-sent</span></td>
+              <td class="td-mono">14:32 today</td>
+              <td><button class="btn btn-ghost btn-sm">···</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary)"></td>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="conv-avatar av-orange" style="width:32px;height:32px;font-size:11px">RM</div><div><div class="td-name">Rohit Mehta</div><div class="td-mono">rohitmehta@yahoo.in</div></div></div></td>
+              <td class="td-mono">+91 87654 32109</td>
+              <td>Goa</td>
+              <td><span class="badge badge-blue">New Inquiry</span></td>
+              <td class="td-mono">—</td>
+              <td>6 pax</td>
+              <td><span class="badge badge-blue" style="font-size:10px">new-inquiry</span></td>
+              <td class="td-mono">13:17 today</td>
+              <td><button class="btn btn-ghost btn-sm">···</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary)"></td>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="conv-avatar av-teal" style="width:32px;height:32px;font-size:11px">SK</div><div><div class="td-name">Sunita Kapoor</div><div class="td-mono">sunita.k@hotmail.com</div></div></div></td>
+              <td class="td-mono">+91 76543 21098</td>
+              <td>Kerala</td>
+              <td><span class="badge badge-green">Booking Confirmed</span></td>
+              <td class="td-mono">₹2,10,000</td>
+              <td>4 pax</td>
+              <td><span class="badge badge-green" style="font-size:10px">confirmed-traveller</span></td>
+              <td class="td-mono">11:04 today</td>
+              <td><button class="btn btn-ghost btn-sm">···</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary)"></td>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="conv-avatar av-pink" style="width:32px;height:32px;font-size:11px">AK</div><div><div class="td-name">Arjun Khanna</div><div class="td-mono">arjun.k@gmail.com</div></div></div></td>
+              <td class="td-mono">+91 65432 10987</td>
+              <td>Ladakh</td>
+              <td><span class="badge badge-blue">New Inquiry</span></td>
+              <td class="td-mono">—</td>
+              <td>2 pax</td>
+              <td><span class="badge badge-blue" style="font-size:10px">new-inquiry</span></td>
+              <td class="td-mono">Yesterday</td>
+              <td><button class="btn btn-ghost btn-sm">···</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary)"></td>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="conv-avatar av-blue2" style="width:32px;height:32px;font-size:11px">MJ</div><div><div class="td-name">Meera Joshi</div><div class="td-mono">meera.joshi@outlook.com</div></div></div></td>
+              <td class="td-mono">+91 54321 09876</td>
+              <td>Rajasthan</td>
+              <td><span class="badge badge-orange">Follow-Up</span></td>
+              <td class="td-mono">₹2,25,000</td>
+              <td>5 pax</td>
+              <td><span class="badge badge-orange" style="font-size:10px">quoted-sent</span></td>
+              <td class="td-mono">2 days ago</td>
+              <td><button class="btn btn-ghost btn-sm">···</button></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" style="accent-color:var(--primary)"></td>
+              <td><div style="display:flex;align-items:center;gap:10px"><div class="conv-avatar av-green" style="width:32px;height:32px;font-size:11px">VP</div><div><div class="td-name">Vijay Patel</div><div class="td-mono">vijay.p@gmail.com</div></div></div></td>
+              <td class="td-mono">+91 43210 98765</td>
+              <td>Shimla</td>
+              <td><span class="badge badge-orange">Itinerary Sent</span></td>
+              <td class="td-mono">₹90,000</td>
+              <td>3 pax</td>
+              <td><span class="badge badge-orange" style="font-size:10px">quoted-sent</span></td>
+              <td class="td-mono">3 days ago</td>
+              <td><button class="btn btn-ghost btn-sm">···</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px 0;font-size:12px;color:var(--muted)">
+          <div>Showing 6 of 1,247 contacts</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm">← Prev</button>
+            <button class="btn btn-secondary btn-sm" style="background:var(--primary-light);color:var(--primary)">1</button>
+            <button class="btn btn-ghost btn-sm">2</button>
+            <button class="btn btn-ghost btn-sm">3</button>
+            <button class="btn btn-ghost btn-sm">Next →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PIPELINES ══ -->
+    <div class="page" id="page-pipelines">
+      <div class="page-header">
+        <div class="breadcrumb">Replora / <span>Pipelines</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div class="page-title">Tour & Travel Pipeline</div>
+            <div class="page-subtitle">Total pipeline value: <strong style="color:var(--primary)">₹12,40,000</strong></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm">Board ▾</button>
+            <button class="btn btn-primary btn-sm">+ Add Deal</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini stats -->
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px">
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--text)">8</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px">New Inquiry</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--primary)">5</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px">Itinerary Sent</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--warning)">3</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px">Follow-Up</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--success)">4</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px">Confirmed</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--orange)">2</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px">Ongoing</div>
+        </div>
+        <div class="card" style="padding:14px;text-align:center">
+          <div style="font-size:20px;font-weight:800;color:var(--teal)">12</div>
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;margin-top:2px">Post-Trip</div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:16px">
+        <div class="kanban">
+          <div class="kanban-col">
+            <div class="kanban-col-header"><div class="kanban-col-title">New Inquiry</div><div class="kanban-count">8</div></div>
+            <div class="deal-card"><div class="deal-name">Arjun Khanna</div><div class="deal-dest">📍 Ladakh · 7D · Jan 2025</div><div class="deal-footer"><div class="deal-value">—</div><div class="deal-pax">2 pax</div></div></div>
+            <div class="deal-card"><div class="deal-name">Nandini Gupta</div><div class="deal-dest">📍 Goa · 5D · Dec 2024</div><div class="deal-footer"><div class="deal-value">—</div><div class="deal-pax">2 pax</div></div></div>
+            <div class="deal-card"><div class="deal-name">Ramesh Jain</div><div class="deal-dest">📍 Shimla · 4D · Jan 2025</div><div class="deal-footer"><div class="deal-value">—</div><div class="deal-pax">4 pax</div></div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-header"><div class="kanban-col-title">Itinerary Sent</div><div class="kanban-count">5</div></div>
+            <div class="deal-card" style="border-left:3px solid var(--primary)"><div class="deal-name">Priya Sharma</div><div class="deal-dest">📍 Manali · 7D · Dec 20</div><div class="deal-footer"><div class="deal-value">₹1,68,000</div><div class="deal-pax">4 pax</div></div></div>
+            <div class="deal-card"><div class="deal-name">Vijay Patel</div><div class="deal-dest">📍 Shimla · 4D · Dec 25</div><div class="deal-footer"><div class="deal-value">₹90,000</div><div class="deal-pax">3 pax</div></div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-header"><div class="kanban-col-title">Follow-Up</div><div class="kanban-count">3</div></div>
+            <div class="deal-card" style="border-left:3px solid var(--warning)"><div class="deal-name">Meera Joshi</div><div class="deal-dest">📍 Rajasthan · 6D · Jan 15</div><div class="deal-footer"><div class="deal-value">₹2,25,000</div><div class="deal-pax">5 pax</div></div></div>
+            <div class="deal-card"><div class="deal-name">Kiran Shah</div><div class="deal-dest">📍 Manali · 5D · Feb 2025</div><div class="deal-footer"><div class="deal-value">₹84,000</div><div class="deal-pax">2 pax</div></div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-header"><div class="kanban-col-title">Confirmed</div><div class="kanban-count">4</div></div>
+            <div class="deal-card" style="border-left:3px solid var(--success)"><div class="deal-name">Sunita Kapoor</div><div class="deal-dest">📍 Kerala · 7D · Dec 27</div><div class="deal-footer"><div class="deal-value">₹2,10,000</div><div class="deal-pax">4 pax</div></div></div>
+            <div class="deal-card" style="border-left:3px solid var(--success)"><div class="deal-name">Rohit Mehta</div><div class="deal-dest">📍 Goa · 5D · Jan 8</div><div class="deal-footer"><div class="deal-value">₹1,80,000</div><div class="deal-pax">6 pax</div></div></div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-col-header"><div class="kanban-col-title">Post-Trip</div><div class="kanban-count">12</div></div>
+            <div class="deal-card"><div class="deal-name">Kavya Nair</div><div class="deal-dest">📍 Goa · Completed Nov</div><div class="deal-footer"><div class="deal-value">₹1,40,000</div><div class="deal-pax">4 pax</div></div></div>
+            <div class="deal-card"><div class="deal-name">Sanjay Verma</div><div class="deal-dest">📍 Manali · Completed Oct</div><div class="deal-footer"><div class="deal-value">₹2,08,000</div><div class="deal-pax">4 pax</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ BROADCASTS ══ -->
+    <div class="page" id="page-broadcasts">
+      <div class="page-header">
+        <div class="breadcrumb">Replora / <span>Broadcasts</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="page-title">Broadcasts</div>
+          <button class="btn btn-primary">+ New Broadcast</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px;width:fit-content;box-shadow:var(--shadow)">
+        <button class="btn btn-primary btn-sm">All Broadcasts</button>
+        <button class="btn btn-ghost btn-sm">Scheduled</button>
+        <button class="btn btn-ghost btn-sm">Drafts</button>
+        <button class="btn btn-ghost btn-sm">Completed</button>
+      </div>
+
+      <div class="broadcast-card">
+        <div class="broadcast-header">
+          <div>
+            <div class="broadcast-name">🏔️ Winter Special — Manali & Shimla</div>
+            <div class="broadcast-meta">Sent Dec 8, 2024 at 10:00 AM · Template: winter_promo_v2</div>
+          </div>
+          <span class="badge badge-green">Completed</span>
+        </div>
+        <div class="broadcast-stats">
+          <div class="bstat"><div class="bstat-value">847</div><div class="bstat-label">Sent</div></div>
+          <div class="bstat"><div class="bstat-value" style="color:var(--primary)">721</div><div class="bstat-label">Delivered</div></div>
+          <div class="bstat"><div class="bstat-value" style="color:var(--success)">523</div><div class="bstat-label">Read</div></div>
+          <div class="bstat"><div class="bstat-value" style="color:var(--orange)">47</div><div class="bstat-label">Replied</div></div>
+        </div>
+      </div>
+      <div class="broadcast-card">
+        <div class="broadcast-header">
+          <div>
+            <div class="broadcast-name">🌴 Goa New Year Package</div>
+            <div class="broadcast-meta">Scheduled Dec 15, 2024 at 9:00 AM · Template: goa_newyear_24</div>
+          </div>
+          <span class="badge badge-blue">Scheduled</span>
+        </div>
+        <div class="broadcast-stats">
+          <div class="bstat"><div class="bstat-value">1,204</div><div class="bstat-label">Recipients</div></div>
+          <div class="bstat"><div class="bstat-value" style="color:var(--muted)">—</div><div class="bstat-label">Delivered</div></div>
+          <div class="bstat"><div class="bstat-value" style="color:var(--muted)">—</div><div class="bstat-label">Read</div></div>
+          <div class="bstat"><div class="bstat-value" style="color:var(--muted)">—</div><div class="bstat-label">Replied</div></div>
+        </div>
+      </div>
+      <div class="broadcast-card">
+        <div class="broadcast-header">
+          <div>
+            <div class="broadcast-name">🏔️ Ladakh Summer 2025 Early Bird</div>
+            <div class="broadcast-meta">Draft · Last edited Dec 7, 2024</div>
+          </div>
+          <div style="display:flex;gap:8px"><span class="badge badge-grey">Draft</span><button class="btn btn-secondary btn-sm">Edit</button><button class="btn btn-primary btn-sm">Schedule</button></div>
+        </div>
+        <div style="background:var(--bg);border-radius:var(--radius-sm);padding:14px;font-size:13px;color:var(--text-2);line-height:1.6;font-style:italic">
+          "Hello {{name}}! 🏔️ Experience the magic of Ladakh this summer. Early bird bookings open for May–August 2025. Book now and save ₹5,000 per person. Reply YES to get the full itinerary..."
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AUTOMATIONS ══ -->
+    <div class="page" id="page-automations">
+      <div class="page-header">
+        <div class="breadcrumb">Replora / <span>Automations</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="page-title">Automations</div>
+          <button class="btn btn-primary">+ New Automation</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px;width:fit-content;box-shadow:var(--shadow)">
+        <button class="btn btn-primary btn-sm">Automations</button>
+        <button class="btn btn-ghost btn-sm">Catalogue</button>
+      </div>
+
+      <div class="grid-equal" style="margin-bottom:0">
+        <div>
+          <div class="automation-card active-auto">
+            <div class="automation-header">
+              <div class="auto-icon" style="background:var(--success-bg)">✅</div>
+              <div>
+                <div class="auto-name">WF3 — Booking Confirmation</div>
+                <div class="auto-desc">Triggers when booking_status field → Confirmed</div>
+              </div>
+              <label class="toggle" style="margin-left:auto"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+            </div>
+            <div class="auto-footer">
+              <span class="badge badge-green">Active</span>
+              <span class="badge badge-grey">field_updated trigger</span>
+              <span style="margin-left:auto;font-size:12px;color:var(--muted)">Fired 23 times</span>
+            </div>
+          </div>
+
+          <div class="automation-card active-auto">
+            <div class="automation-header">
+              <div class="auto-icon" style="background:var(--success-bg)">⭐</div>
+              <div>
+                <div class="auto-name">WF4 — Post-Trip Review</div>
+                <div class="auto-desc">Sends review request 24hrs after trip_stage → completed</div>
+              </div>
+              <label class="toggle" style="margin-left:auto"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+            </div>
+            <div class="auto-footer">
+              <span class="badge badge-green">Active</span>
+              <span class="badge badge-grey">field_updated trigger</span>
+              <span style="margin-left:auto;font-size:12px;color:var(--muted)">Fired 41 times</span>
+            </div>
+          </div>
+
+          <div class="automation-card">
+            <div class="automation-header">
+              <div class="auto-icon" style="background:var(--info-bg)">👋</div>
+              <div>
+                <div class="auto-name">Welcome Message</div>
+                <div class="auto-desc">Sends greeting on first inbound message</div>
+              </div>
+              <label class="toggle" style="margin-left:auto"><input type="checkbox"><div class="toggle-slider"></div></label>
+            </div>
+            <div class="auto-footer">
+              <span class="badge badge-grey">Inactive</span>
+              <span class="badge badge-grey">first_inbound_message</span>
+              <span style="margin-left:auto;font-size:12px;color:var(--muted)">Never fired</span>
+            </div>
+          </div>
+
+          <div class="automation-card">
+            <div class="automation-header">
+              <div class="auto-icon" style="background:var(--purple-bg)">🏷️</div>
+              <div>
+                <div class="auto-name">Auto-tag New Contacts</div>
+                <div class="auto-desc">Adds new-inquiry tag on first contact created</div>
+              </div>
+              <label class="toggle" style="margin-left:auto"><input type="checkbox"><div class="toggle-slider"></div></label>
+            </div>
+            <div class="auto-footer">
+              <span class="badge badge-grey">Inactive</span>
+              <span class="badge badge-grey">new_contact_created</span>
+              <span style="margin-left:auto;font-size:12px;color:var(--muted)">Fired 156 times</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Automation Logs</div>
+            <div class="card-action">View all →</div>
+          </div>
+          <table>
+            <thead><tr><th>Automation</th><th>Contact</th><th>Status</th><th>Time</th></tr></thead>
+            <tbody>
+              <tr><td><span class="badge badge-green" style="font-size:10px">WF3</span></td><td class="td-name">Sunita Kapoor</td><td><span class="badge badge-green">Success</span></td><td class="td-mono">11:04</td></tr>
+              <tr><td><span class="badge badge-green" style="font-size:10px">WF4</span></td><td class="td-name">Kavya Nair</td><td><span class="badge badge-green">Success</span></td><td class="td-mono">10:30</td></tr>
+              <tr><td><span class="badge badge-green" style="font-size:10px">WF3</span></td><td class="td-name">Rohit Mehta</td><td><span class="badge badge-green">Success</span></td><td class="td-mono">Yesterday</td></tr>
+              <tr><td><span class="badge badge-green" style="font-size:10px">WF4</span></td><td class="td-name">Sanjay Verma</td><td><span class="badge badge-orange">Pending</span></td><td class="td-mono">Yesterday</td></tr>
+              <tr><td><span class="badge badge-green" style="font-size:10px">WF3</span></td><td class="td-name">Priya Sharma</td><td><span class="badge badge-red">Failed</span></td><td class="td-mono">2 days ago</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CATALOGUE ══ -->
+    <div class="page" id="page-catalogue">
+      <div class="page-header">
+        <div class="breadcrumb">Replora / <span>Catalogue</span></div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="page-title">Destination Catalogue <span style="font-size:16px;color:var(--muted);font-weight:500">· 9 active</span></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary btn-sm">⬆ Import XLSX</button>
+            <button class="btn btn-primary btn-sm">+ Add Destination</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div class="dest-card">
+          <div class="dest-img" style="background:linear-gradient(135deg,#6366F1,#8B5CF6)">🏔️</div>
+          <div class="dest-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div class="dest-name">Manali Winter</div>
+              <span class="badge badge-green" style="font-size:10px">Active</span>
+            </div>
+            <div class="dest-nights">6 Nights · 7 Days</div>
+            <div class="dest-price">₹42,000 / person</div>
+            <div class="dest-footer">
+              <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center">View</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Edit</button>
+            </div>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img" style="background:linear-gradient(135deg,#14B8A6,#3B82F6)">🌊</div>
+          <div class="dest-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div class="dest-name">Goa Beach Package</div>
+              <span class="badge badge-green" style="font-size:10px">Active</span>
+            </div>
+            <div class="dest-nights">4 Nights · 5 Days</div>
+            <div class="dest-price">₹28,000 / person</div>
+            <div class="dest-footer">
+              <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center">View</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Edit</button>
+            </div>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img" style="background:linear-gradient(135deg,#F97316,#FBBF24)">🐘</div>
+          <div class="dest-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div class="dest-name">Kerala Backwaters</div>
+              <span class="badge badge-green" style="font-size:10px">Active</span>
+            </div>
+            <div class="dest-nights">6 Nights · 7 Days</div>
+            <div class="dest-price">₹52,000 / person</div>
+            <div class="dest-footer">
+              <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center">View</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Edit</button>
+            </div>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img" style="background:linear-gradient(135deg,#8B5CF6,#EC4899)">🏜️</div>
+          <div class="dest-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div class="dest-name">Rajasthan Royal</div>
+              <span class="badge badge-green" style="font-size:10px">Active</span>
+            </div>
+            <div class="dest-nights">7 Nights · 8 Days</div>
+            <div class="dest-price">₹45,000 / person</div>
+            <div class="dest-footer">
+              <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center">View</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Edit</button>
+            </div>
+          </div>
+        </div>
+        <div class="dest-card">
+          <div class="dest-img" style="background:linear-gradient(135deg,#3B82F6,#06B6D4)">⛰️</div>
+          <div class="dest-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <div class="dest-name">Ladakh Adventure</div>
+              <span class="badge badge-green" style="font-size:10px">Active</span>
+            </div>
+            <div class="dest-nights">8 Nights · 9 Days</div>
+            <div class="dest-price">₹65,000 / person</div>
+            <div class="dest-footer">
+              <button class="btn btn-secondary btn-sm" style="flex:1;justify-content:center">View</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Edit</button>
+            </div>
+          </div>
+        </div>
+        <div class="dest-card" style="border:2px dashed var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;min-height:200px">
+          <div style="text-align:center;padding:20px">
+            <div style="font-size:32px;margin-bottom:8px">➕</div>
+            <div style="font-size:14px;font-weight:600;color:var(--primary)">Add Destination</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">Import or create new</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS ══ -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div class="breadcrumb">Replora / <span>Settings</span></div>
+        <div class="page-title">Settings</div>
+        <div class="page-subtitle">Manage your business configuration, WhatsApp API, and AI brain.</div>
+      </div>
+      <div class="settings-layout">
+        <div class="settings-nav">
+          <div class="settings-nav-item active">🏢 Business</div>
+          <div class="settings-nav-item">📱 WhatsApp API</div>
+          <div class="settings-nav-item">🤖 AI Brain</div>
+          <div class="settings-nav-item">💬 Auto Replies</div>
+          <div class="settings-nav-item">👤 Profile</div>
+          <div class="settings-nav-item">🔐 Security</div>
+          <div class="settings-nav-item">🔔 Notifications</div>
+          <div class="settings-nav-item">📊 Integrations</div>
+        </div>
+        <div class="settings-panel">
+
+          <div class="setting-section">
+            <div class="setting-section-title">Business Information</div>
+            <div class="setting-section-desc">This information is used by the AI brain when responding to customers.</div>
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Business Name</label>
+                <input class="form-input" value="Sunshine Tours & Travels">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Support Phone</label>
+                <input class="form-input" value="+91 98989 58529">
+              </div>
+            </div>
+            <hr>
+            <div class="form-row">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">UPI ID</label>
+                <input class="form-input" value="sunshine.tours@upi">
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Payment Note</label>
+                <input class="form-input" placeholder="e.g. Add your name in payment note">
+              </div>
+            </div>
+            <hr>
+            <div class="form-group">
+              <label class="form-label">Payment QR URL</label>
+              <input class="form-input" placeholder="https://... (hosted JPG/PNG of your QR code)">
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+              <button class="btn btn-secondary">Cancel</button>
+              <button class="btn btn-primary">Save Changes</button>
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <div class="setting-section-title">AI Brain — Inbox Automation</div>
+            <div class="setting-section-desc">Control how the AI brain handles incoming WhatsApp messages.</div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Enable AI Brain</div>
+                <div class="toggle-desc">AI automatically handles new inquiries, sends itineraries, and processes payments</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Welcome Message</div>
+                <div class="toggle-desc">Send automated greeting when a new customer messages for the first time</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">Out of Office</div>
+                <div class="toggle-desc">Send auto-reply outside business hours (9 AM – 8 PM IST)</div>
+              </div>
+              <label class="toggle"><input type="checkbox"><div class="toggle-slider"></div></label>
+            </div>
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-label">AI Provider</div>
+                <div class="toggle-desc">Current: Groq (llama-3.1-70b) — fast and free tier available</div>
+              </div>
+              <select class="form-input" style="width:auto;min-width:160px">
+                <option>Groq (Llama 3.1)</option>
+                <option>Gemini Flash</option>
+                <option>OpenAI GPT-4o</option>
+                <option>Claude Haiku</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="setting-section">
+            <div class="setting-section-title">AI System Prompt</div>
+            <div class="setting-section-desc">Customize what the AI knows about your business. Destination catalogue is injected automatically.</div>
+            <textarea class="form-textarea" style="min-height:120px">You are a helpful travel assistant for Sunshine Tours & Travels. Be warm, professional, and always reply in the same language the customer uses. When customers ask about destinations, share pricing and offer to send the full itinerary PDF. For payment queries, share the UPI ID and QR code. Never make up prices — use only the catalogue data provided.</textarea>
+            <div style="display:flex;justify-content:flex-end;margin-top:12px">
+              <button class="btn btn-primary">Save Prompt</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+</div><!-- /main -->
+
+<script>
+/* ── PAGE SWITCHER ── */
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+/* ── THEME SWITCHER ── */
+const root = document.documentElement;
+const icon  = document.getElementById('themeIcon');
+const label = document.getElementById('themeLabel');
+
+function applyTheme(dark) {
+  root.setAttribute('data-theme', dark ? 'dark' : 'light');
+  icon.textContent  = dark ? '🌙' : '☀️';
+  label.textContent = dark ? 'Dark' : 'Light';
+  localStorage.setItem('replora-theme', dark ? 'dark' : 'light');
+}
+
+function toggleTheme() {
+  applyTheme(root.getAttribute('data-theme') !== 'dark');
+}
+
+/* Restore saved preference on load */
+(function() {
+  const saved = localStorage.getItem('replora-theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(saved === 'dark' || (!saved && prefersDark));
+})();
+</script>
+</body>
+</html>

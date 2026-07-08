@@ -6,6 +6,20 @@
 
 ---
 
+## gstack Skills (Available in Claude Code)
+
+Use these slash commands in Claude Code sessions:
+- `/office-hours` — Feature planning, use BEFORE building anything new
+- `/investigate` — Root cause debugging (Vercel, Meta webhook, engine.ts)
+- `/cso` — Security audit, run before client resell
+- `/review` — Code review before every commit
+- `/ship` — Git sync + PR workflow
+- `/qa` — Live browser testing on devdabi.shop
+- `/guard` — Max safety mode for engine.ts or migrations
+- `/autoplan` — Full planning chain in one shot
+
+**Rule:** New feature → /office-hours first. Commit → /review. Resell → /cso.
+
 ## 0. CLAUDE OPERATING RULES (ALWAYS FOLLOW — NON-NEGOTIABLE)
 
 ### 0a. Source of Truth — Always Check Git First
@@ -334,3 +348,21 @@ Docker + ngrok when needed. n8n Code-node rule: only `$json` / `$input` valid.
 ---
 
 *Replora · WaCRM · devdabi.shop 🇮🇳*
+
+---
+
+## Design System
+
+Always read `DESIGN.md` before making any visual or UI decisions.
+All font choices, colors, spacing, border-radius, and aesthetic direction are defined there.
+Do not deviate without explicit user approval.
+In QA mode, flag any code that doesn't match `DESIGN.md`.
+
+Key rules from DESIGN.md:
+- Primary color: `#6366F1` (Indigo) — redesigned July 2026. Never use `#0084ff` or `#00A884` as primary.
+- Fonts: Plus Jakarta Sans (body/UI via `--font-sans`), Geist Mono (data/tables)
+- Light mode (default): `#F0F2F8` BG, `#FFFFFF` card, `#E5E7EB` border
+- Dark mode (`.dark` class on html): `#0F1117` BG, `#1A1D27` card, `#252836` border
+- Theme toggle in dashboard header — persisted to localStorage key `replora-theme`
+- Spacing: 4px base, compact density
+- Motion: minimal-functional only — no entrance animations
