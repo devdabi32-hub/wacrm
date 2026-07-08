@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalogue UI — 3 Design Directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0b0f;
+    --surface: #111318;
+    --surface-2: #161a22;
+    --surface-3: #1c2130;
+    --border: #1e2332;
+    --border-2: #262d40;
+    --primary: #0084ff;
+    --primary-dim: rgba(0,132,255,.12);
+    --primary-hover: #0070e0;
+    --text: #f0f2f7;
+    --text-2: #8b93a8;
+    --text-3: #545e74;
+    --success: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --radius: 10px;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* ─── Header ─── */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .header h1 { font-size: 15px; font-weight: 700; color: var(--text); }
+  .header span { font-size: 13px; color: var(--text-2); }
+  .header .badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    background: var(--primary-dim);
+    color: var(--primary);
+    border: 1px solid rgba(0,132,255,.25);
+    border-radius: 6px;
+    padding: 3px 8px;
+  }
+
+  /* ─── Tabs ─── */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 24px 0;
+  }
+  .tab {
+    padding: 8px 16px 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    transition: all .15s;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    font-weight: 600;
+  }
+
+  /* ─── Content panels ─── */
+  .panel { display: none; padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .panel.active { display: block; }
+
+  /* ─── Page section header ─── */
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  .page-header h2 { font-size: 20px; font-weight: 700; }
+  .page-header p { margin-top: 3px; font-size: 13px; color: var(--text-2); }
+  .btn-group { display: flex; align-items: center; gap: 8px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border-2); background: var(--surface-2);
+    color: var(--text); transition: all .15s;
+  }
+  .btn:hover { background: var(--surface-3); border-color: var(--border-2); }
+  .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-hover); border-color: var(--primary-hover); }
+
+  /* ─── Info banner ─── */
+  .info-banner {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: var(--primary-dim); border: 1px solid rgba(0,132,255,.2);
+    border-radius: var(--radius); padding: 12px 16px; margin-bottom: 20px;
+    font-size: 13px; color: #c5d9f5;
+  }
+  .info-banner svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* ─── Toggle switch ─── */
+  .toggle {
+    position: relative; width: 36px; height: 20px; flex-shrink: 0;
+    background: var(--border-2); border-radius: 10px; cursor: pointer;
+    transition: background .2s;
+  }
+  .toggle.on { background: var(--primary); }
+  .toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; background: #fff; border-radius: 50%;
+    transition: transform .2s;
+  }
+  .toggle.on::after { transform: translateX(16px); }
+
+  /* ─── Status badges ─── */
+  .badge-active {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; letter-spacing: .03em;
+    padding: 2px 8px; border-radius: 99px;
+    background: rgba(34,197,94,.12); color: #4ade80; border: 1px solid rgba(34,197,94,.2);
+  }
+  .badge-inactive {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; letter-spacing: .03em;
+    padding: 2px 8px; border-radius: 99px;
+    background: rgba(255,255,255,.06); color: var(--text-3); border: 1px solid var(--border);
+  }
+  .badge-imported {
+    font-size: 11px; font-weight: 500; padding: 2px 7px; border-radius: 99px;
+    background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(0,132,255,.25);
+  }
+  .chip-slug {
+    font-size: 11px; font-weight: 400; padding: 2px 7px; border-radius: 6px;
+    background: var(--surface-3); color: var(--text-3);
+    font-family: 'SF Mono', 'Fira Mono', monospace;
+  }
+
+  /* ─── Dot menu button ─── */
+  .dot-menu {
+    width: 30px; height: 30px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: none; color: var(--text-2); cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .dot-menu:hover { background: var(--surface-3); color: var(--text); }
+
+  /* ═══════════════════════════════════════
+     VARIANT A: Poster Grid
+  ═══════════════════════════════════════ */
+  .grid-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .grid-toolbar .count { font-size: 12px; color: var(--text-2); }
+  .dest-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .dest-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+    cursor: pointer;
+  }
+  .dest-card:hover {
+    border-color: var(--border-2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  }
+  .dest-card.inactive { opacity: .65; }
+  .card-thumb {
+    width: 100%; aspect-ratio: 16/9; object-fit: cover;
+    background: var(--surface-3);
+    position: relative; overflow: hidden;
+  }
+  .card-thumb-placeholder {
+    width: 100%; aspect-ratio: 16/9;
+    background: linear-gradient(135deg, var(--surface-3) 0%, var(--surface-2) 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-3); font-size: 28px;
+  }
+  .card-status-overlay {
+    position: absolute; top: 10px; right: 10px;
+  }
+  .card-body { padding: 14px; }
+  .card-name { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; line-height: 1.3; }
+  .card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 10px; }
+  .card-price {
+    font-size: 15px; font-weight: 700; color: var(--primary);
+  }
+  .card-duration {
+    font-size: 12px; color: var(--text-2);
+    background: var(--surface-3); border-radius: 5px; padding: 2px 7px;
+  }
+  .card-summary { font-size: 12px; color: var(--text-2); line-height: 1.5; margin-bottom: 12px; }
+  .card-footer {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 10px; border-top: 1px solid var(--border);
+  }
+  .card-actions { display: flex; gap: 4px; }
+  .card-action-btn {
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border-2); background: var(--surface-2);
+    color: var(--text-2); transition: all .15s;
+  }
+  .card-action-btn:hover { color: var(--text); background: var(--surface-3); }
+  .card-action-btn.danger { color: #f87171; }
+  .card-action-btn.danger:hover { background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.2); }
+
+  /* ═══════════════════════════════════════
+     VARIANT B: Power Table
+  ═══════════════════════════════════════ */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .table-wrap table {
+    width: 100%; border-collapse: collapse;
+  }
+  .table-wrap thead {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap th {
+    text-align: left;
+    font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-3); padding: 10px 14px;
+    cursor: pointer; user-select: none;
+  }
+  .table-wrap th:hover { color: var(--text-2); }
+  .table-wrap th .sort-icon { margin-left: 3px; opacity: .4; }
+  .table-wrap td { padding: 0 14px; border-bottom: 1px solid var(--border); }
+  .table-wrap tr:last-child td { border-bottom: none; }
+  .table-wrap tr:hover td { background: rgba(255,255,255,.02); }
+  .table-row-inner {
+    display: flex; align-items: center; gap: 12px; padding: 12px 0;
+  }
+  .table-thumb {
+    width: 52px; height: 36px; border-radius: 6px;
+    background: var(--surface-3); flex-shrink: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--text-3);
+  }
+  .table-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .table-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .table-slug-row { display: flex; gap: 5px; margin-top: 2px; }
+  .col-price { font-size: 13px; font-weight: 600; color: var(--primary); white-space: nowrap; }
+  .col-duration { font-size: 13px; color: var(--text-2); white-space: nowrap; }
+  .col-status-cell { width: 80px; }
+  .col-actions-cell { width: 90px; }
+  .col-actions-inner { display: flex; align-items: center; gap: 4px; }
+  .table-edit-btn {
+    padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border-2); background: var(--surface-2);
+    color: var(--text-2); transition: all .15s;
+  }
+  .table-edit-btn:hover { color: var(--text); background: var(--surface-3); }
+
+  /* ═══════════════════════════════════════
+     VARIANT C: Enhanced List
+  ═══════════════════════════════════════ */
+  .list-wrap { display: flex; flex-direction: column; gap: 10px; }
+  .list-row {
+    display: flex; align-items: center; gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    transition: border-color .15s;
+  }
+  .list-row:hover { border-color: var(--border-2); }
+  .list-thumb {
+    width: 120px; min-height: 80px; flex-shrink: 0;
+    background: var(--surface-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; color: var(--text-3);
+    overflow: hidden;
+  }
+  .list-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .list-thumb-placeholder {
+    width: 120px; min-height: 80px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--surface-3) 0%, var(--surface-2) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; color: var(--text-3);
+  }
+  .list-content {
+    flex: 1; min-width: 0; padding: 14px 16px; cursor: pointer;
+  }
+  .list-top {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 5px; flex-wrap: wrap;
+  }
+  .list-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .list-meta {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  }
+  .list-meta-item {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12px; color: var(--text-2);
+  }
+  .list-meta-price { font-size: 14px; font-weight: 700; color: var(--primary); }
+  .list-summary { font-size: 12px; color: var(--text-2); margin-top: 5px; line-height: 1.5; }
+  .list-keywords { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+  .keyword-chip {
+    font-size: 11px; padding: 2px 7px; border-radius: 5px;
+    background: var(--surface-3); color: var(--text-3); border: 1px solid var(--border);
+  }
+  .list-actions {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 16px; border-left: 1px solid var(--border); flex-shrink: 0;
+  }
+  .list-inline-btn {
+    padding: 6px 12px; border-radius: 7px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border-2); background: var(--surface-2);
+    color: var(--text-2); transition: all .15s; white-space: nowrap;
+  }
+  .list-inline-btn:hover { color: var(--text); background: var(--surface-3); }
+  .list-inline-btn.primary-btn {
+    background: var(--primary-dim); color: var(--primary); border-color: rgba(0,132,255,.25);
+  }
+  .list-inline-btn.primary-btn:hover { background: rgba(0,132,255,.2); }
+  .list-sep { width: 1px; height: 32px; background: var(--border); flex-shrink: 0; }
+
+  /* ─── Design notes panel ─── */
+  .design-notes {
+    margin-top: 28px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-2);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .design-notes h3 { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+  .note-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .note-item { }
+  .note-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-3); margin-bottom: 4px; }
+  .note-val { font-size: 13px; color: var(--text-2); line-height: 1.5; }
+  .note-val.pro { color: #4ade80; }
+  .note-val.con { color: #f87171; }
+
+  /* ─── Divider ─── */
+  .variant-label {
+    text-align: center;
+    font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--text-3); margin-bottom: 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .variant-label::before, .variant-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  /* ─── SVG icons (inline) ─── */
+  svg { display: inline-block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L10 6H15L11 9.5L12.5 15L8 12L3.5 15L5 9.5L1 6H6L8 1Z" fill="#0084ff"/></svg>
+  <h1>Catalogue UI</h1>
+  <span>— 3 Design Directions</span>
+  <div class="badge">Design Preview</div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab active" onclick="switchTab('a', this)">Variant A — Poster Grid</button>
+  <button class="tab" onclick="switchTab('b', this)">Variant B — Power Table</button>
+  <button class="tab" onclick="switchTab('c', this)">Variant C — Enhanced List</button>
+</div>
+
+<!-- ═══════════════════ VARIANT A: POSTER GRID ═══════════════════ -->
+<div id="panel-a" class="panel active">
+
+  <div class="page-header">
+    <div>
+      <h2>Destinations</h2>
+      <p>Manage the packages your AI offers customers on WhatsApp.</p>
+    </div>
+    <div class="btn-group">
+      <button class="btn">⬇ Template</button>
+      <button class="btn">⬆ Import</button>
+      <button class="btn btn-primary">+ Add Destination</button>
+    </div>
+  </div>
+
+  <div class="info-banner">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0084ff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    Add a destination here and it's instantly live in the AI — no code changes needed.
+  </div>
+
+  <div class="grid-toolbar">
+    <span class="count">6 destinations · 5 active</span>
+    <div style="display:flex;gap:6px;">
+      <button class="btn" style="padding:5px 10px;font-size:12px;">Active only</button>
+      <button class="btn" style="padding:5px 10px;font-size:12px;">↕ Sort</button>
+    </div>
+  </div>
+
+  <div class="dest-grid">
+
+    <!-- Card 1 -->
+    <div class="dest-card">
+      <div class="card-thumb-placeholder" style="position:relative;">
+        🏔️
+        <div class="card-status-overlay">
+          <div class="badge-active"><span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Manali Honeymoon Package</div>
+        <div class="card-meta">
+          <span class="card-price">₹14,999</span>
+          <span class="card-duration">5N/6D</span>
+          <span class="badge-imported">Imported</span>
+        </div>
+        <div class="card-summary">Snow point, candlelight dinner, cab included. Departures: 5 Jul, 12 Jul, 19 Jul.</div>
+        <div class="card-footer">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span class="chip-slug">manali-honeymoon</span>
+          </div>
+          <div class="card-actions">
+            <button class="card-action-btn">Edit</button>
+            <button class="card-action-btn danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="dest-card">
+      <div class="card-thumb-placeholder" style="position:relative;">
+        🏖️
+        <div class="card-status-overlay">
+          <div class="badge-active"><span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Goa Beach Getaway</div>
+        <div class="card-meta">
+          <span class="card-price">₹12,499</span>
+          <span class="card-duration">3N/4D</span>
+        </div>
+        <div class="card-summary">North Goa beaches, water sports, seafood dinner included. Daily departures.</div>
+        <div class="card-footer">
+          <span class="chip-slug">goa-beach</span>
+          <div class="card-actions">
+            <button class="card-action-btn">Edit</button>
+            <button class="card-action-btn danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="dest-card">
+      <div class="card-thumb-placeholder" style="position:relative;">
+        🌿
+        <div class="card-status-overlay">
+          <div class="badge-active"><span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Kerala Backwaters Cruise</div>
+        <div class="card-meta">
+          <span class="card-price">₹18,999</span>
+          <span class="card-duration">4N/5D</span>
+        </div>
+        <div class="card-summary">Houseboat stay, Alleppey, Munnar hills. Includes breakfast and dinner.</div>
+        <div class="card-footer">
+          <span class="chip-slug">kerala-backwaters</span>
+          <div class="card-actions">
+            <button class="card-action-btn">Edit</button>
+            <button class="card-action-btn danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="dest-card">
+      <div class="card-thumb-placeholder" style="position:relative;">
+        ❄️
+        <div class="card-status-overlay">
+          <div class="badge-active"><span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Shimla Weekend Trip</div>
+        <div class="card-meta">
+          <span class="card-price">₹8,999</span>
+          <span class="card-duration">2N/3D</span>
+        </div>
+        <div class="card-summary">Mall road, Jakhu temple, ridge viewpoint. Hotel + cab included.</div>
+        <div class="card-footer">
+          <span class="chip-slug">shimla-weekend</span>
+          <div class="card-actions">
+            <button class="card-action-btn">Edit</button>
+            <button class="card-action-btn danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="dest-card">
+      <div class="card-thumb-placeholder" style="position:relative;">
+        🕌
+        <div class="card-status-overlay">
+          <div class="badge-active"><span style="width:6px;height:6px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Rajasthan Heritage Tour</div>
+        <div class="card-meta">
+          <span class="card-price">₹24,999</span>
+          <span class="card-duration">6N/7D</span>
+        </div>
+        <div class="card-summary">Jaipur, Jodhpur, Udaipur. Palace stays, camel safari, folk dinner.</div>
+        <div class="card-footer">
+          <span class="chip-slug">rajasthan-heritage</span>
+          <div class="card-actions">
+            <button class="card-action-btn">Edit</button>
+            <button class="card-action-btn danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6: Inactive -->
+    <div class="dest-card inactive">
+      <div class="card-thumb-placeholder" style="position:relative;">
+        🏯
+        <div class="card-status-overlay">
+          <div class="badge-inactive">Inactive</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Hampi Ruins Explorer</div>
+        <div class="card-meta">
+          <span class="card-price">₹10,499</span>
+          <span class="card-duration">2N/3D</span>
+        </div>
+        <div class="card-summary">UNESCO world heritage site tour. Coracle ride, sunset viewpoint.</div>
+        <div class="card-footer">
+          <span class="chip-slug">hampi-ruins</span>
+          <div class="card-actions">
+            <button class="card-action-btn">Edit</button>
+            <button class="card-action-btn danger">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="design-notes">
+    <h3>Design Notes — Variant A: Poster Grid</h3>
+    <div class="note-grid">
+      <div class="note-item">
+        <div class="note-label">Visual Feel</div>
+        <div class="note-val">Product catalogue / CMS for travel brand. Makes use of destination images (poster_url). Cards feel like a booking platform's admin.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Best For</div>
+        <div class="note-val">Clients who want to show destinations with photos. Strong visual impact at first glance — great for demo / sales.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Pros</div>
+        <div class="note-val pro">✓ Modern, premium look. Destinations feel like products.<br>✓ poster_url images shine here.<br>✓ Instantly client-presentable.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Cons</div>
+        <div class="note-val con">✗ Less efficient when 20+ destinations (scrolling).<br>✗ Without poster images, cards look sparse.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════ VARIANT B: POWER TABLE ═══════════════════ -->
+<div id="panel-b" class="panel">
+
+  <div class="page-header">
+    <div>
+      <h2>Destinations</h2>
+      <p>Manage the packages your AI offers customers on WhatsApp.</p>
+    </div>
+    <div class="btn-group">
+      <button class="btn">⬇ Template</button>
+      <button class="btn">⬆ Import</button>
+      <button class="btn btn-primary">+ Add Destination</button>
+    </div>
+  </div>
+
+  <div class="info-banner">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0084ff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    Add a destination here and it's instantly live in the AI — no code changes needed.
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:44px;"></th>
+          <th>Destination <span class="sort-icon">↕</span></th>
+          <th style="width:130px;">Price <span class="sort-icon">↕</span></th>
+          <th style="width:100px;">Duration</th>
+          <th style="width:90px;">Status</th>
+          <th style="width:110px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td>
+            <div class="table-row-inner" style="padding-left:8px;">
+              <div class="table-thumb">🏔️</div>
+            </div>
+          </td>
+          <td>
+            <div class="table-row-inner" style="padding-left:0;">
+              <div>
+                <div class="table-name">Manali Honeymoon Package</div>
+                <div class="table-slug-row">
+                  <span class="chip-slug">manali-honeymoon</span>
+                  <span class="badge-imported">Imported</span>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-price">₹14,999</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-duration">5N / 6D</span></div></td>
+          <td class="col-status-cell"><div class="table-row-inner" style="padding-left:0;"><div class="toggle on"></div></div></td>
+          <td class="col-actions-cell">
+            <div class="table-row-inner col-actions-inner" style="padding-left:0;">
+              <button class="table-edit-btn">Edit</button>
+              <button class="dot-menu">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td><div class="table-row-inner" style="padding-left:8px;"><div class="table-thumb">🏖️</div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div><div class="table-name">Goa Beach Getaway</div><div class="table-slug-row"><span class="chip-slug">goa-beach</span></div></div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-price">₹12,499</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-duration">3N / 4D</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div class="toggle on"></div></div></td>
+          <td><div class="table-row-inner col-actions-inner" style="padding-left:0;"><button class="table-edit-btn">Edit</button><button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+        </tr>
+
+        <tr>
+          <td><div class="table-row-inner" style="padding-left:8px;"><div class="table-thumb">🌿</div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div><div class="table-name">Kerala Backwaters Cruise</div><div class="table-slug-row"><span class="chip-slug">kerala-backwaters</span></div></div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-price">₹18,999</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-duration">4N / 5D</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div class="toggle on"></div></div></td>
+          <td><div class="table-row-inner col-actions-inner" style="padding-left:0;"><button class="table-edit-btn">Edit</button><button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+        </tr>
+
+        <tr>
+          <td><div class="table-row-inner" style="padding-left:8px;"><div class="table-thumb">❄️</div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div><div class="table-name">Shimla Weekend Trip</div><div class="table-slug-row"><span class="chip-slug">shimla-weekend</span></div></div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-price">₹8,999</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-duration">2N / 3D</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div class="toggle on"></div></div></td>
+          <td><div class="table-row-inner col-actions-inner" style="padding-left:0;"><button class="table-edit-btn">Edit</button><button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+        </tr>
+
+        <tr>
+          <td><div class="table-row-inner" style="padding-left:8px;"><div class="table-thumb">🕌</div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div><div class="table-name">Rajasthan Heritage Tour</div><div class="table-slug-row"><span class="chip-slug">rajasthan-heritage</span></div></div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-price">₹24,999</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-duration">6N / 7D</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div class="toggle on"></div></div></td>
+          <td><div class="table-row-inner col-actions-inner" style="padding-left:0;"><button class="table-edit-btn">Edit</button><button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+        </tr>
+
+        <tr style="opacity:.55;">
+          <td><div class="table-row-inner" style="padding-left:8px;"><div class="table-thumb">🏯</div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div><div class="table-name">Hampi Ruins Explorer</div><div class="table-slug-row"><span class="chip-slug">hampi-ruins</span></div></div></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-price">₹10,499</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><span class="col-duration">2N / 3D</span></div></td>
+          <td><div class="table-row-inner" style="padding-left:0;"><div class="toggle"></div></div></td>
+          <td><div class="table-row-inner col-actions-inner" style="padding-left:0;"><button class="table-edit-btn">Edit</button><button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button></div></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <div class="design-notes">
+    <h3>Design Notes — Variant B: Power Table</h3>
+    <div class="note-grid">
+      <div class="note-item">
+        <div class="note-label">Visual Feel</div>
+        <div class="note-val">Dense, efficient, business-like. Feels like Linear, Vercel's deployment list, or Supabase dashboard. Every pixel earns its place.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Best For</div>
+        <div class="note-val">Power users with 20+ destinations. Easy to scan, compare prices, toggle active status in bulk. Most productive for day-to-day management.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Pros</div>
+        <div class="note-val pro">✓ Fastest to scan and act on 20+ items.<br>✓ Price/duration columns easy to compare.<br>✓ Edit button always visible — no 3-dot needed.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Cons</div>
+        <div class="note-val con">✗ Less visual impact for client demos.<br>✗ Doesn't showcase destination images at all.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════ VARIANT C: ENHANCED LIST ═══════════════════ -->
+<div id="panel-c" class="panel">
+
+  <div class="page-header">
+    <div>
+      <h2>Destinations</h2>
+      <p>Manage the packages your AI offers customers on WhatsApp.</p>
+    </div>
+    <div class="btn-group">
+      <button class="btn">⬇ Template</button>
+      <button class="btn">⬆ Import</button>
+      <button class="btn btn-primary">+ Add Destination</button>
+    </div>
+  </div>
+
+  <div class="info-banner">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0084ff" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    Add a destination here and it's instantly live in the AI — no code changes needed.
+  </div>
+
+  <div class="list-wrap">
+
+    <!-- Row 1 -->
+    <div class="list-row">
+      <div class="list-thumb-placeholder">🏔️</div>
+      <div class="list-content">
+        <div class="list-top">
+          <span class="list-name">Manali Honeymoon Package</span>
+          <span class="chip-slug">manali-honeymoon</span>
+          <span class="badge-imported">Imported</span>
+          <span class="badge-active"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</span>
+        </div>
+        <div class="list-meta">
+          <span class="list-meta-price">₹14,999</span>
+          <span class="list-meta-item">❄️ 5 Nights / 6 Days</span>
+          <span class="list-meta-item">🗓️ Dep: 5 Jul, 12 Jul, 19 Jul</span>
+        </div>
+        <div class="list-summary">Snow point, candlelight dinner, cab included. Perfect for couples seeking a romantic Himalayan escape.</div>
+        <div class="list-keywords">
+          <span class="keyword-chip">manali</span>
+          <span class="keyword-chip">honeymoon</span>
+          <span class="keyword-chip">himachal</span>
+          <span class="keyword-chip">snow</span>
+        </div>
+      </div>
+      <div class="list-actions">
+        <div class="toggle on"></div>
+        <div class="list-sep"></div>
+        <button class="list-inline-btn primary-btn">Edit</button>
+        <button class="dot-menu">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Row 2 -->
+    <div class="list-row">
+      <div class="list-thumb-placeholder">🏖️</div>
+      <div class="list-content">
+        <div class="list-top">
+          <span class="list-name">Goa Beach Getaway</span>
+          <span class="chip-slug">goa-beach</span>
+          <span class="badge-active"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</span>
+        </div>
+        <div class="list-meta">
+          <span class="list-meta-price">₹12,499</span>
+          <span class="list-meta-item">🌊 3 Nights / 4 Days</span>
+          <span class="list-meta-item">🗓️ Daily departures</span>
+        </div>
+        <div class="list-summary">North Goa beaches, water sports, seafood dinner included.</div>
+        <div class="list-keywords">
+          <span class="keyword-chip">goa</span>
+          <span class="keyword-chip">beach</span>
+          <span class="keyword-chip">water sports</span>
+        </div>
+      </div>
+      <div class="list-actions">
+        <div class="toggle on"></div>
+        <div class="list-sep"></div>
+        <button class="list-inline-btn primary-btn">Edit</button>
+        <button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Row 3 -->
+    <div class="list-row">
+      <div class="list-thumb-placeholder">🌿</div>
+      <div class="list-content">
+        <div class="list-top">
+          <span class="list-name">Kerala Backwaters Cruise</span>
+          <span class="chip-slug">kerala-backwaters</span>
+          <span class="badge-active"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</span>
+        </div>
+        <div class="list-meta">
+          <span class="list-meta-price">₹18,999</span>
+          <span class="list-meta-item">⛵ 4 Nights / 5 Days</span>
+          <span class="list-meta-item">🗓️ Dep: 8 Jul, 15 Jul, 22 Jul</span>
+        </div>
+        <div class="list-summary">Houseboat stay, Alleppey, Munnar hills. Includes breakfast and dinner.</div>
+        <div class="list-keywords">
+          <span class="keyword-chip">kerala</span>
+          <span class="keyword-chip">backwaters</span>
+          <span class="keyword-chip">houseboat</span>
+          <span class="keyword-chip">munnar</span>
+        </div>
+      </div>
+      <div class="list-actions">
+        <div class="toggle on"></div>
+        <div class="list-sep"></div>
+        <button class="list-inline-btn primary-btn">Edit</button>
+        <button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Row 4 -->
+    <div class="list-row">
+      <div class="list-thumb-placeholder">❄️</div>
+      <div class="list-content">
+        <div class="list-top">
+          <span class="list-name">Shimla Weekend Trip</span>
+          <span class="chip-slug">shimla-weekend</span>
+          <span class="badge-active"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80;display:inline-block;"></span> Active</span>
+        </div>
+        <div class="list-meta">
+          <span class="list-meta-price">₹8,999</span>
+          <span class="list-meta-item">🏔️ 2 Nights / 3 Days</span>
+          <span class="list-meta-item">🗓️ Fri-Sun batches</span>
+        </div>
+        <div class="list-summary">Mall road, Jakhu temple, ridge viewpoint. Hotel + cab included.</div>
+        <div class="list-keywords">
+          <span class="keyword-chip">shimla</span>
+          <span class="keyword-chip">weekend</span>
+          <span class="keyword-chip">himachal</span>
+        </div>
+      </div>
+      <div class="list-actions">
+        <div class="toggle on"></div>
+        <div class="list-sep"></div>
+        <button class="list-inline-btn primary-btn">Edit</button>
+        <button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+    </div>
+
+    <!-- Row 5: Inactive -->
+    <div class="list-row" style="opacity:.65;">
+      <div class="list-thumb-placeholder">🏯</div>
+      <div class="list-content">
+        <div class="list-top">
+          <span class="list-name">Hampi Ruins Explorer</span>
+          <span class="chip-slug">hampi-ruins</span>
+          <span class="badge-inactive">Inactive</span>
+        </div>
+        <div class="list-meta">
+          <span class="list-meta-price">₹10,499</span>
+          <span class="list-meta-item">🏛️ 2 Nights / 3 Days</span>
+        </div>
+        <div class="list-summary">UNESCO world heritage site tour. Coracle ride, sunset viewpoint. (Draft — not yet published.)</div>
+        <div class="list-keywords">
+          <span class="keyword-chip">hampi</span>
+          <span class="keyword-chip">karnataka</span>
+          <span class="keyword-chip">heritage</span>
+        </div>
+      </div>
+      <div class="list-actions">
+        <div class="toggle"></div>
+        <div class="list-sep"></div>
+        <button class="list-inline-btn primary-btn">Edit</button>
+        <button class="dot-menu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="design-notes">
+    <h3>Design Notes — Variant C: Enhanced List</h3>
+    <div class="note-grid">
+      <div class="note-item">
+        <div class="note-label">Visual Feel</div>
+        <div class="note-val">Rich detail without going full grid. Like Framer's asset library or Notion's list view. More info per row, actions visible inline.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Best For</div>
+        <div class="note-val">Best balance of visual richness + information density. Shows keywords (AI context), departure dates, and summary all at once. Best for day-to-day management AND client demos.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Pros</div>
+        <div class="note-val pro">✓ Most information visible per row.<br>✓ Keywords visible — shows AI context.<br>✓ Inline Edit button, no 3-dot hunting.<br>✓ Scales well from 5 to 50 destinations.</div>
+      </div>
+      <div class="note-item">
+        <div class="note-label">Cons</div>
+        <div class="note-val con">✗ Taller rows than table variant.<br>✗ Without poster images, left side looks plain.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(id, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-' + id).classList.add('active');
+  }
+
+  // Make toggles clickable
+  document.querySelectorAll('.toggle').forEach(t => {
+    t.addEventListener('click', () => t.classList.toggle('on'));
+  });
+</script>
+
+</body>
+</html>

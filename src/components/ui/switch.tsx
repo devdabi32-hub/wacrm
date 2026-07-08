@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import * as React from "react"
 import { Switch as SwitchPrimitive } from "@base-ui/react/switch"
@@ -15,9 +15,9 @@ function Switch({
       data-slot="switch"
       className={cn(
         "inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0084ff] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        "data-[checked]:bg-[#0084ff] data-[unchecked]:bg-slate-700",
+        "data-[checked]:bg-primary data-[unchecked]:bg-muted",
         className,
       )}
       {...props}

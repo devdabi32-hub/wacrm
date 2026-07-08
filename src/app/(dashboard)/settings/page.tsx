@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Settings, MessageSquare, Tag, User, SlidersHorizontal, Users, Building2 } from 'lucide-react';
@@ -42,8 +42,8 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white text-balance">Settings</h1>
-        <p className="text-sm text-slate-400 mt-1">
+        <h1 className="text-2xl font-bold text-foreground text-balance">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-1">
           Manage your profile, WhatsApp® integration, message templates, tags,
           and custom contact fields.
         </p>
@@ -55,45 +55,45 @@ export default function SettingsPage() {
             (whitespace-nowrap triggers per tab). Icon-only below sm
             keeps the row compact; sm+ restores full labels. */}
         <div className="overflow-x-auto">
-          <TabsList className="bg-slate-900 border border-slate-700">
+          <TabsList className="bg-card border border-border">
             <TabsTrigger
               value="profile"
-              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+              className="data-active:bg-secondary data-active:text-primary text-muted-foreground"
             >
               <User className="size-4" />
               <span className="hidden sm:inline">Profile</span>
             </TabsTrigger>
             <TabsTrigger
               value="whatsapp"
-              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+              className="data-active:bg-secondary data-active:text-primary text-muted-foreground"
             >
               <Settings className="size-4" />
               <span className="hidden sm:inline">WhatsApp Config</span>
             </TabsTrigger>
             <TabsTrigger
               value="business"
-              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+              className="data-active:bg-secondary data-active:text-primary text-muted-foreground"
             >
               <Building2 className="size-4" aria-hidden="true" />
               <span className="hidden sm:inline">Business</span>
             </TabsTrigger>
             <TabsTrigger
               value="templates"
-              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+              className="data-active:bg-secondary data-active:text-primary text-muted-foreground"
             >
               <MessageSquare className="size-4" />
               <span className="hidden sm:inline">Templates</span>
             </TabsTrigger>
             <TabsTrigger
               value="tags"
-              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+              className="data-active:bg-secondary data-active:text-primary text-muted-foreground"
             >
               <Tag className="size-4" />
               <span className="hidden sm:inline">Tags</span>
             </TabsTrigger>
             <TabsTrigger
               value="fields"
-              className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+              className="data-active:bg-secondary data-active:text-primary text-muted-foreground"
             >
               <SlidersHorizontal className="size-4" />
               <span className="hidden sm:inline">Custom Fields</span>
@@ -101,7 +101,7 @@ export default function SettingsPage() {
             {isOwner && (
               <TabsTrigger
                 value="team"
-                className="data-active:bg-slate-800 data-active:text-[#0084ff] text-slate-400"
+                className="data-active:bg-secondary data-active:text-primary text-muted-foreground"
               >
                 <Users className="size-4" />
                 <span className="hidden sm:inline">Team</span>

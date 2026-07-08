@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -44,14 +44,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-slate-950 px-4">
-      <Card className="w-full max-w-md border-slate-800 bg-slate-900">
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-4">
+      <Card className="w-full max-w-md border-border bg-card">
         <CardHeader className="items-center text-center">
-          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0084ff]/10">
-            <MessageSquare className="h-6 w-6 text-[#0084ff]" aria-hidden="true" />
+          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+            <MessageSquare className="h-6 w-6 text-primary" aria-hidden="true" />
           </div>
-          <CardTitle className="text-xl text-white">Welcome back</CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardTitle className="text-xl text-foreground">Welcome back</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Sign in to your account
           </CardDescription>
         </CardHeader>
@@ -64,7 +64,7 @@ export default function LoginPage() {
             )}
 
             <div className="flex flex-col gap-2">
-              <Label htmlFor="email" className="text-slate-300">
+              <Label htmlFor="email" className="text-muted-foreground">
                 Email
               </Label>
               <Input
@@ -77,18 +77,18 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
+                className="border-border bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
               />
             </div>
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-slate-300">
+                <Label htmlFor="password" className="text-muted-foreground">
                   Password
                 </Label>
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-[#0084ff] hover:text-[#0084ff]"
+                  className="text-sm text-primary hover:text-primary"
                 >
                   Forgot password?
                 </Link>
@@ -102,14 +102,14 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
+                className="border-border bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
               />
             </div>
 
             <Button
               type="submit"
               disabled={loading}
-              className="mt-2 h-10 w-full bg-[#0084ff] text-white hover:bg-[#0066cc] disabled:opacity-50"
+              className="mt-2 h-10 w-full bg-primary text-foreground hover:bg-[#0066cc] disabled:opacity-50"
             >
               {loading ? "Signing in…" : "Sign in"}
             </Button>

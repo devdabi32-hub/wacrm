@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -36,7 +36,7 @@ const STATUS_META: Record<
   },
   revoked: {
     label: 'Revoked',
-    className: 'bg-slate-600/10 text-slate-400 border-slate-600/20',
+    className: 'bg-slate-600/10 text-muted-foreground border-border/20',
     icon: Trash2,
   },
 };
@@ -124,13 +124,13 @@ export function TeamManager() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-slate-700 bg-slate-900">
+      <Card className="border-border bg-card">
         <CardContent className="pt-6">
           <div className="mb-4 flex items-center gap-2">
-            <UserPlus className="size-5 text-[#0084ff]" />
-            <h2 className="text-lg font-semibold text-white">Invite a team member</h2>
+            <UserPlus className="size-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Invite a team member</h2>
           </div>
-          <p className="mb-4 text-sm text-slate-400">
+          <p className="mb-4 text-sm text-muted-foreground">
             They&apos;ll get an email to set their own password. Once they accept,
             they can access this workspace&apos;s inbox, contacts and pipelines.
           </p>
@@ -147,7 +147,7 @@ export function TeamManager() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   disabled={inviting}
-                  className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
+                  className="border-border bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
                 />
               </div>
               <div className="flex-1">
@@ -161,14 +161,14 @@ export function TeamManager() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={inviting}
-                  className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
+                  className="border-border bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
                 />
               </div>
             </div>
             <Button
               type="submit"
               disabled={inviting}
-              className="self-start bg-[#0084ff] text-white hover:bg-[#0066cc] disabled:opacity-50"
+              className="self-start bg-primary text-foreground hover:bg-[#0066cc] disabled:opacity-50"
             >
               {inviting ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -181,20 +181,20 @@ export function TeamManager() {
         </CardContent>
       </Card>
 
-      <Card className="border-slate-700 bg-slate-900">
+      <Card className="border-border bg-card">
         <CardContent className="pt-6">
-          <h2 className="mb-4 text-lg font-semibold text-white">Members</h2>
+          <h2 className="mb-4 text-lg font-semibold text-foreground">Members</h2>
 
           {loading ? (
-            <div className="flex items-center justify-center py-8 text-slate-400">
+            <div className="flex items-center justify-center py-8 text-muted-foreground">
               <Loader2 className="size-5 animate-spin" />
             </div>
           ) : members.length === 0 ? (
-            <p className="py-8 text-center text-sm text-slate-500">
+            <p className="py-8 text-center text-sm text-muted-foreground">
               No team members yet. Invite someone above.
             </p>
           ) : (
-            <ul className="divide-y divide-slate-800">
+            <ul className="divide-y divide-border">
               {members.map((m) => {
                 const meta = STATUS_META[m.status];
                 const StatusIcon = meta.icon;
@@ -204,10 +204,10 @@ export function TeamManager() {
                     className="flex items-center justify-between gap-3 py-3"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-white">
+                      <p className="truncate text-sm font-medium text-foreground">
                         {m.invited_name || m.invited_email}
                       </p>
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="truncate text-xs text-muted-foreground">
                         {m.invited_name ? `${m.invited_email} · ` : ''}
                         Invited {new Date(m.invited_at).toLocaleDateString()}
                       </p>
@@ -226,7 +226,7 @@ export function TeamManager() {
                         onClick={() => handleRemove(m)}
                         disabled={revokingId === m.id}
                         title="Remove member"
-                        className="text-slate-400 hover:bg-red-500/10 hover:text-red-400"
+                        className="text-muted-foreground hover:bg-red-500/10 hover:text-red-400"
                       >
                         {revokingId === m.id ? (
                           <Loader2 className="size-4 animate-spin" />

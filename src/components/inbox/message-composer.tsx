@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useCallback, KeyboardEvent } from "react";
 import { Send, LayoutTemplate } from "lucide-react";
@@ -65,7 +65,7 @@ export function MessageComposer({
   );
 
   return (
-    <div className="border-t border-slate-800 bg-slate-900 p-3">
+    <div className="border-t border-border bg-card p-3">
       {sessionExpired && (
         <div className="mb-2 flex items-center justify-between rounded-lg bg-amber-500/10 px-3 py-2">
           <p className="text-xs text-amber-400">
@@ -87,7 +87,7 @@ export function MessageComposer({
         <Button
           variant="ghost"
           size="sm"
-          className="h-9 w-9 shrink-0 p-0 text-slate-400 hover:text-white"
+          className="h-9 w-9 shrink-0 p-0 text-muted-foreground hover:text-foreground"
           onClick={onOpenTemplates}
           title="Send template"
         >
@@ -107,14 +107,14 @@ export function MessageComposer({
           disabled={sessionExpired}
           rows={1}
           className={cn(
-            "flex-1 resize-none rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white placeholder-slate-500 outline-none transition-colors focus:border-[#0084ff]/50",
+            "flex-1 resize-none rounded-xl border border-border bg-secondary px-4 py-2.5 text-sm text-foreground placeholder-slate-500 outline-none transition-colors focus:border-primary/50",
             sessionExpired && "cursor-not-allowed opacity-50"
           )}
         />
 
         <Button
           size="sm"
-          className="h-9 w-9 shrink-0 bg-[#0084ff] p-0 hover:bg-[#0066cc] disabled:opacity-40"
+          className="h-9 w-9 shrink-0 bg-primary p-0 hover:bg-[#0066cc] disabled:opacity-40"
           disabled={!text.trim() || sessionExpired || sending}
           onClick={handleSend}
         >

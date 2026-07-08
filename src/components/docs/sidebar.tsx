@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -27,8 +27,8 @@ export function DocsSidebar({ pages, onNavigate }: DocsSidebarProps) {
         className={cn(
           'flex items-center justify-between rounded-md px-3 py-2 transition-colors',
           pathname === '/docs'
-            ? 'bg-slate-800 text-white'
-            : 'text-slate-300 hover:bg-slate-800/60 hover:text-white',
+            ? 'bg-secondary text-foreground'
+            : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground',
         )}
       >
         <span>Overview</span>
@@ -36,7 +36,7 @@ export function DocsSidebar({ pages, onNavigate }: DocsSidebarProps) {
 
       {Object.entries(sections).map(([section, items]) => (
         <div key={section}>
-          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
             {section}
           </p>
           <ul className="flex flex-col gap-0.5">
@@ -51,8 +51,8 @@ export function DocsSidebar({ pages, onNavigate }: DocsSidebarProps) {
                     className={cn(
                       'block rounded-md px-3 py-1.5 transition-colors',
                       active
-                        ? 'bg-[#0084ff]/10 text-[#4da6ff]'
-                        : 'text-slate-400 hover:bg-slate-800/60 hover:text-white',
+                        ? 'bg-primary/10 text-[#4da6ff]'
+                        : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground',
                     )}
                   >
                     {p.title}

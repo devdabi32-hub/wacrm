@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
@@ -20,13 +20,13 @@ export function DocsShell({ pages, children }: DocsShellProps) {
   const closeMobile = () => setMobileOpen(false)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
-      <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition-colors hover:bg-slate-800 hover:text-white lg:hidden"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground lg:hidden"
               aria-label={mobileOpen ? 'Close docs menu' : 'Open docs menu'}
               onClick={() => setMobileOpen((v) => !v)}
             >
@@ -37,13 +37,13 @@ export function DocsShell({ pages, children }: DocsShellProps) {
               className="flex items-center gap-2"
               aria-label="CRM Template for WhatsApp home"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#0084ff]">
-                <MessageSquare className="h-4 w-4 text-white" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+                <MessageSquare className="h-4 w-4 text-foreground" />
               </span>
-              <span className="text-sm font-semibold text-white">
+              <span className="text-sm font-semibold text-foreground">
                 CRM Template for WhatsApp
               </span>
-              <span className="hidden rounded-md border border-slate-700 bg-slate-900 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-slate-400 sm:inline-block">
+              <span className="hidden rounded-md border border-border bg-card px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:inline-block">
                 Docs
               </span>
             </Link>
@@ -52,7 +52,7 @@ export function DocsShell({ pages, children }: DocsShellProps) {
           <div className="flex items-center gap-1.5">
             <Link
               href="/"
-              className="hidden rounded-lg px-3 py-1.5 text-sm text-slate-300 transition-colors hover:bg-slate-800 hover:text-white sm:inline-flex"
+              className="hidden rounded-lg px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:inline-flex"
             >
               Home
             </Link>
@@ -61,13 +61,13 @@ export function DocsShell({ pages, children }: DocsShellProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="View source on GitHub"
-              className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
+              className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
               <GithubIcon className="h-4 w-4" />
             </a>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-lg bg-[#0084ff] px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-[#0066cc]"
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-[#0066cc]"
             >
               Sign in
             </Link>
@@ -83,11 +83,11 @@ export function DocsShell({ pages, children }: DocsShellProps) {
         {mobileOpen && (
           <div className="fixed inset-0 top-16 z-30 flex lg:hidden">
             <div
-              className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-background/80 backdrop-blur-sm"
               onClick={closeMobile}
               aria-hidden
             />
-            <div className="relative ml-0 mr-auto flex h-full w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-slate-800 bg-slate-950 px-4 py-6">
+            <div className="relative ml-0 mr-auto flex h-full w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-border bg-background px-4 py-6">
               <DocsSidebar pages={pages} onNavigate={closeMobile} />
             </div>
           </div>
@@ -96,7 +96,7 @@ export function DocsShell({ pages, children }: DocsShellProps) {
         <main className="min-w-0 flex-1 py-10">{children}</main>
       </div>
 
-      <footer className="mt-10 border-t border-slate-800 bg-slate-950">
+      <footer className="mt-10 border-t border-border bg-background">
         <div className="mx-auto w-full max-w-7xl px-4 py-6 text-xs leading-relaxed text-slate-600 sm:px-6">
           WhatsApp® is a registered trademark of Meta Platforms, Inc.
           Hostinger is not affiliated with, endorsed by, or sponsored by

@@ -37,7 +37,7 @@ export default async function DocPage({ params }: DocPageProps) {
 
   return (
     <article className="mx-auto w-full max-w-3xl">
-      <p className="text-xs font-semibold uppercase tracking-wider text-[#0084ff]">
+      <p className="text-xs font-semibold uppercase tracking-wider text-primary">
         {doc.section}
       </p>
       <div
@@ -47,18 +47,18 @@ export default async function DocPage({ params }: DocPageProps) {
 
       <nav
         aria-label="Pagination"
-        className="mt-16 grid grid-cols-1 gap-3 border-t border-slate-800 pt-8 sm:grid-cols-2"
+        className="mt-16 grid grid-cols-1 gap-3 border-t border-border pt-8 sm:grid-cols-2"
       >
         {prev ? (
           <Link
             href={`/docs/${prev.slug}`}
-            className="group flex flex-col gap-1 rounded-xl border border-slate-800 bg-slate-900/40 px-5 py-4 transition-colors hover:border-slate-700 hover:bg-slate-900/70"
+            className="group flex flex-col gap-1 rounded-xl border border-border bg-card/40 px-5 py-4 transition-colors hover:border-border hover:bg-card/70"
           >
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               <ArrowLeft className="h-3.5 w-3.5" />
               Previous
             </span>
-            <span className="text-sm font-semibold text-white">
+            <span className="text-sm font-semibold text-foreground">
               {prev.title}
             </span>
           </Link>
@@ -68,13 +68,13 @@ export default async function DocPage({ params }: DocPageProps) {
         {next ? (
           <Link
             href={`/docs/${next.slug}`}
-            className="group flex flex-col items-end gap-1 rounded-xl border border-slate-800 bg-slate-900/40 px-5 py-4 text-right transition-colors hover:border-slate-700 hover:bg-slate-900/70"
+            className="group flex flex-col items-end gap-1 rounded-xl border border-border bg-card/40 px-5 py-4 text-right transition-colors hover:border-border hover:bg-card/70"
           >
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Next
               <ArrowRight className="h-3.5 w-3.5" />
             </span>
-            <span className="text-sm font-semibold text-white">
+            <span className="text-sm font-semibold text-foreground">
               {next.title}
             </span>
           </Link>

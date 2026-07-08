@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
@@ -185,10 +185,10 @@ export function ImportModal({ open, onOpenChange, onImported }: ImportModalProps
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bg-slate-900 border-slate-700 text-slate-200 sm:max-w-lg">
+      <DialogContent className="bg-card border-border text-foreground sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="text-white">Import Contacts</DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogTitle className="text-foreground">Import Contacts</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Upload a CSV file with a &quot;phone&quot; column (required). Optional columns:
             name, email, company.
           </DialogDescription>
@@ -198,23 +198,23 @@ export function ImportModal({ open, onOpenChange, onImported }: ImportModalProps
           {/* Upload area */}
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-700 p-6 cursor-pointer hover:border-[#0084ff]/50 transition-colors"
+            className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-6 cursor-pointer hover:border-primary/50 transition-colors"
           >
             {file ? (
               <>
-                <FileText className="size-8 text-[#0084ff]" />
-                <p className="text-sm text-slate-300">{file.name}</p>
-                <p className="text-xs text-slate-500">
+                <FileText className="size-8 text-primary" />
+                <p className="text-sm text-muted-foreground">{file.name}</p>
+                <p className="text-xs text-muted-foreground">
                   {parsedRows.length} row{parsedRows.length !== 1 ? 's' : ''} detected
                 </p>
               </>
             ) : (
               <>
-                <Upload className="size-8 text-slate-500" />
-                <p className="text-sm text-slate-400">
+                <Upload className="size-8 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
                   Click to upload CSV file
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   CSV with &quot;phone&quot; column required
                 </p>
               </>
@@ -232,33 +232,33 @@ export function ImportModal({ open, onOpenChange, onImported }: ImportModalProps
           {/* Preview table */}
           {preview.length > 0 && !result && (
             <div className="space-y-2">
-              <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Preview (first {preview.length} rows)
               </p>
-              <div className="rounded-lg border border-slate-700 overflow-hidden">
+              <div className="rounded-lg border border-border overflow-hidden">
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="bg-slate-800">
-                      <th className="px-3 py-1.5 text-left text-slate-400 font-medium">Phone</th>
-                      <th className="px-3 py-1.5 text-left text-slate-400 font-medium">Name</th>
-                      <th className="px-3 py-1.5 text-left text-slate-400 font-medium">Email</th>
-                      <th className="px-3 py-1.5 text-left text-slate-400 font-medium">Company</th>
+                    <tr className="bg-secondary">
+                      <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">Phone</th>
+                      <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">Name</th>
+                      <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">Email</th>
+                      <th className="px-3 py-1.5 text-left text-muted-foreground font-medium">Company</th>
                     </tr>
                   </thead>
                   <tbody>
                     {preview.map((row, i) => (
-                      <tr key={i} className="border-t border-slate-700/50">
-                        <td className="px-3 py-1.5 text-slate-300">{row.phone}</td>
-                        <td className="px-3 py-1.5 text-slate-300">{row.name || '-'}</td>
-                        <td className="px-3 py-1.5 text-slate-300">{row.email || '-'}</td>
-                        <td className="px-3 py-1.5 text-slate-300">{row.company || '-'}</td>
+                      <tr key={i} className="border-t border-border/50">
+                        <td className="px-3 py-1.5 text-muted-foreground">{row.phone}</td>
+                        <td className="px-3 py-1.5 text-muted-foreground">{row.name || '-'}</td>
+                        <td className="px-3 py-1.5 text-muted-foreground">{row.email || '-'}</td>
+                        <td className="px-3 py-1.5 text-muted-foreground">{row.company || '-'}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
               {parsedRows.length > 5 && (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-muted-foreground">
                   ...and {parsedRows.length - 5} more rows
                 </p>
               )}
@@ -267,11 +267,11 @@ export function ImportModal({ open, onOpenChange, onImported }: ImportModalProps
 
           {/* Results */}
           {result && (
-            <div className="rounded-lg border border-slate-700 p-4 space-y-2">
-              <p className="text-sm font-medium text-white">Import Complete</p>
+            <div className="rounded-lg border border-border p-4 space-y-2">
+              <p className="text-sm font-medium text-foreground">Import Complete</p>
               <div className="flex items-center gap-4">
                 {result.imported > 0 && (
-                  <div className="flex items-center gap-1.5 text-[#0084ff] text-sm">
+                  <div className="flex items-center gap-1.5 text-primary text-sm">
                     <CheckCircle className="size-4" />
                     {result.imported} imported
                   </div>
@@ -287,12 +287,12 @@ export function ImportModal({ open, onOpenChange, onImported }: ImportModalProps
           )}
         </div>
 
-        <DialogFooter className="bg-slate-900 border-slate-700">
+        <DialogFooter className="bg-card border-border">
           <Button
             type="button"
             variant="outline"
             onClick={() => handleOpenChange(false)}
-            className="border-slate-700 text-slate-300 hover:bg-slate-800"
+            className="border-border text-muted-foreground hover:bg-secondary"
           >
             {result ? 'Close' : 'Cancel'}
           </Button>
@@ -301,7 +301,7 @@ export function ImportModal({ open, onOpenChange, onImported }: ImportModalProps
               type="button"
               disabled={parsedRows.length === 0 || importing}
               onClick={handleImport}
-              className="bg-[#0084ff] hover:bg-[#0055cc] text-white"
+              className="bg-primary hover:bg-primary/80 text-foreground"
             >
               {importing && <Loader2 className="size-4 animate-spin" />}
               Import {parsedRows.length > 0 ? `${parsedRows.length} Contacts` : ''}

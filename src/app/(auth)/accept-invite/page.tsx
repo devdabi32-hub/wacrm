@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -119,20 +119,20 @@ export default function AcceptInvitePage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
-      <Card className="w-full max-w-md border-slate-800 bg-slate-900">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <Card className="w-full max-w-md border-border bg-card">
         <CardHeader className="items-center text-center">
-          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0084ff]/10">
-            <Users className="h-6 w-6 text-[#0084ff]" aria-hidden="true" />
+          <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+            <Users className="h-6 w-6 text-primary" aria-hidden="true" />
           </div>
-          <CardTitle className="text-xl text-white">Set your password</CardTitle>
-          <CardDescription className="text-slate-400">
+          <CardTitle className="text-xl text-foreground">Set your password</CardTitle>
+          <CardDescription className="text-muted-foreground">
             You&apos;ve been invited to the team. Choose a password to finish.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {checking ? (
-            <div className="flex items-center justify-center py-8 text-slate-400">
+            <div className="flex items-center justify-center py-8 text-muted-foreground">
               <Loader2 className="size-5 animate-spin" aria-hidden="true" />
             </div>
           ) : !hasSession ? (
@@ -154,7 +154,7 @@ export default function AcceptInvitePage() {
               )}
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="password" className="text-slate-300">
+                <Label htmlFor="password" className="text-muted-foreground">
                   New password
                 </Label>
                 <Input
@@ -166,12 +166,12 @@ export default function AcceptInvitePage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
+                  className="border-border bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
                 />
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="confirm" className="text-slate-300">
+                <Label htmlFor="confirm" className="text-muted-foreground">
                   Confirm password
                 </Label>
                 <Input
@@ -183,14 +183,14 @@ export default function AcceptInvitePage() {
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   required
-                  className="border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus-visible:border-[#0084ff] focus-visible:ring-[#0084ff]/20"
+                  className="border-border bg-secondary text-foreground placeholder:text-muted-foreground focus-visible:border-primary focus-visible:ring-primary/20"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={saving}
-                className="mt-2 h-10 w-full bg-[#0084ff] text-white hover:bg-[#0066cc] disabled:opacity-50"
+                className="mt-2 h-10 w-full bg-primary text-foreground hover:bg-[#0066cc] disabled:opacity-50"
               >
                 {saving ? "Saving…" : "Set password & continue"}
               </Button>

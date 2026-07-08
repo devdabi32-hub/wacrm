@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -284,12 +284,12 @@ export default function PipelinesPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <div className="h-8 w-48 animate-pulse rounded bg-slate-800" />
-          <div className="h-9 w-28 animate-pulse rounded-lg bg-slate-800" />
+          <div className="h-8 w-48 animate-pulse rounded bg-secondary" />
+          <div className="h-9 w-28 animate-pulse rounded-lg bg-secondary" />
         </div>
         <div className="flex gap-3">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-96 w-72 animate-pulse rounded-xl bg-slate-800/50" />
+            <div key={i} className="h-96 w-72 animate-pulse rounded-xl bg-secondary/50" />
           ))}
         </div>
       </div>
@@ -304,20 +304,20 @@ export default function PipelinesPage() {
           {/* Pipeline selector dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger
-              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800 transition-colors data-[popup-open]:bg-slate-800"
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-sm text-foreground hover:bg-secondary transition-colors data-[popup-open]:bg-secondary"
             >
-              <GitBranch className="h-4 w-4 text-[#0084ff]" aria-hidden="true" />
+              <GitBranch className="h-4 w-4 text-primary" aria-hidden="true" />
               <span className="font-semibold">
                 {selectedPipeline?.name ?? "Select Pipeline"}
               </span>
-              <ChevronDown className="h-4 w-4 text-slate-400" aria-hidden="true" />
+              <ChevronDown className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-64 border-slate-700 bg-slate-900 text-slate-200"
+              className="w-64 border-border bg-card text-foreground"
             >
               {pipelines.length === 0 && (
-                <DropdownMenuItem disabled className="text-slate-500">
+                <DropdownMenuItem disabled className="text-muted-foreground">
                   No pipelines yet
                 </DropdownMenuItem>
               )}
@@ -327,19 +327,19 @@ export default function PipelinesPage() {
                   onClick={() => setSelectedPipelineId(p.id)}
                   className={
                     p.id === selectedPipelineId
-                      ? "text-[#0084ff]"
-                      : "text-slate-300"
+                      ? "text-primary"
+                      : "text-muted-foreground"
                   }
                 >
                   <GitBranch className="mr-2 h-3.5 w-3.5" />
                   {p.name}
                 </DropdownMenuItem>
               ))}
-              <DropdownMenuSeparator className="bg-slate-700" />
+              <DropdownMenuSeparator className="bg-muted" />
               {selectedPipeline && (
                 <DropdownMenuItem
                   onClick={() => setSettingsOpen(true)}
-                  className="text-slate-300"
+                  className="text-muted-foreground"
                 >
                   <Settings className="mr-2 h-3.5 w-3.5" />
                   Manage Pipelines
@@ -353,7 +353,7 @@ export default function PipelinesPage() {
           <Button
             variant="outline"
             onClick={() => setNewPipelineOpen(true)}
-            className="border-slate-700 bg-slate-900 text-slate-200 hover:bg-slate-800"
+            className="border-border bg-card text-foreground hover:bg-secondary"
           >
             <Plus className="mr-1 h-4 w-4" />
             Add Pipeline
@@ -361,7 +361,7 @@ export default function PipelinesPage() {
           <Button
             onClick={() => handleAddDeal()}
             disabled={!selectedPipelineId || stages.length === 0}
-            className="bg-[#0084ff] text-white hover:bg-[#0055cc]"
+            className="bg-primary text-foreground hover:bg-primary/80"
           >
             <Plus className="mr-1 h-4 w-4" />
             Add Deal
@@ -371,17 +371,17 @@ export default function PipelinesPage() {
 
       {/* Board */}
       {pipelines.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700 py-20">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-20">
           <GitBranch className="h-12 w-12 text-slate-600" aria-hidden="true" />
-          <h3 className="mt-4 text-lg font-medium text-white">
+          <h3 className="mt-4 text-lg font-medium text-foreground">
             No pipelines yet
           </h3>
-          <p className="mt-2 text-sm text-slate-400">
+          <p className="mt-2 text-sm text-muted-foreground">
             Create a pipeline to start tracking deals
           </p>
           <Button
             onClick={() => setNewPipelineOpen(true)}
-            className="mt-4 bg-[#0084ff] text-white hover:bg-[#0055cc]"
+            className="mt-4 bg-primary text-foreground hover:bg-primary/80"
           >
             <Plus className="mr-1 h-4 w-4" />
             Create Pipeline
@@ -402,12 +402,12 @@ export default function PipelinesPage() {
 
       {/* New Pipeline Dialog */}
       <Dialog open={newPipelineOpen} onOpenChange={setNewPipelineOpen}>
-        <DialogContent className="sm:max-w-sm bg-slate-900 border-slate-700">
+        <DialogContent className="sm:max-w-sm bg-card border-border">
           <DialogHeader>
-            <DialogTitle className="text-white">New Pipeline</DialogTitle>
+            <DialogTitle className="text-foreground">New Pipeline</DialogTitle>
           </DialogHeader>
           <div className="py-2">
-            <Label htmlFor="pipeline-name" className="text-slate-300">Pipeline Name</Label>
+            <Label htmlFor="pipeline-name" className="text-muted-foreground">Pipeline Name</Label>
             <Input
               id="pipeline-name"
               name="pipeline-name"
@@ -415,27 +415,27 @@ export default function PipelinesPage() {
               value={newPipelineName}
               onChange={(e) => setNewPipelineName(e.target.value)}
               placeholder="e.g., Enterprise Sales"
-              className="mt-2 bg-slate-800 border-slate-700 text-white"
+              className="mt-2 bg-secondary border-border text-foreground"
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleCreatePipeline();
               }}
             />
-            <p className="mt-2 text-xs text-slate-400">
+            <p className="mt-2 text-xs text-muted-foreground">
               Default stages (New Inquiry → Post-Trip) will be created automatically.
             </p>
           </div>
-          <DialogFooter className="bg-slate-900/50 border-slate-700">
+          <DialogFooter className="bg-card/50 border-border">
             <Button
               variant="outline"
               onClick={() => setNewPipelineOpen(false)}
-              className="border-slate-700 text-slate-300 hover:bg-slate-800"
+              className="border-border text-muted-foreground hover:bg-secondary"
             >
               Cancel
             </Button>
             <Button
               onClick={handleCreatePipeline}
               disabled={creating || !newPipelineName.trim()}
-              className="bg-[#0084ff] text-white hover:bg-[#0055cc]"
+              className="bg-primary text-foreground hover:bg-primary/80"
             >
               {creating ? "Creating…" : "Create Pipeline"}
             </Button>

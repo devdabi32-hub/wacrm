@@ -49,7 +49,7 @@ export default async function Image() {
               width: 64,
               height: 64,
               borderRadius: 14,
-              background: '#0084ff',
+              background: '#6366F1',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

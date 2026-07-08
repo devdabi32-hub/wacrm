@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -124,8 +124,8 @@ export default function NewBroadcastPage() {
     <div className="mx-auto max-w-3xl space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">New Broadcast</h1>
-        <p className="mt-1 text-sm text-slate-400">
+        <h1 className="text-2xl font-bold text-foreground">New Broadcast</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
           Create and send a broadcast message to your contacts.
         </p>
       </div>
@@ -142,17 +142,17 @@ export default function NewBroadcastPage() {
                 <div
                   className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium transition-all ${
                     isCompleted
-                      ? 'bg-[#0084ff] text-white'
+                      ? 'bg-primary text-foreground'
                       : isActive
-                        ? 'border-2 border-[#0084ff] bg-[#0084ff]/10 text-[#0084ff]'
-                        : 'border border-slate-700 bg-slate-800 text-slate-500'
+                        ? 'border-2 border-primary bg-primary/10 text-primary'
+                        : 'border border-border bg-secondary text-muted-foreground'
                   }`}
                 >
                   {isCompleted ? <Check className="h-4 w-4" /> : index + 1}
                 </div>
                 <span
                   className={`hidden text-sm font-medium sm:block ${
-                    isActive ? 'text-white' : isCompleted ? 'text-[#0084ff]' : 'text-slate-500'
+                    isActive ? 'text-foreground' : isCompleted ? 'text-primary' : 'text-muted-foreground'
                   }`}
                 >
                   {step.label}
@@ -161,7 +161,7 @@ export default function NewBroadcastPage() {
               {index < steps.length - 1 && (
                 <div
                   className={`mx-3 h-px flex-1 ${
-                    index < currentStep ? 'bg-[#0084ff]' : 'bg-slate-800'
+                    index < currentStep ? 'bg-primary' : 'bg-secondary'
                   }`}
                 />
               )}

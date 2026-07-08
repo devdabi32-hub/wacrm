@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -64,8 +64,8 @@ const KEY_URLS: Record<Provider, string> = {
 const DEFAULT_SYSTEM_PROMPT =
   "You are a helpful WhatsApp assistant for a Tour & Travel company. Keep replies short, clear, and friendly. Maximum 2-3 sentences. Always reply in the same language the customer uses. For new inquiries, ask about travel dates, group size, and destination."
 
-const inputCls = "w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-[#0084ff] focus:outline-none transition"
-const labelCls = "block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5"
+const inputCls = "w-full rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none transition"
+const labelCls = "block text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5"
 
 // ─────────────────────────────────────────────
 // Existing page setup (unchanged)
@@ -162,20 +162,20 @@ export default function AutomationsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white text-balance">Automations</h1>
-          <p className="mt-1 text-sm text-slate-400">
+          <h1 className="text-2xl font-bold text-foreground text-balance">Automations</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Build workflows and configure AI engine for WhatsApp.
           </p>
         </div>
         {activeTab === "workflows" && (
-          <Button onClick={() => router.push("/automations/new")} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">
+          <Button onClick={() => router.push("/automations/new")} className="bg-primary text-foreground hover:bg-primary/80">
             <Plus className="h-4 w-4" /> Create Automation
           </Button>
         )}
       </div>
 
       {/* Tab switcher */}
-      <div className="inline-flex rounded-lg border border-slate-800 bg-slate-900 p-1 gap-1">
+      <div className="inline-flex rounded-lg border border-border bg-card p-1 gap-1">
         {TABS.map((t) => {
           const Icon = t.icon
           const active = activeTab === t.id
@@ -186,8 +186,8 @@ export default function AutomationsPage() {
               className={cn(
                 "flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
                 active
-                  ? "bg-[#0084ff] text-white"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
+                  ? "bg-primary text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               )}
             >
               <Icon className="h-4 w-4" />
@@ -202,25 +202,25 @@ export default function AutomationsPage() {
         <>
           {automations === null ? (
             <div className="flex h-64 items-center justify-center">
-              <Loader2 className="h-6 w-6 animate-spin text-[#0084ff]" />
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
           ) : (
             <>
               {automations.length < 3 && (
                 <section>
-                  <h2 className="mb-3 text-sm font-semibold text-slate-300">Quick-start templates</h2>
+                  <h2 className="mb-3 text-sm font-semibold text-muted-foreground">Quick-start templates</h2>
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
                     {TEMPLATE_ORDER.map((slug) => {
                       const t = AUTOMATION_TEMPLATES[slug]
                       const Icon = TEMPLATE_ICON[slug]
                       return (
                         <button key={slug} onClick={() => router.push(`/automations/new?template=${slug}`)}
-                          className="group flex flex-col items-start rounded-xl border border-slate-800 bg-slate-900 p-4 text-left transition-colors hover:border-[#0084ff]/50 hover:bg-slate-900/80">
-                          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-[#0084ff]/10 text-[#0084ff]">
+                          className="group flex flex-col items-start rounded-xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/50 hover:bg-card/80">
+                          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
                             <Icon className="h-5 w-5" />
                           </div>
-                          <div className="text-sm font-semibold text-white">{t.name}</div>
-                          <p className="mt-1 text-xs text-slate-400">{t.description}</p>
+                          <div className="text-sm font-semibold text-foreground">{t.name}</div>
+                          <p className="mt-1 text-xs text-muted-foreground">{t.description}</p>
                         </button>
                       )
                     })}
@@ -229,12 +229,12 @@ export default function AutomationsPage() {
               )}
 
               {automations.length === 0 ? (
-                <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 bg-slate-900/40">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0084ff]/10">
-                    <Zap className="h-6 w-6 text-[#0084ff]" />
+                <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/40">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                    <Zap className="h-6 w-6 text-primary" />
                   </div>
-                  <p className="mt-3 text-sm font-medium text-white">No automations yet</p>
-                  <p className="mt-1 text-xs text-slate-400">Pick a template above or create one from scratch.</p>
+                  <p className="mt-3 text-sm font-medium text-foreground">No automations yet</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Pick a template above or create one from scratch.</p>
                 </div>
               ) : (
                 <ul className="space-y-3">
@@ -265,7 +265,7 @@ export default function AutomationsPage() {
             <DialogTitle>Delete automation</DialogTitle>
             <DialogDescription>
               This permanently removes{" "}
-              <span className="text-white">{pendingDelete?.name}</span> and its execution history. This cannot be undone.
+              <span className="text-foreground">{pendingDelete?.name}</span> and its execution history. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -291,23 +291,23 @@ function AutomationCard({ automation, onToggle, onEdit, onDuplicate, onLogs, onD
 }) {
   const meta = triggerMeta(automation.trigger_type)
   return (
-    <li className="rounded-xl border border-slate-800 bg-slate-900 transition-colors hover:border-slate-700">
+    <li className="rounded-xl border border-border bg-card transition-colors hover:border-border">
       <div className="flex items-center gap-4 p-4">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#0084ff]/10" aria-hidden>
-          <Zap className="h-5 w-5 text-[#0084ff]" />
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10" aria-hidden>
+          <Zap className="h-5 w-5 text-primary" />
         </div>
         <button type="button" onClick={onEdit} className="min-w-0 flex-1 text-left">
           <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-semibold text-white">{automation.name}</span>
+            <span className="truncate text-sm font-semibold text-foreground">{automation.name}</span>
             {automation.is_active && (
               <span className="relative flex h-2 w-2" aria-label="active">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#0084ff] opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#0084ff]" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
               </span>
             )}
           </div>
-          {automation.description && <p className="mt-0.5 truncate text-xs text-slate-400">{automation.description}</p>}
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          {automation.description && <p className="mt-0.5 truncate text-xs text-muted-foreground">{automation.description}</p>}
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium", meta.pillClass)}>
               {meta.label}
             </span>
@@ -319,7 +319,7 @@ function AutomationCard({ automation, onToggle, onEdit, onDuplicate, onLogs, onD
         <div className="flex items-center gap-3">
           <Switch checked={automation.is_active} onCheckedChange={(v) => onToggle(!!v)} aria-label={automation.is_active ? "Deactivate" : "Activate"} />
           <DropdownMenu>
-            <DropdownMenuTrigger aria-label="Open menu" className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-800 hover:text-white">
+            <DropdownMenuTrigger aria-label="Open menu" className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
               <MoreVertical className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -434,7 +434,7 @@ function AIEngineTab() {
   if (loading) {
     return (
       <div className="flex h-48 items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-[#0084ff]" />
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     )
   }
@@ -443,7 +443,7 @@ function AIEngineTab() {
     <div className="space-y-4">
 
       {/* Sub-tab: Settings | Catalogue */}
-      <div className="inline-flex rounded-lg border border-slate-800 bg-slate-900 p-1 gap-1">
+      <div className="inline-flex rounded-lg border border-border bg-card p-1 gap-1">
         {([
           { id: "settings", label: "Settings", icon: Settings },
           { id: "catalogue", label: "Catalogue", icon: MapPin },
@@ -457,8 +457,8 @@ function AIEngineTab() {
               className={cn(
                 "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
                 active
-                  ? "bg-[#0084ff] text-white"
-                  : "text-slate-400 hover:text-white hover:bg-slate-800"
+                  ? "bg-primary text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               )}
             >
               <Icon className="h-4 w-4" />
@@ -473,27 +473,27 @@ function AIEngineTab() {
       ) : (
       <>
       {/* Info banner */}
-      <div className="flex items-start gap-3 rounded-xl border border-[#0084ff]/25 bg-[#0084ff]/10 px-4 py-3">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#0084ff]" />
-        <p className="text-sm text-slate-300">
+      <div className="flex items-start gap-3 rounded-xl border border-primary/25 bg-primary/10 px-4 py-3">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        <p className="text-sm text-muted-foreground">
           AI Engine automatically replies to incoming WhatsApp messages. Configure your LLM provider below. AI replies only when no agent is assigned and the contact is not a confirmed traveller.
         </p>
       </div>
 
       {/* ── Card 1: AI Engine ── */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900 overflow-hidden">
-        <div className="flex items-center justify-between border-b border-slate-800 p-5">
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="flex items-center justify-between border-b border-border p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0084ff]/10">
-              <Bot className="h-5 w-5 text-[#0084ff]" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+              <Bot className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-white">AI Auto-Reply Engine</h3>
-              <p className="text-xs text-slate-400 mt-0.5">LLM-powered replies to incoming messages</p>
+              <h3 className="text-sm font-semibold text-foreground">AI Auto-Reply Engine</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">LLM-powered replies to incoming messages</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400">{aiEnabled ? "Active" : "Paused"}</span>
+            <span className="text-xs text-muted-foreground">{aiEnabled ? "Active" : "Paused"}</span>
             <Switch checked={aiEnabled} onCheckedChange={setAiEnabled} />
           </div>
         </div>
@@ -508,14 +508,14 @@ function AIEngineTab() {
                 onChange={(e) => { setProvider(e.target.value as Provider); setModel(MODELS[e.target.value as Provider]?.[0] ?? "") }}
                 className={inputCls}
               >
-                {PROVIDERS.map((p) => <option key={p.value} value={p.value} className="bg-slate-900">{p.label}</option>)}
+                {PROVIDERS.map((p) => <option key={p.value} value={p.value} className="bg-card">{p.label}</option>)}
               </select>
             </div>
             {provider !== "webhook" && (
               <div>
                 <label className={labelCls}>Model</label>
                 <select value={model} onChange={(e) => setModel(e.target.value)} className={inputCls}>
-                  {(MODELS[provider] ?? []).map((m) => <option key={m} value={m} className="bg-slate-900">{m}</option>)}
+                  {(MODELS[provider] ?? []).map((m) => <option key={m} value={m} className="bg-card">{m}</option>)}
                 </select>
               </div>
             )}
@@ -531,7 +531,7 @@ function AIEngineTab() {
                 placeholder="https://your-n8n.com/webhook/..."
                 className={inputCls}
               />
-              <p className="mt-1.5 text-xs text-slate-500">WaCRM will POST contact + message JSON to this URL on every inbound message.</p>
+              <p className="mt-1.5 text-xs text-muted-foreground">WaCRM will POST contact + message JSON to this URL on every inbound message.</p>
             </div>
           ) : (
             <>
@@ -546,14 +546,14 @@ function AIEngineTab() {
                     className={inputCls + " pr-20 font-mono"}
                   />
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                    <button onClick={() => setShowKey(!showKey)} aria-label={showKey ? "Hide API key" : "Show API key"} className="flex h-7 w-7 items-center justify-center text-slate-400 hover:text-white">
+                    <button onClick={() => setShowKey(!showKey)} aria-label={showKey ? "Hide API key" : "Show API key"} className="flex h-7 w-7 items-center justify-center text-muted-foreground hover:text-foreground">
                       {showKey ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
                     </button>
                   </div>
                 </div>
                 <div className="mt-1.5 flex items-center justify-between">
-                  <span className="text-xs text-slate-500">🔒 Encrypted with AES-256-GCM before storage.</span>
-                  <a href={KEY_URLS[provider]} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-[#0084ff] hover:underline">
+                  <span className="text-xs text-muted-foreground">🔒 Encrypted with AES-256-GCM before storage.</span>
+                  <a href={KEY_URLS[provider]} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
                     Get free API key <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
@@ -567,7 +567,7 @@ function AIEngineTab() {
                   onChange={(e) => setSystemPrompt(e.target.value.slice(0, 1000))}
                   className={inputCls + " h-auto resize-none py-2.5"}
                 />
-                <div className="mt-1 text-right text-xs text-slate-500">{systemPrompt.length} / 1000</div>
+                <div className="mt-1 text-right text-xs text-muted-foreground">{systemPrompt.length} / 1000</div>
               </div>
             </>
           )}
@@ -575,21 +575,21 @@ function AIEngineTab() {
       </div>
 
       {/* ── Card 2: Welcome Message ── */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900">
+      <div className="rounded-xl border border-border bg-card">
         <div className="flex items-center justify-between p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10">
               <MessageCircle className="h-5 w-5 text-emerald-400" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-white">Welcome Message</div>
-              <div className="text-xs text-slate-400 mt-0.5">Send to new contacts on their very first message</div>
+              <div className="text-sm font-semibold text-foreground">Welcome Message</div>
+              <div className="text-xs text-muted-foreground mt-0.5">Send to new contacts on their very first message</div>
             </div>
           </div>
           <Switch checked={welcomeEnabled} onCheckedChange={setWelcomeEnabled} />
         </div>
         {welcomeEnabled && (
-          <div className="border-t border-slate-800 px-5 pb-5 pt-4">
+          <div className="border-t border-border px-5 pb-5 pt-4">
             <label className={labelCls}>Message Text</label>
             <textarea
               rows={3}
@@ -602,21 +602,21 @@ function AIEngineTab() {
       </div>
 
       {/* ── Card 3: Out of Office ── */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900">
+      <div className="rounded-xl border border-border bg-card">
         <div className="flex items-center justify-between p-5">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10">
               <Clock className="h-5 w-5 text-amber-400" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-white">Out of Office</div>
-              <div className="text-xs text-slate-400 mt-0.5">Auto-reply outside business hours (uses IST timezone)</div>
+              <div className="text-sm font-semibold text-foreground">Out of Office</div>
+              <div className="text-xs text-muted-foreground mt-0.5">Auto-reply outside business hours (uses IST timezone)</div>
             </div>
           </div>
           <Switch checked={oooEnabled} onCheckedChange={setOooEnabled} />
         </div>
         {oooEnabled && (
-          <div className="border-t border-slate-800 px-5 pb-5 pt-4 space-y-4">
+          <div className="border-t border-border px-5 pb-5 pt-4 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Offline From</label>
@@ -642,7 +642,7 @@ function AIEngineTab() {
 
       {/* Save button */}
       <div className="flex items-center gap-3 pt-2">
-        <Button onClick={handleSave} disabled={saving} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">
+        <Button onClick={handleSave} disabled={saving} className="bg-primary text-foreground hover:bg-primary/80">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {saving ? "Saving…" : "Save AI Engine Config"}
         </Button>
@@ -832,15 +832,15 @@ function CatalogueSection() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start gap-3 rounded-xl border border-[#0084ff]/25 bg-[#0084ff]/10 px-4 py-3">
-        <Info className="mt-0.5 h-4 w-4 shrink-0 text-[#0084ff]" />
-        <p className="text-sm text-slate-300">
+      <div className="flex items-start gap-3 rounded-xl border border-primary/25 bg-primary/10 px-4 py-3">
+        <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+        <p className="text-sm text-muted-foreground">
           Manage the packages your AI offers customers on WhatsApp. Add a destination here and it&apos;s instantly live — no code changes needed.
         </p>
       </div>
 
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-white">Destinations</h3>
+        <h3 className="text-sm font-semibold text-foreground">Destinations</h3>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={downloadDestinationTemplate}>
             <Download className="h-4 w-4" /> Template
@@ -848,7 +848,7 @@ function CatalogueSection() {
           <Button variant="outline" onClick={() => setImportOpen(true)}>
             <Upload className="h-4 w-4" /> Import
           </Button>
-          <Button onClick={openAdd} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">
+          <Button onClick={openAdd} className="bg-primary text-foreground hover:bg-primary/80">
             <Plus className="h-4 w-4" /> Add Destination
           </Button>
         </div>
@@ -856,36 +856,36 @@ function CatalogueSection() {
 
       {destinations === null ? (
         <div className="flex h-48 items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-[#0084ff]" />
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       ) : destinations.length === 0 ? (
-        <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-slate-800 bg-slate-900/40">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0084ff]/10">
-            <MapPin className="h-6 w-6 text-[#0084ff]" />
+        <div className="flex h-48 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-card/40">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+            <MapPin className="h-6 w-6 text-primary" />
           </div>
-          <p className="mt-3 text-sm font-medium text-white">No destinations yet</p>
-          <p className="mt-1 text-xs text-slate-400">Add your first package — it&apos;ll show up in the AI&apos;s menu right away.</p>
+          <p className="mt-3 text-sm font-medium text-foreground">No destinations yet</p>
+          <p className="mt-1 text-xs text-muted-foreground">Add your first package — it&apos;ll show up in the AI&apos;s menu right away.</p>
         </div>
       ) : (
         <ul className="space-y-3">
           {destinations.map((d) => (
-            <li key={d.id} className="rounded-xl border border-slate-800 bg-slate-900 transition-colors hover:border-slate-700">
+            <li key={d.id} className="rounded-xl border border-border bg-card transition-colors hover:border-border">
               <div className="flex items-center gap-4 p-4">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#0084ff]/10" aria-hidden>
-                  <MapPin className="h-5 w-5 text-[#0084ff]" />
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary/10" aria-hidden>
+                  <MapPin className="h-5 w-5 text-primary" />
                 </div>
                 <button type="button" onClick={() => openEdit(d)} className="min-w-0 flex-1 text-left">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-semibold text-white">{d.name}</span>
-                    <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[11px] text-slate-400">{d.slug}</span>
+                    <span className="truncate text-sm font-semibold text-foreground">{d.name}</span>
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-[11px] text-muted-foreground">{d.slug}</span>
                     {d.imported && (
-                      <span className="rounded-full border border-[#0084ff]/40 bg-[#0084ff]/10 px-2 py-0.5 text-[11px] text-[#0084ff]">Imported</span>
+                      <span className="rounded-full border border-primary/40 bg-primary/10 px-2 py-0.5 text-[11px] text-primary">Imported</span>
                     )}
                     {!d.active && (
-                      <span className="rounded-full border border-slate-700 px-2 py-0.5 text-[11px] text-slate-500">Inactive</span>
+                      <span className="rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground">Inactive</span>
                     )}
                   </div>
-                  <div className="mt-1 flex flex-wrap items-center gap-1 text-xs text-slate-500">
+                  <div className="mt-1 flex flex-wrap items-center gap-1 text-xs text-muted-foreground">
                     {d.nights != null && d.days != null && <span>{d.nights}N/{d.days}D</span>}
                     {d.price_from != null && <span>· from {d.currency} {d.price_from}</span>}
                     {d.summary && <span className="truncate">· {d.summary}</span>}
@@ -899,7 +899,7 @@ function CatalogueSection() {
                     aria-label={d.active ? "Deactivate" : "Activate"}
                   />
                   <DropdownMenu>
-                    <DropdownMenuTrigger aria-label="Open menu" className="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-800 hover:text-white">
+                    <DropdownMenuTrigger aria-label="Open menu" className="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground">
                       <MoreVertical className="h-4 w-4" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -933,7 +933,7 @@ function CatalogueSection() {
           <DialogHeader>
             <DialogTitle>Delete destination</DialogTitle>
             <DialogDescription>
-              This permanently removes <span className="text-white">{pendingDelete?.name}</span> from your catalogue. The AI will stop offering it. This cannot be undone.
+              This permanently removes <span className="text-foreground">{pendingDelete?.name}</span> from your catalogue. The AI will stop offering it. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -1046,7 +1046,7 @@ function DestinationDialog({ open, destination, onClose, onSaved }: {
           <div>
             <label className={labelCls}>Keywords (comma-separated)</label>
             <input value={form.keywords} onChange={(e) => set("keywords", e.target.value)} placeholder="manali, honeymoon, himachal" className={inputCls} />
-            <p className="mt-1 text-xs text-slate-500">Used to match this package when a customer mentions it.</p>
+            <p className="mt-1 text-xs text-muted-foreground">Used to match this package when a customer mentions it.</p>
           </div>
 
           <div>
@@ -1089,15 +1089,15 @@ function DestinationDialog({ open, destination, onClose, onSaved }: {
             </div>
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-slate-800 px-3 py-2.5">
-            <span className="text-sm text-slate-300">Active (visible to AI + customers)</span>
+          <div className="flex items-center justify-between rounded-lg border border-border px-3 py-2.5">
+            <span className="text-sm text-muted-foreground">Active (visible to AI + customers)</span>
             <Switch checked={form.active} onCheckedChange={(v) => set("active", !!v)} />
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="ghost" onClick={onClose} disabled={saving}>Cancel</Button>
-          <Button onClick={handleSave} disabled={saving} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">
+          <Button onClick={handleSave} disabled={saving} className="bg-primary text-foreground hover:bg-primary/80">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
             {saving ? "Saving…" : destination ? "Save changes" : "Add destination"}
           </Button>
@@ -1233,10 +1233,10 @@ function ImportDialog({ open, onClose, onImported }: {
 
         {step === "upload" && (
           <div className="space-y-4 py-2">
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-muted-foreground">
               Don&apos;t have a file yet? Download the template, fill it in your spreadsheet tool, then upload it here.
             </p>
-            <label className="flex h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/50 text-slate-400 transition-colors hover:border-[#0084ff]/50 hover:text-white">
+            <label className="flex h-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-secondary/50 text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground">
               {parsing ? <Loader2 className="h-6 w-6 animate-spin" /> : <Upload className="h-6 w-6" />}
               <span className="text-sm">{parsing ? "Reading file…" : "Click to choose a .csv or .xlsx file"}</span>
               <input
@@ -1253,7 +1253,7 @@ function ImportDialog({ open, onClose, onImported }: {
 
         {step === "map" && (
           <div className="space-y-4 py-2">
-            <p className="text-sm text-slate-400">{rows.length} row(s) detected. Map your columns to destination fields, then review the preview below.</p>
+            <p className="text-sm text-muted-foreground">{rows.length} row(s) detected. Map your columns to destination fields, then review the preview below.</p>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               {DESTINATION_FIELDS.map((f) => (
                 <div key={f.key}>
@@ -1263,9 +1263,9 @@ function ImportDialog({ open, onClose, onImported }: {
                     onChange={(e) => setMapping((m) => ({ ...m, [f.key]: Number(e.target.value) }))}
                     className={inputCls}
                   >
-                    <option value={-1} className="bg-slate-900">— Not mapped —</option>
+                    <option value={-1} className="bg-card">— Not mapped —</option>
                     {headers.map((h, i) => (
-                      <option key={i} value={i} className="bg-slate-900">{h || `Column ${i + 1}`}</option>
+                      <option key={i} value={i} className="bg-card">{h || `Column ${i + 1}`}</option>
                     ))}
                   </select>
                 </div>
@@ -1274,9 +1274,9 @@ function ImportDialog({ open, onClose, onImported }: {
 
             <div>
               <p className={labelCls}>Preview (first 5 rows)</p>
-              <div className="overflow-x-auto rounded-lg border border-slate-800">
+              <div className="overflow-x-auto rounded-lg border border-border">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-800/60 text-slate-400">
+                  <thead className="bg-secondary/60 text-muted-foreground">
                     <tr>
                       {DESTINATION_FIELDS.map((f) => (
                         <th key={f.key} className="whitespace-nowrap px-3 py-2 font-medium">{f.label}</th>
@@ -1287,7 +1287,7 @@ function ImportDialog({ open, onClose, onImported }: {
                     {rows.slice(0, 5).map((r, i) => {
                       const built = buildImportRow(r, mapping)
                       return (
-                        <tr key={i} className="border-t border-slate-800 text-slate-300">
+                        <tr key={i} className="border-t border-border text-muted-foreground">
                           {DESTINATION_FIELDS.map((f) => (
                             <td key={f.key} className="max-w-[160px] truncate whitespace-nowrap px-3 py-2">
                               {String(built[f.key] ?? "")}
@@ -1307,14 +1307,14 @@ function ImportDialog({ open, onClose, onImported }: {
           <div className="space-y-4 py-2">
             <div className="flex items-center gap-3 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3">
               <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-400" />
-              <p className="text-sm text-slate-200">
+              <p className="text-sm text-foreground">
                 {result.inserted} destination{result.inserted === 1 ? "" : "s"} imported and live.
               </p>
             </div>
             {result.skipped.length > 0 && (
               <div>
                 <p className={labelCls}>Skipped rows ({result.skipped.length})</p>
-                <div className="max-h-40 overflow-y-auto rounded-lg border border-slate-800 p-2 text-xs text-slate-400">
+                <div className="max-h-40 overflow-y-auto rounded-lg border border-border p-2 text-xs text-muted-foreground">
                   {result.skipped.map((s, i) => (
                     <div key={i}>Row {s.row}: {s.reason}</div>
                   ))}
@@ -1333,14 +1333,14 @@ function ImportDialog({ open, onClose, onImported }: {
               <Button variant="ghost" onClick={() => setStep("upload")} disabled={importing}>
                 <ArrowLeft className="h-4 w-4" /> Back
               </Button>
-              <Button onClick={handleConfirm} disabled={importing} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">
+              <Button onClick={handleConfirm} disabled={importing} className="bg-primary text-foreground hover:bg-primary/80">
                 {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
                 {importing ? "Importing…" : `Import ${rows.length} row(s)`}
               </Button>
             </>
           )}
           {step === "result" && (
-            <Button onClick={onImported} className="bg-[#0084ff] text-white hover:bg-[#0055cc]">Done</Button>
+            <Button onClick={onImported} className="bg-primary text-foreground hover:bg-primary/80">Done</Button>
           )}
         </DialogFooter>
       </DialogContent>

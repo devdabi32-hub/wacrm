@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { Plus, Trash2, Loader2, SlidersHorizontal, GripVertical } from 'lucide-react';
@@ -209,7 +209,7 @@ export function CustomFieldManager() {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <Loader2 className="size-6 animate-spin text-[#0084ff]" />
+                <Loader2 className="size-6 animate-spin text-primary" />
             </div>
         );
     }
@@ -219,15 +219,15 @@ export function CustomFieldManager() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-lg font-semibold text-white">Custom Fields</h2>
-                    <p className="text-sm text-slate-400">
+                    <h2 className="text-lg font-semibold text-foreground">Custom Fields</h2>
+                    <p className="text-sm text-muted-foreground">
                         Define extra data fields for your contacts — tour preferences,
                         booking status, travel dates, and more.
                     </p>
                 </div>
                 <Button
                     onClick={() => setDialogOpen(true)}
-                    className="bg-[#0084ff] hover:bg-[#0055cc] text-white"
+                    className="bg-primary hover:bg-primary/80 text-foreground"
                 >
                     <Plus className="size-4" />
                     New Field
@@ -236,20 +236,20 @@ export function CustomFieldManager() {
 
             {/* Field list */}
             {fields.length === 0 ? (
-                <Card className="bg-slate-900 border-slate-700 ring-0">
+                <Card className="bg-card border-border ring-0">
                     <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                         <SlidersHorizontal className="size-8 text-slate-600 mb-3" />
-                        <p className="text-slate-400 text-sm">No custom fields yet.</p>
-                        <p className="text-slate-500 text-xs mt-1">
+                        <p className="text-muted-foreground text-sm">No custom fields yet.</p>
+                        <p className="text-muted-foreground text-xs mt-1">
                             Create fields to track tour interest, travel dates, booking
                             status, and more on every contact.
                         </p>
                     </CardContent>
                 </Card>
             ) : (
-                <Card className="bg-slate-900 border-slate-700 ring-0">
+                <Card className="bg-card border-border ring-0">
                     <CardContent className="pt-2 pb-2">
-                        <div className="divide-y divide-slate-800">
+                        <div className="divide-y divide-border">
                             {fields.map((field) => (
                                 <div
                                     key={field.id}
@@ -259,27 +259,27 @@ export function CustomFieldManager() {
 
                                     {/* Field info */}
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium text-white truncate">
+                                        <p className="text-sm font-medium text-foreground truncate">
                                             {field.field_name}
                                         </p>
                                         {field.field_type === 'select' &&
                                             field.field_options &&
                                             field.field_options.length > 0 && (
-                                                <p className="text-xs text-slate-500 mt-0.5 truncate">
+                                                <p className="text-xs text-muted-foreground mt-0.5 truncate">
                                                     Options: {field.field_options.join(', ')}
                                                 </p>
                                             )}
                                     </div>
 
                                     {/* Type badge */}
-                                    <span className="shrink-0 inline-flex items-center rounded-md bg-slate-800 border border-slate-700 px-2 py-0.5 text-xs text-slate-400">
+                                    <span className="shrink-0 inline-flex items-center rounded-md bg-secondary border border-border px-2 py-0.5 text-xs text-muted-foreground">
                                         {FIELD_TYPE_LABELS[field.field_type] ?? field.field_type}
                                     </span>
 
                                     {/* Delete */}
                                     <button
                                         onClick={() => confirmDelete(field)}
-                                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-slate-500 hover:text-red-400 p-1 rounded"
+                                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-red-400 p-1 rounded"
                                         title="Delete field"
                                     >
                                         <Trash2 className="size-4" />
@@ -293,10 +293,10 @@ export function CustomFieldManager() {
 
             {/* ── Create Dialog ── */}
             <Dialog open={dialogOpen} onOpenChange={(open) => { if (!open) resetDialog(); else setDialogOpen(true); }}>
-                <DialogContent className="bg-slate-900 border-slate-700 sm:max-w-md">
+                <DialogContent className="bg-card border-border sm:max-w-md">
                     <DialogHeader>
-                        <DialogTitle className="text-white">New Custom Field</DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogTitle className="text-foreground">New Custom Field</DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
                             This field will appear on every contact&apos;s profile under the
                             Custom tab.
                         </DialogDescription>
@@ -305,12 +305,12 @@ export function CustomFieldManager() {
                     <div className="space-y-4 py-2">
                         {/* Field name */}
                         <div className="space-y-2">
-                            <Label className="text-slate-300">Field Name</Label>
+                            <Label className="text-muted-foreground">Field Name</Label>
                             <Input
                                 placeholder="e.g. Tour Interest"
                                 value={newFieldName}
                                 onChange={(e) => setNewFieldName(e.target.value)}
-                                className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                                className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && newFieldType !== 'select') handleCreate();
                                 }}
@@ -319,24 +319,24 @@ export function CustomFieldManager() {
 
                         {/* Field type */}
                         <div className="space-y-2">
-                            <Label className="text-slate-300">Field Type</Label>
+                            <Label className="text-muted-foreground">Field Type</Label>
                             <Select
                                 value={newFieldType}
                                 onValueChange={(v) => setNewFieldType(v as FieldType)}
                             >
-                                <SelectTrigger className="bg-slate-800 border-slate-700 text-white">
+                                <SelectTrigger className="bg-secondary border-border text-foreground">
                                     <SelectValue />
                                 </SelectTrigger>
-                                <SelectContent className="bg-slate-800 border-slate-700">
+                                <SelectContent className="bg-secondary border-border">
                                     {(Object.keys(FIELD_TYPE_LABELS) as FieldType[]).map((type) => (
                                         <SelectItem
                                             key={type}
                                             value={type}
-                                            className="text-white focus:bg-slate-700"
+                                            className="text-foreground focus:bg-muted"
                                         >
                                             <div>
                                                 <p className="font-medium">{FIELD_TYPE_LABELS[type]}</p>
-                                                <p className="text-xs text-slate-400 mt-0.5">
+                                                <p className="text-xs text-muted-foreground mt-0.5">
                                                     {FIELD_TYPE_DESCRIPTIONS[type]}
                                                 </p>
                                             </div>
@@ -349,9 +349,9 @@ export function CustomFieldManager() {
                         {/* Options — only for select type */}
                         {newFieldType === 'select' && (
                             <div className="space-y-2">
-                                <Label className="text-slate-300">
+                                <Label className="text-muted-foreground">
                                     Options{' '}
-                                    <span className="text-slate-500 font-normal">
+                                    <span className="text-muted-foreground font-normal">
                                         (comma-separated)
                                     </span>
                                 </Label>
@@ -359,7 +359,7 @@ export function CustomFieldManager() {
                                     placeholder="Domestic, International, Adventure, Honeymoon"
                                     value={newFieldOptions}
                                     onChange={(e) => setNewFieldOptions(e.target.value)}
-                                    className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+                                    className="bg-secondary border-border text-foreground placeholder:text-muted-foreground"
                                 />
                                 {newFieldOptions.trim() && (
                                     <div className="flex flex-wrap gap-1.5 mt-1">
@@ -370,7 +370,7 @@ export function CustomFieldManager() {
                                             .map((opt) => (
                                                 <span
                                                     key={opt}
-                                                    className="inline-flex items-center rounded-full bg-slate-700 px-2.5 py-0.5 text-xs text-slate-300"
+                                                    className="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
                                                 >
                                                     {opt}
                                                 </span>
@@ -381,18 +381,18 @@ export function CustomFieldManager() {
                         )}
                     </div>
 
-                    <DialogFooter className="border-t border-slate-800 pt-4">
+                    <DialogFooter className="border-t border-border pt-4">
                         <Button
                             variant="outline"
                             onClick={resetDialog}
-                            className="border-slate-700 text-slate-300 hover:bg-slate-800"
+                            className="border-border text-muted-foreground hover:bg-secondary"
                         >
                             Cancel
                         </Button>
                         <Button
                             onClick={handleCreate}
                             disabled={saving}
-                            className="bg-[#0084ff] hover:bg-[#0055cc] text-white"
+                            className="bg-primary hover:bg-primary/80 text-foreground"
                         >
                             {saving ? (
                                 <>
@@ -409,27 +409,27 @@ export function CustomFieldManager() {
 
             {/* ── Delete Confirmation Dialog ── */}
             <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                <DialogContent className="bg-slate-900 border-slate-700 sm:max-w-sm">
+                <DialogContent className="bg-card border-border sm:max-w-sm">
                     <DialogHeader>
-                        <DialogTitle className="text-white">Delete Field</DialogTitle>
-                        <DialogDescription className="text-slate-400">
+                        <DialogTitle className="text-foreground">Delete Field</DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
                             Are you sure you want to delete &quot;{fieldToDelete?.field_name}&quot;?
                             All saved values for this field across all contacts will also be
                             deleted. This cannot be undone.
                         </DialogDescription>
                     </DialogHeader>
-                    <DialogFooter className="border-t border-slate-800 pt-4">
+                    <DialogFooter className="border-t border-border pt-4">
                         <Button
                             variant="outline"
                             onClick={() => setDeleteDialogOpen(false)}
-                            className="border-slate-700 text-slate-300 hover:bg-slate-800"
+                            className="border-border text-muted-foreground hover:bg-secondary"
                         >
                             Cancel
                         </Button>
                         <Button
                             onClick={handleDelete}
                             disabled={deleting}
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            className="bg-red-600 hover:bg-red-700 text-foreground"
                         >
                             {deleting ? (
                                 <>
