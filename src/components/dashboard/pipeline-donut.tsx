@@ -111,7 +111,7 @@ function Donut({ data }: { data: PipelineDonutData }) {
           x={cx}
           y={cy - 6}
           textAnchor="middle"
-          className="fill-slate-500 text-[11px]"
+          className="fill-muted-foreground text-[11px]"
         >
           Total
         </text>

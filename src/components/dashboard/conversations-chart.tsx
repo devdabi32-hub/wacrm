@@ -215,7 +215,7 @@ function LineSvg({
                 y={y}
                 textAnchor="end"
                 dominantBaseline="middle"
-                className="fill-slate-500 text-[10px]"
+                className="fill-muted-foreground text-[10px]"
               >
                 {t}
               </text>
@@ -231,7 +231,7 @@ function LineSvg({
               x={xFor(i)}
               y={VB_H - 8}
               textAnchor="middle"
-              className="fill-slate-500 text-[10px]"
+              className="fill-muted-foreground text-[10px]"
             >
               {shortDayLabel(p.day)}
             </text>
@@ -289,7 +289,7 @@ function LineSvg({
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
               {hovered.incoming} incoming
             </span>
-            <span className="flex items-center gap-1.5 text-[#4da6ff]">
+            <span className="flex items-center gap-1.5 text-primary">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
               {hovered.outgoing} outgoing
             </span>

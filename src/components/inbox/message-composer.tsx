@@ -107,14 +107,14 @@ export function MessageComposer({
           disabled={sessionExpired}
           rows={1}
           className={cn(
-            "flex-1 resize-none rounded-xl border border-border bg-secondary px-4 py-2.5 text-sm text-foreground placeholder-slate-500 outline-none transition-colors focus:border-primary/50",
+            "flex-1 resize-none rounded-xl border border-border bg-secondary px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary/50",
             sessionExpired && "cursor-not-allowed opacity-50"
           )}
         />
 
         <Button
           size="sm"
-          className="h-9 w-9 shrink-0 bg-primary p-0 hover:bg-[#0066cc] disabled:opacity-40"
+          className="h-9 w-9 shrink-0 bg-primary p-0 hover:bg-primary/80 disabled:opacity-40"
           disabled={!text.trim() || sessionExpired || sending}
           onClick={handleSend}
         >
@@ -125,7 +125,7 @@ export function MessageComposer({
       {/* Hint sits outside the flex row so its height doesn't push
           `items-end` buttons below the textarea. Indented to line up
           under the textarea left edge (w-9 button + gap-2 = 44px). */}
-      <p className="mt-1 pl-11 text-[10px] text-slate-600">
+      <p className="mt-1 pl-11 text-[10px] text-muted-foreground">
         Type &apos;/&apos; for quick replies
       </p>
     </div>

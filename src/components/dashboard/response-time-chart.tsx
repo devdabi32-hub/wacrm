@@ -110,7 +110,7 @@ function Bars({
               y={y}
               textAnchor="end"
               dominantBaseline="middle"
-              className="fill-slate-500 text-[10px]"
+              className="fill-muted-foreground text-[10px]"
             >
               {t}m
             </text>
@@ -171,7 +171,7 @@ function Bars({
               x={x + barW / 2}
               y={VB_H - 10}
               textAnchor="middle"
-              className="fill-slate-400 text-[11px]"
+              className="fill-muted-foreground text-[11px]"
             >
               {DOW_SHORT_MON_FIRST[i]}
             </text>

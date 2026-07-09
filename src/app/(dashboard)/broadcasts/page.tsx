@@ -192,7 +192,7 @@ export default function BroadcastsPage() {
 
       {broadcasts.length === 0 ? (
         <div className="flex h-64 flex-col items-center justify-center rounded-xl border border-border bg-card">
-          <Radio className="mb-3 h-10 w-10 text-slate-600" aria-hidden="true" />
+          <Radio className="mb-3 h-10 w-10 text-muted-foreground" aria-hidden="true" />
           <p className="text-sm font-medium text-foreground">No broadcasts yet</p>
           <p className="mt-1 text-xs text-muted-foreground">
             Create your first broadcast to reach your contacts at scale.

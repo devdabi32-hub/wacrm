@@ -291,12 +291,12 @@ export function MessageThread({
     return (
       <div className="flex flex-1 flex-col items-center justify-center bg-background">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary">
-          <MessageSquare className="h-8 w-8 text-slate-600" />
+          <MessageSquare className="h-8 w-8 text-muted-foreground" />
         </div>
         <h3 className="mt-4 text-sm font-medium text-muted-foreground">
           Select a conversation
         </h3>
-        <p className="mt-1 text-xs text-slate-600">
+        <p className="mt-1 text-xs text-muted-foreground">
           Choose a conversation from the left to start messaging
         </p>
       </div>
@@ -411,7 +411,7 @@ export function MessageThread({
         ) : messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12">
             <p className="text-sm text-muted-foreground">No messages yet</p>
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-muted-foreground">
               Send a template to start the conversation
             </p>
           </div>

@@ -45,7 +45,7 @@ export default async function DocsIndexPage() {
                       {p.description}
                     </p>
                   )}
-                  <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors group-hover:text-[#4da6ff]">
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-primary transition-colors group-hover:text-primary">
                     Read
                     <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </span>

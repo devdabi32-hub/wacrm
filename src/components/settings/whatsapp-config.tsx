@@ -584,7 +584,7 @@ export function WhatsAppConfig() {
                 href="https://developers.facebook.com/docs/whatsapp/cloud-api/get-started"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-[#4da6ff] transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary transition-colors"
               >
                 <ExternalLink className="size-3.5" />
                 Meta WhatsApp API Documentation

@@ -67,7 +67,7 @@ export function DocsShell({ pages, children }: DocsShellProps) {
             </a>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-[#0066cc]"
+              className="inline-flex items-center justify-center rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-foreground transition-colors hover:bg-primary/80"
             >
               Sign in
             </Link>
@@ -97,7 +97,7 @@ export function DocsShell({ pages, children }: DocsShellProps) {
       </div>
 
       <footer className="mt-10 border-t border-border bg-background">
-        <div className="mx-auto w-full max-w-7xl px-4 py-6 text-xs leading-relaxed text-slate-600 sm:px-6">
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 text-xs leading-relaxed text-muted-foreground sm:px-6">
           WhatsApp® is a registered trademark of Meta Platforms, Inc.
           Hostinger is not affiliated with, endorsed by, or sponsored by
           Meta Platforms, Inc.

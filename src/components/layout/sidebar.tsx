@@ -195,7 +195,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
 
         {/* Watermark */}
         <div className="shrink-0 px-4 py-1.5 text-center">
-          <p className="text-[10px] text-slate-600">Product by Automation Guru</p>
+          <p className="text-[10px] text-muted-foreground">Product by Automation Guru</p>
         </div>
 
         {/* User section */}

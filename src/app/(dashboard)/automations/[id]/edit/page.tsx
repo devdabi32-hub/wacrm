@@ -54,7 +54,7 @@ export default function EditAutomationPage({
         <p className="text-sm text-red-400">{error}</p>
         <button
           onClick={() => router.push("/automations")}
-          className="text-sm text-primary hover:text-[#4da6ff]"
+          className="text-sm text-primary hover:text-primary"
         >
           Back to Automations
         </button>

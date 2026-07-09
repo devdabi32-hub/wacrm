@@ -280,7 +280,7 @@ export default function ContactsPage() {
               <TableRow className="border-border">
                 <TableCell colSpan={7} className="text-center py-12">
                   <div className="flex flex-col items-center gap-2">
-                    <Users className="size-8 text-slate-600" aria-hidden="true" />
+                    <Users className="size-8 text-muted-foreground" aria-hidden="true" />
                     <p className="text-sm text-muted-foreground">
                       {search ? 'No contacts match your search.' : 'No contacts yet.'}
                     </p>
@@ -312,10 +312,10 @@ export default function ContactsPage() {
                     {contact.phone}
                   </TableCell>
                   <TableCell className="text-muted-foreground hidden md:table-cell text-sm">
-                    {contact.email || <span className="text-slate-600">-</span>}
+                    {contact.email || <span className="text-muted-foreground">-</span>}
                   </TableCell>
                   <TableCell className="text-muted-foreground hidden lg:table-cell text-sm">
-                    {contact.company || <span className="text-slate-600">-</span>}
+                    {contact.company || <span className="text-muted-foreground">-</span>}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
                     <div className="flex flex-wrap gap-1">
@@ -333,7 +333,7 @@ export default function ContactsPage() {
                           </span>
                         ))
                       ) : (
-                        <span className="text-slate-600 text-xs">-</span>
+                        <span className="text-muted-foreground text-xs">-</span>
                       )}
                       {contact.tags && contact.tags.length > 3 && (
                         <span className="text-[10px] text-muted-foreground">

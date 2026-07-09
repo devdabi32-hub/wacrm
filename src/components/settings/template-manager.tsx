@@ -39,7 +39,7 @@ const categoryColors: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-  Draft: 'bg-slate-600/20 text-muted-foreground border-border/30',
+  Draft: 'bg-muted text-muted-foreground border-border/30',
   Pending: 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30',
   Approved: 'bg-primary/20 text-primary border-primary/30',
   Rejected: 'bg-red-600/20 text-red-400 border-red-600/30',

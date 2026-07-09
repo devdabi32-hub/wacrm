@@ -238,7 +238,7 @@ export function CustomFieldManager() {
             {fields.length === 0 ? (
                 <Card className="bg-card border-border ring-0">
                     <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                        <SlidersHorizontal className="size-8 text-slate-600 mb-3" />
+                        <SlidersHorizontal className="size-8 text-muted-foreground mb-3" />
                         <p className="text-muted-foreground text-sm">No custom fields yet.</p>
                         <p className="text-muted-foreground text-xs mt-1">
                             Create fields to track tour interest, travel dates, booking
@@ -255,7 +255,7 @@ export function CustomFieldManager() {
                                     key={field.id}
                                     className="flex items-center gap-3 py-3 group"
                                 >
-                                    <GripVertical className="size-4 text-slate-600 shrink-0" />
+                                    <GripVertical className="size-4 text-muted-foreground shrink-0" />
 
                                     {/* Field info */}
                                     <div className="flex-1 min-w-0">

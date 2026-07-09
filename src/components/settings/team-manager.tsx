@@ -36,7 +36,7 @@ const STATUS_META: Record<
   },
   revoked: {
     label: 'Revoked',
-    className: 'bg-slate-600/10 text-muted-foreground border-border/20',
+    className: 'bg-muted/50 text-muted-foreground border-border/20',
     icon: Trash2,
   },
 };
@@ -168,7 +168,7 @@ export function TeamManager() {
             <Button
               type="submit"
               disabled={inviting}
-              className="self-start bg-primary text-foreground hover:bg-[#0066cc] disabled:opacity-50"
+              className="self-start bg-primary text-foreground hover:bg-primary/80 disabled:opacity-50"
             >
               {inviting ? (
                 <Loader2 className="size-4 animate-spin" />

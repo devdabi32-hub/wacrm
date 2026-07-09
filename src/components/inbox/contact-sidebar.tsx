@@ -11,7 +11,7 @@ import {
   Check,
   User,
   Tag as TagIcon,
-  DollarSign,
+  IndianRupee,
   StickyNote,
   Plus,
 } from "lucide-react";
@@ -158,7 +158,7 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
               {copied ? (
                 <Check className="h-3 w-3 text-primary" />
               ) : (
-                <Copy className="h-3 w-3 text-slate-600" />
+                <Copy className="h-3 w-3 text-muted-foreground" />
               )}
             </button>
 
@@ -181,7 +181,7 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
             </div>
             <div className="mt-2 flex flex-wrap gap-1">
               {tags.length === 0 ? (
-                <p className="px-1 text-xs text-slate-600">No tags</p>
+                <p className="px-1 text-xs text-muted-foreground">No tags</p>
               ) : (
                 tags.map((tag) => (
                   <span
@@ -205,12 +205,12 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
           {/* Active Deals */}
           <div>
             <div className="flex items-center gap-2 px-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              <DollarSign className="h-3 w-3" />
+              <IndianRupee className="h-3 w-3" />
               Active Deals
             </div>
             <div className="mt-2 space-y-2">
               {deals.length === 0 ? (
-                <p className="px-1 text-xs text-slate-600">No deals</p>
+                <p className="px-1 text-xs text-muted-foreground">No deals</p>
               ) : (
                 deals.map((deal) => (
                   <div
@@ -222,8 +222,11 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
                     </p>
                     <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                       <span>
-                        {deal.currency ?? "$"}
-                        {deal.value.toLocaleString()}
+                        {new Intl.NumberFormat("en-IN", {
+                          style: "currency",
+                          currency: deal.currency || "INR",
+                          maximumFractionDigits: 0,
+                        }).format(Number(deal.value || 0))}
                       </span>
                       {deal.stage && (
                         <span
@@ -259,11 +262,11 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
                   onChange={(e) => setNewNote(e.target.value)}
                   placeholder="Add a note..."
                   rows={2}
-                  className="flex-1 resize-none rounded-lg border border-border bg-secondary px-3 py-2 text-xs text-foreground placeholder-slate-500 outline-none focus:border-primary/50"
+                  className="flex-1 resize-none rounded-lg border border-border bg-secondary px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50"
                 />
                 <Button
                   size="sm"
-                  className="h-auto bg-primary px-2 hover:bg-[#0066cc]"
+                  className="h-auto bg-primary px-2 hover:bg-primary/80"
                   onClick={handleAddNote}
                   disabled={!newNote.trim() || addingNote}
                 >
@@ -280,7 +283,7 @@ export function ContactSidebar({ contact }: ContactSidebarProps) {
                     <p className="whitespace-pre-wrap text-xs text-muted-foreground">
                       {note.note_text}
                     </p>
-                    <p className="mt-1 text-[10px] text-slate-600">
+                    <p className="mt-1 text-[10px] text-muted-foreground">
                       {format(new Date(note.created_at), "MMM d, yyyy HH:mm")}
                     </p>
                   </div>

@@ -27,7 +27,7 @@ import {
   X,
   Trash2,
   MessageSquare,
-  DollarSign,
+  IndianRupee,
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -55,7 +55,7 @@ export function DealForm({
 
   const [title, setTitle] = useState("");
   const [value, setValue] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("INR");
   const [contactId, setContactId] = useState("");
   const [stageId, setStageId] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
@@ -82,7 +82,7 @@ export function DealForm({
     if (deal) {
       setTitle(deal.title);
       setValue(String(deal.value ?? ""));
-      setCurrency(deal.currency || "USD");
+      setCurrency(deal.currency || "INR");
       // contact_id is nullable when the contact has been deleted
       // (migration 004: ON DELETE SET NULL). "" means "no selection".
       setContactId(deal.contact_id ?? "");
@@ -93,7 +93,7 @@ export function DealForm({
     } else {
       setTitle("");
       setValue("");
-      setCurrency("USD");
+      setCurrency("INR");
       setContactId("");
       setStageId(defaultStageId || stages[0]?.id || "");
       setAssignedTo("");
@@ -279,7 +279,7 @@ export function DealForm({
               {linkedConversation && (
                 <Link
                   href="/inbox"
-                  className="mt-1 inline-flex items-center gap-1.5 self-start rounded-md bg-primary/10 px-2 py-1 text-xs text-primary hover:bg-[#0066cc]/20"
+                  className="mt-1 inline-flex items-center gap-1.5 self-start rounded-md bg-primary/10 px-2 py-1 text-xs text-primary hover:bg-primary/20"
                 >
                   <MessageSquare className="h-3 w-3" />
                   Link to Conversation
@@ -291,7 +291,7 @@ export function DealForm({
               <div className="grid gap-2">
                 <Label className="text-muted-foreground">Value</Label>
                 <div className="relative">
-                  <DollarSign className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                  <IndianRupee className="absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     type="number"
                     value={value}
@@ -308,6 +308,7 @@ export function DealForm({
                   onChange={(e) => setCurrency(e.target.value)}
                   className="h-9 w-full rounded-lg border border-border bg-secondary px-2.5 text-sm text-foreground outline-none focus:border-primary"
                 >
+                  <option value="INR">INR</option>
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
                   <option value="GBP">GBP</option>

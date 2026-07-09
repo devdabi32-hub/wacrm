@@ -320,8 +320,8 @@ export function Step3Personalize({
             <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
           )}
         </div>
-        <div className="rounded-lg bg-[#0e1a12] p-3">
-          <div className="ml-auto max-w-[85%] rounded-lg bg-[#0055cc]/30 px-3 py-2 shadow-sm">
+        <div className="rounded-lg bg-muted p-3">
+          <div className="ml-auto max-w-[85%] rounded-lg bg-primary/20 px-3 py-2 shadow-sm">
             <p className="whitespace-pre-wrap text-sm text-foreground-50">
               {previewText}
             </p>

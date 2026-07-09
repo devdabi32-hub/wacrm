@@ -173,7 +173,7 @@ export function BusinessSettingsForm() {
             <Button
               type="submit"
               disabled={saving}
-              className="bg-primary text-foreground hover:bg-[#0066cc] disabled:opacity-50"
+              className="bg-primary text-foreground hover:bg-primary/80 disabled:opacity-50"
             >
               {saving ? (
                 <><Loader2 className="mr-2 size-4 animate-spin" aria-hidden="true" />Saving…</>

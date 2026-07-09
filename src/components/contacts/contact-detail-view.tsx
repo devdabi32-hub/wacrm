@@ -31,7 +31,7 @@ import {
   Trash2,
   Save,
   X,
-  DollarSign,
+  IndianRupee,
 } from 'lucide-react';
 
 interface ContactDetailViewProps {
@@ -632,7 +632,7 @@ export function ContactDetailView({
                       <div key={field.id} className="space-y-1.5">
                         <Label className="text-muted-foreground text-xs capitalize">
                           {field.field_name}
-                          <span className="ml-1.5 text-slate-600 font-normal normal-case">
+                          <span className="ml-1.5 text-muted-foreground font-normal normal-case">
                             ({field.field_type})
                           </span>
                         </Label>
@@ -696,10 +696,10 @@ export function ContactDetailView({
                         </div>
                         <div className="mt-1.5 flex items-center justify-between text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
-                            <DollarSign className="size-3" />
-                            {new Intl.NumberFormat('en-US', {
+                            <IndianRupee className="size-3" />
+                            {new Intl.NumberFormat('en-IN', {
                               style: 'currency',
-                              currency: deal.currency || 'USD',
+                              currency: deal.currency || 'INR',
                               maximumFractionDigits: 0,
                             }).format(Number(deal.value || 0))}
                           </span>

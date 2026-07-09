@@ -86,7 +86,7 @@ const STEP_META: Record<AutomationStepType, StepMeta> = {
   assign_conversation: { label: "Assign Conversation", icon: UserCheck, border: "border-l-primary" },
   update_contact_field: { label: "Update Contact Field", icon: PencilLine, border: "border-l-primary" },
   create_deal: { label: "Create Deal", icon: Briefcase, border: "border-l-primary" },
-  wait: { label: "Wait", icon: Hourglass, border: "border-l-slate-500" },
+  wait: { label: "Wait", icon: Hourglass, border: "border-l-border" },
   condition: { label: "Condition (If/Else)", icon: GitBranch, border: "border-l-amber-500" },
   send_webhook: { label: "Send Webhook", icon: Webhook, border: "border-l-primary" },
   close_conversation: { label: "Close Conversation", icon: CircleSlash, border: "border-l-primary" },
@@ -307,7 +307,7 @@ export function AutomationBuilder({ initial }: { initial: BuilderInitial }) {
 
       {/* Canvas */}
       <div className="relative flex-1 overflow-y-auto">
-        <div className="absolute inset-0 bg-[radial-gradient(circle,#1e293b_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle,var(--border)_1px,transparent_1px)] [background-size:20px_20px] pointer-events-none" />
         <div className="relative mx-auto flex max-w-2xl flex-col items-center gap-0 px-4 py-10">
           <TriggerCard
             type={state.trigger_type}
@@ -614,7 +614,7 @@ function StepRenderer({
             onClick={() => props.setExpandedId(expanded ? null : step.cid)}
             className="flex w-full items-center gap-3 px-4 py-3 text-left"
           >
-            <GripVertical className="h-4 w-4 flex-shrink-0 text-slate-600" aria-hidden />
+            <GripVertical className="h-4 w-4 flex-shrink-0 text-muted-foreground" aria-hidden />
             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-secondary text-muted-foreground">
               <Icon className="h-4 w-4" />
             </div>
@@ -740,7 +740,7 @@ function AddButton({ onPick }: { onPick: (t: AutomationStepType) => void }) {
       <div className="h-4 w-[2px] bg-muted" aria-hidden />
       <DropdownMenu>
         <DropdownMenuTrigger
-          className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-border bg-background text-muted-foreground transition-colors hover:border-primary hover:bg-[#0066cc]/10 hover:text-primary data-[popup-open]:border-primary data-[popup-open]:bg-primary/20 data-[popup-open]:text-primary"
+          className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed border-border bg-background text-muted-foreground transition-colors hover:border-primary hover:bg-primary/80/10 hover:text-primary data-[popup-open]:border-primary data-[popup-open]:bg-primary/20 data-[popup-open]:text-primary"
           aria-label="Add step"
         >
           <Plus className="h-4 w-4" />

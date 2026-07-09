@@ -109,14 +109,14 @@ export default function LoginPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="mt-2 h-10 w-full bg-primary text-foreground hover:bg-[#0066cc] disabled:opacity-50"
+              className="mt-2 h-10 w-full bg-primary text-foreground hover:bg-primary/80 disabled:opacity-50"
             >
               {loading ? "Signing in…" : "Sign in"}
             </Button>
           </form>
         </CardContent>
       </Card>
-      <p className="text-xs text-slate-600">Product by Automation Guru</p>
+      <p className="text-xs text-muted-foreground">Product by Automation Guru</p>
     </div>
   );
 }
