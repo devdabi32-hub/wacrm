@@ -60,4 +60,4 @@ AUTOMATION_CRON_SECRET=generate-a-long-random-string
 
 ## Next step
 
-[Deploy on Hostinger →](./deployment-hostinger.md)
+[Deploy on Vercel →](./deployment-vercel.md)

@@ -17,8 +17,8 @@ These docs walk you from a freshly forked repo to a production deploy.
 
 **Deploy**
 
-5. **[Deploy on Hostinger](./deployment-hostinger.md)** — Managed Node.js
-   Hosting walkthrough, the recommended way to ship the template.
+5. **[Deploy on Vercel](./deployment-vercel.md)** — free Hobby tier, the
+   recommended way to ship the template.
 6. **[Automations cron](./automations-and-cron.md)** — schedule the pending
    executions drain so waits and delays fire.
 
@@ -36,8 +36,7 @@ These docs walk you from a freshly forked repo to a production deploy.
   WhatsApp Business app.
 - A WhatsApp phone number that is **not** already tied to the regular
   WhatsApp or WhatsApp Business mobile apps.
-- A [Hostinger Managed Node.js Hosting](https://www.hostinger.com/web-apps-hosting)
-  plan (or any Node host that runs long-running Node.js 20+ processes).
+- A [Vercel](https://vercel.com) account (free Hobby tier — no card required).
 
 ## Stack at a glance
 
@@ -50,5 +49,4 @@ These docs walk you from a freshly forked repo to a production deploy.
 
 ## Getting help
 
-If something is unclear or broken, open an issue against the source repo:
-<https://github.com/ArnasDon/wacrm/issues>.
+Contact Replora support: `devdabi32@gmail.com`.

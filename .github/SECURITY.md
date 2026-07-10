@@ -10,9 +10,7 @@ lands.
 
 Instead, please report privately via one of:
 
-- [GitHub Security Advisories](https://github.com/ArnasDon/wacrm/security/advisories/new)
-  (preferred — keeps the disclosure, fix, and CVE all in one place).
-- Email: `a.donauskas@hostinger.com` with `[CRM template security]` in the subject.
+- Email: `devdabi32@gmail.com` with `[WaCRM security]` in the subject.
 
 Include, if you can:
 
