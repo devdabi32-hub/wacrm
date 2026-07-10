@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
             </Link>
           </CardContent>
         </Card>
-        <p className="text-xs text-muted-foreground">Product by Automation Guru</p>
+        <p className="text-xs text-muted-foreground">Product by Replora</p>
       </div>
     );
   }
@@ -130,7 +130,7 @@ export default function ForgotPasswordPage() {
           </Link>
         </CardContent>
       </Card>
-      <p className="text-xs text-muted-foreground">Product by Automation Guru</p>
+      <p className="text-xs text-muted-foreground">Product by Replora</p>
     </div>
   );
 }

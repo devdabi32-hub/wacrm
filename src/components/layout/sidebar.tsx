@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Link from "next/link";
+import { SITE_NAME } from "@/lib/seo/site-config";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { cn } from "@/lib/utils";
@@ -115,7 +116,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
               <MessageSquare className="h-4 w-4 text-foreground" />
             </div>
             <span className="text-sm font-semibold text-foreground">
-              Automation Guru
+              {SITE_NAME}
             </span>
           </Link>
           <button
@@ -195,7 +196,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
 
         {/* Watermark */}
         <div className="shrink-0 px-4 py-1.5 text-center">
-          <p className="text-[10px] text-muted-foreground">Product by Automation Guru</p>
+          <p className="text-[10px] text-muted-foreground">Product by {SITE_NAME}</p>
         </div>
 
         {/* User section */}

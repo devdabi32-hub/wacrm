@@ -193,7 +193,7 @@ export default function ResetPasswordPage() {
           )}
         </CardContent>
       </Card>
-      <p className="text-xs text-muted-foreground">Product by Automation Guru</p>
+      <p className="text-xs text-muted-foreground">Product by Replora</p>
     </div>
   );
 }
