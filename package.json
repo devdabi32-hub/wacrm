@@ -34,7 +34,10 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "check:bom": "node scripts/assert-no-bom.mjs",
+    "build:install-sql": "npm run check:bom && node scripts/build-install.mjs",
+    "check:install": "node scripts/check-install-fresh.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",

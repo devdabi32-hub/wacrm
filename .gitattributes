@@ -1,0 +1,4 @@
+# Force LF for SQL so migrations and the generated install.sql stay byte-stable
+# across Windows/macOS/Linux checkouts. Does NOT strip a UTF-8 BOM — that is
+# enforced by scripts/assert-no-bom.mjs (npm run check:bom).
+*.sql text eol=lf
