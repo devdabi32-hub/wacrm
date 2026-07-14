@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- 010_business_settings.sql — Per-client business/payment/support config
 --
 -- Extends whatsapp_config (the per-client config row that already holds

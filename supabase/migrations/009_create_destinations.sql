@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- 009_create_destinations.sql — Destinations (data-driven travel packages)
 --
 -- The catalogue each client manages from the admin UI. The AI engine
