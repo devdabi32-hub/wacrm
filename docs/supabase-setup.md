@@ -31,15 +31,16 @@ idempotent (safe to re-run). The simplest way to apply them:
 ### Option A — SQL Editor (quickest)
 
 1. Open **SQL Editor** in the Supabase dashboard.
-2. For each file in `supabase/migrations/`, in numeric order:
-   - `001_initial_schema.sql`
-   - `002_pipelines_enhancements.sql`
-   - `003_broadcast_recipient_wamid.sql`
-   - `004_contact_delete_set_null.sql`
-   - `005_broadcast_counts_incremental.sql`
-   - `006_automations.sql`
-   - `007_automations_increment_counter.sql`
-3. Paste into the editor and run. Each file prints its own status.
+2. Paste the contents of **`supabase/install.sql`** and run it. This single file is
+   the entire schema — every migration (`001`…`013`) concatenated in numeric order,
+   plus the `uuid-ossp` extension line. It is idempotent (safe to re-run) and needs
+   no existing user.
+3. That's the whole schema in one paste. It runs top-to-bottom and reports its status.
+
+> `install.sql` is **generated** from `supabase/migrations/` via
+> `npm run build:install-sql` — do not hand-edit it. After adding a migration,
+> regenerate it; `npm run check:install` fails in CI if it goes stale, and
+> `npm run check:bom` guards against UTF-8 BOMs that would break the concatenation.
 
 ### Option B — Supabase CLI
 

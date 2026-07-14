@@ -49,6 +49,27 @@ Add **all** of these before clicking Deploy:
 | `NEXT_PUBLIC_SITE_NAME` | `Sunshine Tours CRM` | Client brand name |
 | `AUTOMATION_CRON_SECRET` | `xyz...` | **SECRET** — generate fresh per client (see below) |
 
+> **⚠️ The build FAILS without the two `NEXT_PUBLIC_SUPABASE_*` vars.** They are
+> baked in at **build time**, and `next build` prerenders the auth pages
+> (`/accept-invite`, `/login`, `/forgot-password`, `/reset-password`), each of
+> which creates a Supabase client. If the URL or anon key is missing, the build
+> errors during prerender with:
+>
+> ```
+> @supabase/ssr: Your project's URL and API key are required to create a Supabase client!
+> Export encountered an error on /(auth)/accept-invite/page: /accept-invite, exiting the build.
+> ```
+>
+> Set both **before** deploying, scoped to **Production** (tick Production, not
+> just Preview). This is a config issue, not a code bug — do not "fix" it by
+> forcing those pages dynamic: `NEXT_PUBLIC_*` still bake in at build, so a
+> missing key would just move the same failure to runtime (login breaks in the
+> browser) and ship a silently-broken app.
+>
+> Changed an env var later? Vercel does **not** auto-rebuild, and `NEXT_PUBLIC_*`
+> only bake in at build — trigger a manual **Redeploy** (Deployments → ⋯ →
+> Redeploy).
+
 ### Generate `ENCRYPTION_KEY` and `AUTOMATION_CRON_SECRET`
 
 Run in a terminal (Node.js required):
