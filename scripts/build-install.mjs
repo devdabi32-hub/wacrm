@@ -37,7 +37,7 @@ const HEADER = `-- =============================================================
 -- database schema (tables, indexes, RLS policies, functions, triggers, storage
 -- bucket, realtime) for a single client on a brand-new, empty Supabase project.
 --
--- It is migrations 001..013 concatenated IN EXACT ORDER, verbatim, plus this
+-- It is migrations 001..014 concatenated IN EXACT ORDER, verbatim, plus this
 -- header and the explicit uuid-ossp line below. Nothing was dropped, merged, or
 -- de-duplicated. The duplicate CREATE EXTENSION lines and the repeated policy
 -- names across 001..012 are INTENTIONAL LAYERING: migration 012 deliberately

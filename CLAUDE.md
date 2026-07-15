@@ -144,9 +144,10 @@ WF3 Booking-Confirmation (`field_updated`), WF4 Post-Trip review. No conflict wi
 
 ## 4. LIVE DATABASE SCHEMA (key tables)
 
-> **Important:** live DB ≠ migration files. AI config columns + `ai_paused` were applied directly
-> via SQL Editor, NOT a migration file (actual `008` = `profile_avatars_storage`; there is no
-> `008_ai_engine.sql`). All un-migrated changes must be captured in `seed_tour_travel.sql` (Step 8).
+> **Important:** live DB ≠ migration files. AI config columns + `ai_paused` were ORIGINALLY applied
+> directly via SQL Editor; they are NOW captured in migration `014_ai_config_columns.sql` (folded into
+> `install.sql`), so a fresh client gets an AI-ready schema. Actual `008` = `profile_avatars_storage`
+> (there is no `008_ai_engine.sql`).
 
 **`destinations`** (migration `009`) — per-user, RLS `FOR ALL USING (auth.uid() = user_id)`, `set_updated_at` trigger:
 `id, user_id, name, slug (unique per user — stable handle for AI actions), keywords[] (jsonb, GIN-indexed),
@@ -164,7 +165,7 @@ business (mig 010): `business_name, support_phone, upi_id, payment_qr_url, payme
 **`contact_custom_values`** — composite unique `(contact_id, custom_field_id)`.
 **`automations` / `automation_steps` / `automation_logs` / `automation_pending_executions`** (mig 006).
 
-Migrations applied: `001`–`008` (008 = profile_avatars_storage) · `009` destinations · `010` business_settings · `011` destinations.imported.
+Migrations applied: `001`–`008` (008 = profile_avatars_storage) · `009` destinations · `010` business_settings · `011` destinations.imported · `012` workspace_members · `013` workspace_members.invited_name · `014` ai_config_columns. Full schema concatenated in `supabase/install.sql` (regenerate via `npm run build:install-sql`; never hand-edit).
 
 ### Tour & Travel CRM data (live)
 - **9 custom fields:** `tour_interest`, `travel_dates`, `group_size`, `budget_range`,
@@ -249,7 +250,7 @@ uses UTC (apparent cron delays = UTC vs IST).
 ### Done ✅
 - Repo forked, running, login working; branding → Replora `#0084ff`.
 - Meta Cloud API connected (permanent token, phone_number_id); production deployed `devdabi.shop`.
-- Custom fields (9), 6 pipeline stages, 5 tags, UptimeRobot cron.
+- Custom fields (8 — live DB; doc previously said 9, `quoted_price` was never created), 6 pipeline stages, 5 tags, UptimeRobot cron.
 - **AI brain Steps 1–5 COMPLETE + live-tested** (all 5 intents passed on real WhatsApp 16 June):
   `hi`→menu, `manali`→poster+itinerary, `confirm`→payment, off-script→reply, `talk to agent`→handoff.
 - `send_media` engine action (image/document by hosted link).
@@ -260,21 +261,25 @@ uses UTC (apparent cron delays = UTC vs IST).
   Activate), CSV/XLSX import via SheetJS (`cdn.sheetjs.com` build — NOT npm `xlsx@0.18.5` which has
   unpatched high-severity CVEs), `imported` badge (mig 011), `slugify`/`uniqueSlug`/`toStringArray`
   in `src/lib/destinations/utils.ts`. Stale-state bugs fixed (`force-dynamic` + `no-store`).
+- **Step 7 COMPLETE** — Settings page with Business tab (`components/settings/business-settings-form.tsx`:
+  business_name / support_phone / UPI / payment QR / note) + Inbox "Resume AI / Take Over" button
+  (`components/inbox/message-thread.tsx`, `ai_paused` toggle). The zero-code-delivery enabler.
+- **AI config columns migrated** — `014_ai_config_columns.sql` back-fills the AI + `ai_paused` columns
+  that were previously SQL-Editor-only, so `install.sql` now provisions an AI-ready schema for fresh clients.
+- **Step 8 COMPLETE — `seed_tour_travel.sql`** — 8 custom fields, 5 tags, pipeline + 6 stages;
+  idempotent (`INSERT … WHERE NOT EXISTS`), `CLIENT_USER_ID` placeholder, zero hardcoded UUIDs.
+  Destinations + business/AI config values intentionally EXCLUDED (per-client, filled via UI). WF3
+  automation deferred. Live-tested against master DB (idempotent + fresh-path both verified).
 
 ### Pending ⏳ (priority order)
-1. **Step 7 (remaining)** — Settings page (business_name / support_phone / UPI / payment QR) +
-   Inbox "Resume AI / Take Over" button (`ai_paused` toggle). The zero-code-delivery enabler.
-2. **Keyword-filter gap** — `buildCatalogueContext` injects ALL active destinations every turn;
+1. **Keyword-filter gap** — `buildCatalogueContext` injects ALL active destinations every turn;
    add keyword-match filter against the GIN-indexed `keywords` column before it scales.
-3. **Step 8 — `seed_tour_travel.sql`** — captures destinations (+ `imported`) + business cols + AI cols
-   + custom fields + pipeline + tags, all with `CLIENT_USER_ID` placeholder, name-based lookups,
-   zero hardcoded UUIDs. (Finalise LAST so all features are captured.)
-4. **Payment verification** — Razorpay/Cashfree link + webhook → booking_status=Confirmed → re-enable WF3.
-5. **Polish** — poster+itinerary as one message (fix ordering); prompt-tuning (no over-promising;
+2. **Payment verification** — Razorpay/Cashfree link + webhook → booking_status=Confirmed → re-enable WF3.
+3. **Polish** — poster+itinerary as one message (fix ordering); prompt-tuning (no over-promising;
    graceful "I've paid"); set real support_phone.
-6. **Resell hardening** — `site-config.ts` env-driven; hide landing/signup for client deploys.
-7. **WF4 Post-Trip review;** WF3 `send_message` → `send_template` after Meta approval.
-8. **Step 6 single-reply suppression** — largely MOOT (AI is sole inbound handler); optional safety net.
+4. **Resell hardening** — `site-config.ts` env-driven; hide landing/signup for client deploys.
+5. **WF4 Post-Trip review;** WF3 `send_message` → `send_template` after Meta approval.
+6. **Step 6 single-reply suppression** — largely MOOT (AI is sole inbound handler); optional safety net.
 
 ---
 
