@@ -564,10 +564,10 @@ function AIEngineTab() {
                 <textarea
                   rows={4}
                   value={systemPrompt}
-                  onChange={(e) => setSystemPrompt(e.target.value.slice(0, 1000))}
+                  onChange={(e) => setSystemPrompt(e.target.value)}
                   className={inputCls + " h-auto resize-none py-2.5"}
                 />
-                <div className="mt-1 text-right text-xs text-muted-foreground">{systemPrompt.length} / 1000</div>
+                <div className="mt-1 text-right text-xs text-muted-foreground">{systemPrompt.length} characters</div>
               </div>
             </>
           )}
