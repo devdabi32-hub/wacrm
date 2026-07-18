@@ -332,6 +332,7 @@ interface DestinationRow {
     slug: string
     keywords: string[] | null
     summary: string | null
+    description: string | null
     highlights: string[] | null
     departures: string[] | null
     poster_url: string | null
@@ -433,8 +434,44 @@ async function actionSendDestination(ctx: ActionContext, ref?: string): Promise<
         return
     }
 
-    const dur = dest.nights && dest.days ? ` ${dest.nights}N/${dest.days}D` : ''
+    // Build the complete destination message, data-driven from the catalogue.
+    // Order: heading (name · duration · price) → summary → itinerary →
+    // description → departures → CTA. Highlights are intentionally held back —
+    // they go into the AI's catalogue context and are shared only when a
+    // customer asks for more detail (buildCatalogueContext).
+    const dur = dest.nights && dest.days ? ` · ${dest.nights}N/${dest.days}D` : ''
+    const price = dest.price_from
+        ? ` · from ${!dest.currency || dest.currency === 'INR' ? '₹' : dest.currency + ' '}${Number(dest.price_from).toLocaleString('en-IN')}`
+        : ''
+
+    const lines: string[] = [`*${dest.name}*${dur}${price}`]
+    if (dest.summary) lines.push(dest.summary)
+    lines.push('')
+    if (dest.itinerary_url) lines.push(`👉 Itinerary: ${dest.itinerary_url}`)
+    if (dest.description) lines.push(dest.description)
+    if (dest.departures && dest.departures.length) {
+        lines.push(`📅 Departures: ${dest.departures.join(', ')}`)
+    }
+    lines.push('')
+    lines.push('Reply *confirm* to book ✅')
+    const body = lines.join('\n')
+
+    const sendBodyText = () =>
+        engineSendText({
+            userId: ctx.userId,
+            conversationId: ctx.conversationId,
+            contactId: ctx.contactId,
+            text: body,
+        })
+
+    // WhatsApp image captions cap at 1024 chars. Common case: the whole body
+    // rides as the poster caption = one complete message bubble. If it would
+    // overflow (long description), send the poster with a short caption and the
+    // full body as an immediate follow-up text so nothing is dropped and the
+    // send never fails.
+    const CAPTION_LIMIT = 1000
     if (dest.poster_url) {
+        const fitsInCaption = body.length <= CAPTION_LIMIT
         try {
             await engineSendMedia({
                 userId: ctx.userId,
@@ -442,23 +479,19 @@ async function actionSendDestination(ctx: ActionContext, ref?: string): Promise<
                 contactId: ctx.contactId,
                 mediaType: 'image',
                 link: dest.poster_url,
-                caption: `${dest.name}${dur} 🏔️`,
+                caption: fitsInCaption ? body : `*${dest.name}*${dur}${price}`,
             })
         } catch (err) {
             console.error('[ai-engine] poster send failed:', err)
+            // Poster failed — still deliver the full details as text.
+            await sendBodyText()
+            return
         }
+        if (!fitsInCaption) await sendBodyText()
+    } else {
+        // No poster on file — send the details as text.
+        await sendBodyText()
     }
-
-    const parts: string[] = [`*${dest.name}*${dur}`]
-    if (dest.highlights && dest.highlights.length) parts.push(`✨ ${dest.highlights.join(' · ')}`)
-    if (dest.itinerary_url) parts.push(`\n👉 Full itinerary: ${dest.itinerary_url}`)
-    parts.push(`\nReply *confirm* to book ✅`)
-    await engineSendText({
-        userId: ctx.userId,
-        conversationId: ctx.conversationId,
-        contactId: ctx.contactId,
-        text: parts.join('\n'),
-    })
 }
 
 async function actionSendPayment(ctx: ActionContext, ref?: string): Promise<void> {
@@ -569,7 +602,7 @@ async function dispatchAIAction(ctx: ActionContext, action: AIAction): Promise<v
 async function buildCatalogueContext(userId: string, cfg: ActionCfg): Promise<string> {
     const { data } = await supabaseAdmin()
         .from('destinations')
-        .select('name, slug, summary, price_from, currency, nights, days')
+        .select('name, slug, summary, price_from, currency, nights, days, highlights')
         .eq('user_id', userId)
         .eq('active', true)
         .order('sort_order', { ascending: true })
@@ -591,7 +624,13 @@ async function buildCatalogueContext(userId: string, cfg: ActionCfg): Promise<st
             const price = d.price_from ? `from ${d.currency || 'INR'} ${d.price_from}` : ''
             const meta = [dur, price, d.summary].filter(Boolean).join(' · ')
             lines.push(`- slug:"${d.slug}" name:"${d.name}"${meta ? ' — ' + meta : ''}`)
+            if (d.highlights && d.highlights.length) {
+                lines.push(`    highlights: ${d.highlights.join(', ')}`)
+            }
         }
+        lines.push(
+            'The send_destination action already sends the poster, itinerary, description and departure dates. Share a destination\'s highlights (listed above) ONLY when the customer asks for more detail — never dump them unprompted.',
+        )
         lines.push(
             'If a customer asks about a destination NOT listed above, tell them it is not currently available and use the send_menu action.',
         )
