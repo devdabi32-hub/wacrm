@@ -76,6 +76,12 @@ const DEFAULT_MODELS: Record<string, string> = {
 const DEFAULT_SYSTEM_PROMPT =
     'You are a helpful WhatsApp assistant for a Tour & Travel company. Keep replies short, clear, and friendly. Maximum 2-3 sentences. Always reply in the same language the customer uses.'
 
+// How many past messages the AI keeps in context each turn (customer + bot +
+// human-agent replies). Bumped 5 → 15 so the assistant remembers more of the
+// conversation. 15 short WhatsApp turns ≈ 1-2k tokens, well within every
+// provider's context window.
+const HISTORY_LIMIT = 15
+
 // ─────────────────────────────────────────────
 // OOO helper — mirrors Replora's isInOOOWindow()
 // ─────────────────────────────────────────────
@@ -103,14 +109,14 @@ function isInOOOWindow(start: string, end: string): boolean {
 async function getConversationHistory(
     conversationId: string,
     currentMessageId?: string,
-    limit = 5
+    limit = HISTORY_LIMIT
 ): Promise<ChatMessage[]> {
     const db = supabaseAdmin()
     let query = db
         .from('messages')
         .select('message_id, content_text, sender_type')
         .eq('conversation_id', conversationId)
-        .in('sender_type', ['customer', 'bot'])
+        .in('sender_type', ['customer', 'bot', 'agent'])
         .order('created_at', { ascending: false })
         .limit(limit + 1) // fetch one extra in case we filter out current
 
@@ -129,7 +135,8 @@ async function getConversationHistory(
         .slice(0, limit)
         .reverse()
         .map((msg) => ({
-            role: msg.sender_type === 'bot' ? 'assistant' : 'user',
+            // bot + human agent are both "our side" → assistant; customer → user
+            role: msg.sender_type === 'customer' ? 'user' : 'assistant',
             content: msg.content_text || '',
         }))
 }
@@ -774,7 +781,7 @@ export async function runAIReply(input: AIReplyInput): Promise<void> {
         const finalSystemPrompt = `${systemPrompt}\n\n${catalogue}\n\n${RESPONSE_FORMAT_INSTRUCTION}`
 
         // Fetch conversation history for context (excludes current message)
-        const history = await getConversationHistory(conversationId, currentMessageId, 5)
+        const history = await getConversationHistory(conversationId, currentMessageId, HISTORY_LIMIT)
         console.log(`[ai-engine] History: ${history.length} messages, provider: ${provider}`)
 
         // Call LLM (returns raw text; will be JSON per the response-format contract)
